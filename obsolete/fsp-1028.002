@@ -1,0 +1,284 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FSP-1028
+Revision:       2
+Title:          FTN Address Format
+Author:         Stas Degteff
+Issue Date:     04 Feb 2004
+Review Date:    04 Feb 2005
+----------------------------------------------------------------------
+Contents:
+                1. FTN Address Format
+                2. Requirements To The Address Components
+                3. Special FTN Addresses
+                A. References
+                B. Glossary
+                C. Acknowledgements
+                D. The Author Contact Information
+                E. History
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Standard Proposal (FSP).
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+----------------------------------------------------------------------
+
+Abstract
+--------
+
+  This document describes a format of addresses used in any
+  Fidonet Technology Network such as FIDONET.
+
+----------------------------------------------------------------------
+
+Definitions
+-----------
+
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in FTA-1006 revision 2.
+
+  Other terms may be found in the Glossary at the end of this document
+  and other FTSC documents.
+
+
+1. FTN Address Format
+---------------------
+
+  A FTN address MUST be specified in the following form:
+
+       [zone:]network/node[.point][@domain]
+
+  where:
+       zone     The zone number. This field is RECOMMENDED.
+       network  The network or region number. This field is REQUIRED.
+       node     The node number. This field is REQUIRED.
+       point    The point number. This field is REQUIRED for points
+                and is OPTIONAL for nodes.
+       domain   The FTN domain name. This field is OPTIONAL.
+
+  Any node has zero as a point number. Addresses like
+  "zone:network/node" and "zone:network/node.0" are identical.
+
+  An address like "network/node" is named a "2D address".
+  An address like "zone:network/node" is named a "3D address".
+  An address like "zone:network/node.point" is named a "4D address".
+  An address like "zone:network/node.point@domain" is named a
+  "5D address".
+  A node address like "zone:network/node@domain" is also named a "5D
+  address".
+
+  At processing time any optional address component MUST be
+  substituted with corresponding value for this node.
+
+  2D, 3D or 4D form of FTN address MAY be used only for the internal
+  network connections. An example: node 1:12/34@fidonet may use 2D, 3D
+  or 4D address form to communicate with the node 1:56/78@fidonet and
+  it should use 3D or 4D address to communicate with the node
+  3:456/789@fidonet.
+
+
+  FTN Addresses Examples
+  ----------------------
+
+  A 2D FTN address example:  10/12
+  A 3D FTN address examples:  1:10/12, 2:50/-1
+  A 4D FTN address examples:  1:10/12.0, 2:10/12.12
+  A 5D FTN address examples:  2:50/207.1@fidonet, 13:1/7@bbsnet
+
+
+2. Requirements To The Address Components
+-----------------------------------------
+
+  The Zone Number
+  ---------------
+
+  The zone number MUST be an integer number in the range from 1 to
+  32767.   Implementations note: use a 16 bit integer. See also
+  [FTS-0001.016].
+
+
+  The Network Number
+  ------------------
+
+  The network number MUST be an integer number in the range from 1 to
+  32767. Implementations note: use a 16 bit integer.
+
+
+  The Node Number
+  ---------------
+
+  The node number MUST be an integer number in the range from -1 to
+  32767. Implementations note: use a 16 bit integer.
+
+
+  The Point Number
+  ---------------
+
+  The point number MUST be an integer number in the range from -1 to
+  32767. Implementations note: use a 16 bit integer.
+
+
+  The Domain Name
+  ---------------
+
+  The domain name MUST be a character string not more than 8
+  characters long and MUST include only characters as defined below in
+  BNF. Any other character cannot be used in a domain name.
+
+      domain   = *pchar
+      pchar    = alphaLC | digit | safe
+      alphaLC  = "a" | "b" | ... | "z"
+      digit    = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" |
+                 "8" | "9"
+      safe     = '-' | '_' | '~'
+
+
+3. Special FTN Addresses
+------------------------
+
+  Some addresses are used for special purposes. These are "technical"
+  addresses (addresses of zonegates and internetwork gates, zone and
+  region coordinators, network hosts, node candidate's addresses).
+
+
+  A Coordinator's Addresses
+  -------------------------
+
+  A Zone Coordinator has a technical address like "zone:zone/0@domain".
+  This address may be shortened to a 3D form or a 2D form (the 2D form
+  is NOT RECOMMENDED). An example:
+
+       2:2/0@fidonet
+
+  A Regional Coordinator has a address like "zone:region/0@domain".
+  This address may be shortened to a 3D form. An example:
+
+       2:50/0@fidonet
+
+
+  A Host Address
+  --------------
+
+  A Network Host has the address like "zone:network/0@domain", where
+  the "network" is a network number. This address may be shortened to
+  a 3D form. An example:
+
+       2:5080/0@fidonet
+
+
+  A Zonegate Address
+  ------------------
+
+  Usually the mail between zones is sent via special nodes. These
+  nodes are named "zonegates". A zonegate technical address is
+  assigned in such a way that its network number is set to the zone
+  number of its own and its node address is set to the zone number of
+  its communication partner. Here are two examples:
+
+       2:2/1   the zonegate from zone 2 to zone 1
+       1:1/2   the zonegate from zone 1 to zone 2
+
+
+  A Node Candidate's Address
+  --------------------------
+
+  A node candidate MAY send a node request to a network or a region
+  coordinator from an address like "zone:network/-1@domain" where
+  "network" is a network or region number correspondingly. (See
+  [POLICY4]).
+  An example:
+
+       2:22/-1@fidonet
+
+  Address like this is not supported with many modern FTN software and
+  it is obsoleted but it is specified in the Fidonet Policy v. 4.07
+  ([POLICY4]).
+
+
+A. References
+-------------
+
+  [POLICY4]
+       A FidoNet Policy Document Version 4.07.
+
+  [FTS-0001.016]
+       A Basic FidoNet(r) Technical Standard Revision 16. Randy Bush,
+       Pacific Systems Group. September 30, 1995.
+
+  [FTS-5000.001]
+       The Distribution Nodelist. Colin Turner, Andreas Klein, Michael
+       McCabe, David Hallford, Odinn Sorensen. 27 June 1999.
+
+
+B. Glossary
+-----------
+
+  FTN
+  FTN compatible network
+       A data exchange network built on standards and technologies of
+       the FIDONET.
+
+  Domain
+  FTN domain
+       The largest FTN structure unit that unites all the nodes of
+       some FTN.
+
+  Network
+  FTN network
+       A FTN network structure unit that usually unites the nodes of
+       one area of a country. A FTN network is a part of a FTN region.
+
+  Node
+  FTN node
+       The main FTN network structure unit. A FTN node is a part of a
+       FTN network or a FTN region.
+
+  Region
+  FTN region
+       A FTN network structure unit that usually unites the nodes of
+       one country or several neighbouring countries or large
+       territory of big country. A FTN region is a part of a FTN zone.
+
+  Zone
+  FTN zone
+       A second (after domain) FTN structure unit. A FTN zone is a
+       part of the FTN domain. A zone usually unites nodes on one
+       mainland.
+
+
+C. Acknowledgements
+-------------------
+
+  The following person were helpful:
+
+  Michael Dukelsky (<dukelsky@aha.ru>, 2:5020/1042@fidonet)
+
+  The following persons have voiced valuable remarks:
+
+  Igor Romanovsky  (2:5022/60@fidonet)
+  Gisbert Rudolph  (2:2443/2161@fidonet)
+  Jame Clay (1:120/546@fidonet)
+  Aleksej R. Serdyukov (2:5020/1042.42@fidonet)
+  Michiel Broek (2:280/28)
+  Hiro Dudani (2:244/1512)
+
+
+D. The Author Contact Information
+---------------------------------
+
+  Stas Degteff 2:5080/102@fidonet, <g@grumbler.org>
+
+
+E. History
+----------
+
+  20031103: First public draft.
+  20040204: First public release.
