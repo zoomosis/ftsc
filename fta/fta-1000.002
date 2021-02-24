@@ -1,0 +1,105 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTA-1000
+Revision:       2
+Title:          FTSC Charter
+Author:         Administrator
+Revision Date:  29 December 1997
+Expiry Date:    Permanent Document
+----------------------------------------------------------------------
+Contents:
+                1. Mission
+                2. Structure
+                3. Access
+----------------------------------------------------------------------
+
+
+1. Mission
+----------
+
+  The Fidonet Technical Standards Committee (FTSC) is responsible for
+  providing a thorough technical definition of FidoNet and its
+  protocols sufficient to maintain it as a compatible electronic mail
+  system, specifically by:
+
+  1. Documenting current practice in technical standards.
+  2. Encouraging new technologies in Fidonet software development.
+  3. Reassessing and revising FTS documents regularly.
+  4. Being publicly accessible to Fidonet sysops.
+  5. Distributing Technical Standards and Proposals.
+  6. Providing FTS document interpretations on software compatibility.
+
+  The FTSC shall maintain a publication which documents only the
+  minimum acceptable protocol for a Fidonet node to receive mail as
+  referred to in the current FidoNet Policy Document (Policy 4.07 at
+  this writing) The FTSC shall not take upon itself any right to
+  increase or decrease this requirement without express direction to
+  do so from the International Coordinator (IC).
+
+
+2. Structure
+------------
+
+  2.1 Organization
+  ----------------
+
+  1. All members are Fidonet nodes in good standing.
+  2. Membership consists of no less than 7 and no more than 30.
+  3. Standing members are appointed Fidonet-wide as detailed in
+     FTA-1001 (FTSC Operations).
+  4. An Administrator is selected by the FTSC standing members.
+  5. Working Group Leaders are appointed by the Administrator.
+  6. A freely-available list of members and Working Groups is
+     maintained.
+
+
+  2.2 FTSC Administrator
+  ----------------------
+
+  Appointed for a specific term, and responsible for coordinating the
+  activities of the Working Groups and for the smooth operation of the
+  FTSC as detailed in FTA-1001 (FTSC Operations).
+
+
+  2.3 Standing Members
+  --------------------
+
+  Appointed for a specific term to advise and assist the Administrator
+  in directing the technical focus of the FTSC.
+
+
+  2.4 Working Groups
+  ------------------
+
+  Formed to develop and update standards. Both standing and short-term
+  Working Groups may be formed.
+
+
+  2.5 Working Group Leader
+  ------------------------
+
+  Responsible for forming an assigned Working Group and ensuring that
+  its work is completed in a timely manner. Working Groups, and their
+  assigned areas of expertise are detailed in FTA-1001 (FTSC
+  Operations).
+
+
+3. Access
+---------
+
+  A file distribution echo, and public and private echomail
+  conferences are maintained, along with conferences for the various
+  Working Groups, as detailed in FTA-1001 (FTSC Operations).
+
+
+A. History
+----------
+
+  Rev.1, 19971009: First non-draft release. Author Adrian Walker.
+  Rev.2, 19971229: Reformatted slightly. Author changed to
+                   Administrator. Revision number added.
+
+
+****************************************************************************
