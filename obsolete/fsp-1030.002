@@ -1,0 +1,183 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FSP-1030
+Revision:       2
+Title:          Unicode character set in FidoNet messages
+Author:         Aleksej R. Serdyukov, 2:5020/24000
+Revision Date:  15 November 2005
+Expiry Date:    15 November 2007
+
+
+----------------------------------------------------------------------
+Contents:
+
+  1. CHRS kludge internationalization levels
+  2. Used kludges
+  3. Technical fields
+  4. Short information on Unicode
+  A. References
+  B. History
+
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Standards Proposal (FSP).
+
+  This document specifies an optional Fidonet standard protocol for
+  the Fidonet community, and requests discussion and suggestions for
+  improvements.
+
+  This document is released to the public domain, and may be used,
+  copied or modified without restriction.
+
+
+Abstract
+--------
+
+  This document specifies the usage of Unicode Consortium character
+  set in FidoNet messages and the levels of ^ACHRS.
+
+
+Introduction
+------------
+
+  In common life, Fidonet uses only eight-bit character sets.
+  Sometimes there is a need to transmit special characters which are
+  not binary and don't fit into the codepage being used. Then some
+  people use something like TeX, or create new transliteration
+  schemes, but it is not known to software and readers have to interpret
+  them  manually, while the schemes are often not even intended to be
+  standard.
+  As Unicode became a world standard and there are FTN editors that
+  require almost nothing to support it, it can be possible to use it
+  in messages.
+
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+  in this document are to be interpreted as described in FTA-1006.
+
+
+1. CHRS kludge
+--------------
+
+  First, read FSP-1013, and, maybe, for historical purposes, FSC-0054.
+
+  Known CHRS internationalization levels are Level 1 and Level 2.
+
+  Level 1 is for 7-bit character sets.
+
+  Level 2 is for ASCII-compatible 8-bit character sets.
+
+  I didn't see any usage of Level 3 and 4, so I propose its details.
+
+
+  Level 3
+  -------
+
+  Constant character-length character sets those are either not
+  ASCII-compatible or with more than 8-bit for each character.
+
+  This suits for UTF-16 and UTF-32 definitions, but these encodings
+  cannot be used with the current packet format.
+
+
+  Level 4
+  -------
+
+  Variable character-length character sets like UTF-8.
+
+  UTF-8 is ASCII-compatible. You may choose a higher level for
+  variable character-length, non-ASCII-compatible character sets.
+
+
+2. Used kludges
+---------------
+
+  UTF-8 must be identified in CHRS as "UTF-8 4".
+
+  Some editors use "CHRS: IBMPC 2" and specify the actual charset in
+  the CHARSET kludge. Such behaviour is unwanted and MUST NOT be used
+  with UTF-8.
+
+  A kludge like ^AUCS may be used to define what features of Unicode
+  standard could be used in the message. It has no much weight with
+  UTF-8 and is left to the implementors.
+
+
+3. Technical fields
+-------------------
+
+  As From, To, and Subject fields have strictly limited lengths, usage
+  of UTF-8 in them can be very uncomfortable, because it can shorten
+  the fields up to four times.
+  Other issues are also possible, like the one that some software may
+  have less advanced processing methods for the fields than for the
+  body.
+
+  To solve the problem, ^AUCSFROM:, ^AUCSTO:, ^AUCSSUBJ: kludges may be
+  used. The kludges are optional, and software may manage them as its
+  author wishes.
+  If the kludges are used, the replaced fields themselve MUST NOT be
+  left empty. Message reading software may show the substitute fields'
+  contents instead of the real fields', but it must fill the real
+  fields when answering a message, regardless of what it does with
+  the substitute fields. Still, the real fields must be in UTF-8.
+
+  Tearline and origin certainly do not need any additional lines to be
+  added to the message and are left to the implementor.
+
+
+4. Short information on Unicode
+-------------------------------
+
+  The UTF-16, the default Unicode state, is easy to understand. It is
+  like any other encoding, but each character takes two bytes. As it
+  doesn't avoid the usage of control characters, it can't be used with
+  the current packet standard with its zero-ending message body.
+
+  UTF-8 avoids control characters in text, but requires special
+  implementation.
+  The first level of it is direct bit-based translation of 2-byte
+  UTF-16 to UTF-8 using a simple table, allowing representation of
+  the first 63486 of the Unicode characters.
+  The next level is surrogates to represent other 1048544.
+  The level used may be specified in the UCS kludge to show, for
+  example, if loading of the additional characters (as a font) is
+  required.
+
+  For further information, refer to the Unicode Standard.
+
+
+A. References
+-------------
+
+  FTA-1006.002
+    Key words to indicate requirement levels
+    Author: Administrator
+    Date  : 1998.01.17
+
+  FSC-0054.004
+    The CHARSET Proposal
+    Author: Duncan McNutt
+    Date  : 1991.05.27
+
+  FSP-1013.001
+    Character set definition in Fidonet messages
+    Author: Peter Karlsson
+    Date  : 1999.09.04
+
+  The Unicode Standard
+    Author: The Unicode Consortium
+    URL   : www.unicode.org
+
+
+B. History
+----------
+
+  Rev.1, 20031117: First release as FSP
+  Rev.2.Draft1, 20050629:
+  Rev.2.Draft3, 20051016: grammar corrections
