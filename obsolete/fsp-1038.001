@@ -1,0 +1,119 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FSP-1038
+Revision:       1
+Title:          The INO4 flag.
+Author(s):      Michiel van der Vlist
+Date:           3 November 2013
+----------------------------------------------------------------------
+Contents:
+                1. Introduction.
+                2. The problem.
+                3. The solution.
+----------------------------------------------------------------------
+
+1. Introduction
+---------------
+
+  The InterNet is running out of addresses. To solve this problem
+  it is slowly migrating from 32 bit addresses (IPv4) to 128 bit
+  addresses (IPv6).
+
+  The conversion is largely transparent for the user. When querying
+  the DNS system to resolve a host name, an IPv6 capable system
+  initiating a connection will look if an AAAA record is present
+  and use the IPv6 address if that is the case. If not, it will use
+  the IPv4 address. There is no need for a nodelist flag to signal
+  IPv6 capability, the lower layers will handle it transparently.
+
+
+2. The Problem
+--------------
+
+  Presently all IPv6 capable nodes in the nodelist also support
+  connectivity over IPv4. So there is downward compatibility. At
+  present IPv4 only nodes have no problems connecting to IPv6 capable
+  nodes, they just connect via IPv4.
+
+  We can however not expect that situation to last forever. While the
+  number of IPv6 capable nodes grows, IPv4 connectivity will eventu-
+  ally degrade.
+
+  Some day there will be nodes that no longer accept incoming connec-
+  tions over IPv4. At best they will be behind a GGNAT or Carrier
+  Grade NAT. That is a NAT operated by their ISP, so they will have no
+  control over the port forwarding tables. At worst they will have no
+  IPv4 at all. Either way, these nodes will not be reachable by nodes
+  that do not have IPv6 capability.
+
+  Attempts to connect will fail and most mailers will just repeat
+  the attempt at regular intervals until the sysop intervenes. At
+  present there is no way to predict such a failure beforehand.
+
+  To avoid this undesirable situation I propose a flag that indicates
+  that an otherwise IP capable node does not support incoming connec-
+  tions over IPv4.
+
+
+3. The INO4 flag
+----------------
+
+  INO4       Indicates that an otherwise IP capable node is unable to
+             accept incoming connections over IPv4.
+
+
+4. Considerations
+-----------------
+
+  Although NOIPV4 would be more clear, it goes against the custom that
+  all IP related flags start wit the letter 'I'. It is also needlessly
+  long.
+  Someone suggested to use IPV6 with the definition of "IPv6 only".
+  This is bound to be misunderstood as other capability flags have
+  always meant "in addition of". V34 means an additional V34 capabi-
+  lity, not "V34 only". X75 does not mean "X75 only". Using IPV6 with
+  a definition of "IPv6 only" will raise confusion and hence improper
+  use .
+
+  Note that in the very long run as IPv4 gradually fades out, we may
+  reach a situation where most of the IP capable nodes in the nodelist
+  will carry this flag. If and when this happens, the Fidonet communi-
+  ty may consider dropping this flag and marking the minority that
+  still accepts incoming connections over IPv4 with an IPV4 flag.
+
+
+References
+----------
+
+  [FTS-5]    "The distribution nodelist", Ben Baker, Rick Moore.
+             February 1989. Obsoleted by FTS-5000.
+
+  [FTS-5000] "The distribution nodelist".
+             FTSC Members, Administrator and Honoured Guests
+             Dec 2012.
+
+  [FTS-5001] "Nodelist flags and userflags".
+             FTSC Members, Administrator and Honoured Guests
+             March 2013.
+
+
+Contact Data
+------------
+
+  Michiel van der Vlist
+  Fidonet:  2:280/5555
+  E-mail:   pa0mmv at vrza dot org
+  E-mail:   administrator at ftsc dot org
+
+History
+-------
+
+   Rev.1, 20131103: Initial Release.
+                    Principal author Michiel van der Vlist.
+
+**********************************************************************
+
+
+
