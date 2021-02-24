@@ -1,0 +1,133 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FSP-1025
+Revision:       1
+Title:          IPv6 colon substitution in the nodelist. 
+Author(s):      Michiel van der Vlist
+
+Revision Date:  8 September 2003
+Review Date:    8 September 2005
+----------------------------------------------------------------------
+Contents:
+                1. Introduction.
+                2. The problem.
+                3. The solution.
+                4. The standard.
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Standards Proposal (FSP).
+
+  This document proposes a Fidonet standard for the Fidonet
+  community.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+1. Introduction
+---------------
+
+  In addition to the classic modem connection over telephone lines
+  FidoNet increasingly makes use of the InterNet for its links.
+  This means InterNet contact information needs to be in the nodelist.
+  Up to now, this has been in the form of IP quads and fqdn's. (Fully
+  Qualified  Domain Names). 
+  In the future the need to have IPv6 addresses in the nodelist may
+  very well arise.
+
+  There is problem however.
+
+
+2. The Problem
+--------------
+
+  The format of an IPv6 address is:
+
+    Eight hexadecimal values in the range 0-FFFF separated by a colon.
+    One or more successive zero values may once be represented by
+    two successive colons. F.e. 1234::6789:abcd expands to
+    1234:0:0:0:0:0:6789:abcd.
+
+  The problem is that the colon is already in use to separate a nodelist
+  flag from its parameter(s), that some flags may carry a variable number
+  of parameters and that the colon is also used to separate parameters
+  from each other.
+  F.e. a flag carrying both an fqdn and a port number:
+
+    FLAG:fido.ddutch.nl:1234
+
+  Having the same character for separating parameters as for separating
+  individual items within a multidimensional parameter creates a parsing
+  problem.
+
+  Does 1234::6789:abcd:5678 resolve to address 1234:0:0:0:0:0:6789:abcd
+  with a port number of 5678 or does it resolve to just an address of
+  1234:0:0:0:0:6789:abcd:5678 and no port number specified?
+
+
+3. The Solution
+---------------
+
+  The solution is obvious: the colons in IPv6 are to be substituted
+  by something else. The choice of what character to use is however 
+  less obvious. About half a dozen characters are equally suitable.
+  This will lead to different developers making different choices.
+
+  Setting an early standard will avoid that.
+
+
+4. The standard
+---------------
+
+  Whenever an IPv6 address is to appear as a parameter in the
+  nodelist the colons in the address shall be replaced by a
+  hash character ( # ), hex 23. 
+
+  The colon separating the address from another parameter such as a
+  port number shall remain as is.
+
+  Example: 1234##6789#abcd:5678
+
+
+References
+----------
+
+  [FTS-5]    "The distribution nodelist", Ben Baker, Rick Moore.
+             February 1989. Obsoleted by FTS-5000.
+
+  [FTS-5000] "The distribution nodelist". Colin Turner, Andreas Klein,
+             Michael McCabe, David Hallford, Odinn Sorensen.
+             June 1999.
+
+  [FTS-5001] "Nodelist flags and userflags". Colin Turner,
+             Andreas Klein, Michael McCabe, David Hallford,
+             Odinn Sorensen.
+             June 1999.
+
+  [RFC1883]  S. Deering, R. Hinden. Internet Protocol, version 6 (IPv6)
+             Dec 1995
+
+  [RFC1884]  S. Deering, R. Hinden. IP Version 6 Addressing Architecture.
+             Dec 1995
+ 
+
+Contact Data
+------------
+
+  Michiel van der Vlist
+  Fidonet:  2:280/5555
+  E-mail:   pa0mmv@vrza.org
+
+
+History
+-------
+
+   Rev.1, 20030908: Initial Release.
+                    Principal author Michiel van der Vlist.
+
+**********************************************************************
