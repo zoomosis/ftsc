@@ -49,7 +49,7 @@ Date:     21-Jul-95
             4.6. Tear Line and Origin Line .................................5
        5. Guidelines for Use ...............................................5
             5.1. Direct RTF Mail ...........................................5
-                    5.1.1. RTF Capability On the Receiving System...........5
+                    5.1.1. RTF Capability On the Receiving System...........5
 
                                                   RTF Mail Proposal    page 2
 
@@ -85,7 +85,7 @@ Date:     21-Jul-95
             8.1. ANSI to IBM PC Codepage 437 and Macintosh ................11
             8.2. IBM PC Codepage 437 to ANSI ..............................15
             8.3. IBM PC Codepage 437 to ANSI ..............................17
-            8.4. Macintosh to ANSI ........................................18
+            8.4. Macintosh to ANSI ........................................18
 
                                                   RTF Mail Proposal    page 3
 
@@ -127,28 +127,28 @@ Date:     21-Jul-95
             to use would be the Rich Text Format.  RTF (as it is abbreviated)
             has the following advantages over other formats:
 
-            1.                RTF is 100% text-based; it contains _no_ binary data
+            1.                RTF is 100% text-based; it contains _no_ binary data
                whatsoever.  Therefore, RTF messages can be stored in Type 2
                packets and routed through existing channels without the risk
                of breaking existing software.  RTF echos can be created as
                well, and RTF echomail will successfully travel through non-
                RTF distribution channels.
                
-            2.                RTF supports multiple character sets.  Although all FidoNet
+            2.                RTF supports multiple character sets.  Although all FidoNet
                RTF mail in languages using Latin-based alphabets must use the
                ISO 8859/1 character set (Macintosh and IBM PC conversion
                tables are included in this document), other alphabets are
                supported as well.
-               
+               
 
                                                   RTF Mail Proposal    page 4
 
 
-            3.                Numerous development tools exist which do the "dirty work" of
+            3.                Numerous development tools exist which do the "dirty work" of
                implementing RTF.  It is supported directly by some operating
                systems.
                
-            4.                The RTF specification has been made freely available by the
+            4.                The RTF specification has been made freely available by the
                authors.
 
             The Rich Text Format specification is published by Microsoft.  It
@@ -192,7 +192,7 @@ Date:     21-Jul-95
             All appropriate kludge lines shall appear at the top of the
             message, as defined by their FTS and FSC documents.  These come
             _before_ the first opening curly brace of the RTF text, and have
-            nothing to do with that formatting.
+            nothing to do with that formatting.
 
                                                   RTF Mail Proposal    page 5
 
@@ -240,7 +240,7 @@ Date:     21-Jul-95
             Pictures and embedded objects are very large.  To avoid problems
             associated with the potentially large size of messages with
             embedded objects, each direct RTF message shall be limited to
-            65520 bytes.  This limitation applies only to Type 2 packets.
+            65520 bytes.  This limitation applies only to Type 2 packets.
 
                                                   RTF Mail Proposal    page 6
 
@@ -294,7 +294,7 @@ Date:     21-Jul-95
             data from RTF messages and convert them to the IBM PC
             codepage 437 character set, so that they can be forwarded into a
             plain ASCII echo.  This effectively allows an echo to be shared
-            by RTF and non-RTF systems.
+            by RTF and non-RTF systems.
 
                                                   RTF Mail Proposal    page 7
 
@@ -340,7 +340,7 @@ Date:     21-Jul-95
                  RTF.NET_DEV
 
             Ideally, echos with different formats would never carry the same
-            root name, unless they are actually linked.
+            root name, unless they are actually linked.
 
                                                   RTF Mail Proposal    page 8
 
@@ -395,7 +395,7 @@ Date:     21-Jul-95
             To prevent this from happening, each line of an RTF message
             should be limited to 65 characters, including the hard CR.  This
             is possible because the RTF standard calls for paragraphs to end
-            with the \par control word; hard CRs are ignored.
+            with the \par control word; hard CRs are ignored.
 
                                                   RTF Mail Proposal    page 9
 
@@ -451,7 +451,7 @@ Date:     21-Jul-95
             This just makes more sense in electronic mail.  We'll use snail
             mail as an analogy.  When letter is written and printed using a
             word processor, the time of printing is shown, not the time that
-            the letter arrives at its destination.
+            the letter arrives at its destination.
 
                                                   RTF Mail Proposal   page 10
 
@@ -498,7 +498,7 @@ Date:     21-Jul-95
 
             The 16-bit character sets and other extended features used for
             some Far Eastern languages are beyond the capabilities of the
-            Type 2 message packet.
+            Type 2 message packet.
 
                                                   RTF Mail Proposal   page 11
 
@@ -551,7 +551,7 @@ Date:     21-Jul-95
                       BC    n/a     AC  one fourth
                       BD    n/a     AB  one half
                       BE    n/a    n/a  one third
-                      BF     C0     A8  inverted question mark
+                      BF     C0     A8  inverted question mark
 
                                                   RTF Mail Proposal   page 12
 
@@ -596,7 +596,7 @@ Date:     21-Jul-95
                                         circumflex accent
                       D5     CD     4F  latin capital letter O with tilde
                       D6     85     99  latin capital letter O with diaeresis
-                      D7     78     78  multiplication sign
+                      D7     78     78  multiplication sign
 
                                                   RTF Mail Proposal   page 13
 
@@ -644,7 +644,7 @@ Date:     21-Jul-95
                       EE     94     8C  latin small letter i with circumflex
                                         accent
                       EF     95     8B  latin small letter i with diaeresis
-                      F0     6F     6F
+                      F0     6F     6F
 
                                                   RTF Mail Proposal   page 14
 
@@ -675,7 +675,7 @@ Date:     21-Jul-95
                       FD     79     79  latin small letter y with acute
                                         accent
                       FE    n/a    n/a
-                      FF     D8     98  latin small letter y with diaeresis
+                      FF     D8     98  latin small letter y with diaeresis
 
                                                   RTF Mail Proposal   page 15
 
@@ -726,7 +726,7 @@ Date:     21-Jul-95
                       9D     A5  yen sign
                       9E    n/a  latin capital letter P with small t
                       9F    n/a  latin small letter script f,
-                                 florin sign
+                                 florin sign
 
                                                   RTF Mail Proposal   page 16
 
@@ -777,7 +777,7 @@ Date:     21-Jul-95
                       F4    n/a
                       F5    n/a
                       F6     F7  division sign
-                      F7    n/a  almost equals
+                      F7    n/a  almost equals
 
                                                   RTF Mail Proposal   page 17
 
@@ -793,7 +793,7 @@ Date:     21-Jul-95
                       FC    n/a  superscripted latin small letter n
                       FD     B2  superscripted 2
                       FE     2A  bullet
-                      FF     A0  no-break space
+                      FF     A0  no-break space
 
                                                   RTF Mail Proposal   page 18
 
@@ -845,7 +845,7 @@ Date:     21-Jul-95
                      A5     2A  bullet
                      A6     B6  paragraph sign
                      A7     DF  latin small leter sharp s,
-                                greek capital letter beta
+                                greek capital letter beta
 
                                                   RTF Mail Proposal   page 19
 
@@ -894,7 +894,7 @@ Date:     21-Jul-95
                      CC     C3  latin capital letter A with tilde
                      CD     D5  latin capital letter O with tilde
                      CE    n/a  latin capital ligature O with E
-                     CF    n/a  latin small ligature o with e
+                     CF    n/a  latin small ligature o with e
 
                                                   RTF Mail Proposal   page 20
 
@@ -942,7 +942,7 @@ Date:     21-Jul-95
                      F4     D9  latin capital letter U with grave accent
                      F5    n/a  latin small letter i without dot above
                      F6     5E  circumflex accent
-                     F7    n/a  nonspacing tilde
+                     F7    n/a  nonspacing tilde
 
                                                   RTF Mail Proposal   page 21
 
@@ -960,4 +960,4 @@ Date:     21-Jul-95
                      FC     B8  cedilla
                      FD    n/a  double acute accent
                      FE    n/a  ogonek
-                     FF    n/a  caron
+                     FF    n/a  caron
