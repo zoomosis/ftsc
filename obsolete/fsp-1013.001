@@ -1,0 +1,225 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FSP-1013
+Revision:       1
+Title:          Character set definition in Fidonet messages
+Author:         Peter Karlsson
+Revision Date:  04 September 1999
+Expiry Date:    04 September 2199
+----------------------------------------------------------------------
+Contents:
+                1. Introduction
+                2. Format of the identifier
+                3. Supported levels
+                4. Supported character sets
+                5. Obsolete identifiers
+                6. Notes
+----------------------------------------------------------------------
+
+
+Status of this document
+-----------------------
+
+  This document suggests a proposed protocol for the FidoNet(r)
+  community, and requests discussion and suggestions for improvements.
+  Distribution of this document is unlimited.
+
+
+Abstract
+--------
+
+  This document defines the identifiers that are used to indicate the
+  character set used within messages that are distributed in Fidonet.
+
+  There has been many attempts on defining a common standard on what
+  character set is used in Fidonet distributed messages. The only one
+  that has gained widespread is the "CHRS" standard, described in
+  FSC-0054. This document tries to describe the current usage, as
+  well as standardizing the parts of it that was ambigously defined.
+
+
+1. Introduction
+---------------
+
+  As Fidonet is an international network, one has to consider that
+  not all people speak English. Many languages also have alphabets
+  that are either bigger than the standard English alphabet, or
+  completely different. To keep track of which character set is used
+  for a particular message, this documents describes a way to identify
+  this to the reader.
+
+
+2. Format of identifier
+-----------------------
+
+  The CHRS control line is formatted as follows:
+
+        ^ACHRS: <identifier> <level>
+
+  Where <identifier> is a character string of no more than eight (8)
+  characters identifying the character set to use, and level is a
+  numeric value describing what level of CHRS this message is written
+  in.
+
+  For backward compatibility, the use of "CHARSET" instead of "CHRS"
+  should be supported when reading messages.
+
+  Some current implementations do not add the required <level> field.
+  Implemetations of this document should allow for this usage, but
+  never write such control lines themselves.
+
+  Incoming messages without "CHRS" control lines should be considered
+  as being written in the area's default character set (normally
+  ASCII, IBM codepage 437, LATIN-1 or similar).
+
+
+3. Supported levels
+-------------------
+
+  These levels are the one that are implemented in current software:
+
+ Level 0
+ -------
+
+  This level is for messages containing of pure seven-bit ASCII only.
+  Outgoing messages in pure ASCII need not be identified by a "CHRS"
+  control line, but if they are, they should be indicated as
+  "ASCII 1" (not "ASCII 0").
+
+ Level 1
+ -------
+
+  First level of internationalization, using seven bit character sets.
+  Most of these are based on US ASCII, with minor internationalization
+  variations.
+
+ Level 2
+ -------
+
+  Second level of internationalization, using eight bit character
+  sets.
+
+  This level adds support for character sets that use "extended
+  ASCII", i.e codes with the most significant bit set. The character
+  sets in level two are all based on ASCII (the codes 0-127 coincides
+  with ASCII).
+
+ Level 3 and above
+ -----------------
+
+  Level 3 or higher as specified by FSC-54 has no known current
+  implementation, because of which this document are considered
+  reserved for future use.
+
+  Level 3 would be suited for a Unicode (ISO 10646) implementation.
+  Because of limitations of currently available Fidonet packet
+  standards, it is not at the time of writing viable to specify how
+  this should work.
+
+
+4. Supported character sets
+---------------------------
+
+  These character sets are defined at the moment:
+
+  Identifier  Character set
+  ----------  -------------
+
+    Level 1 character sets (seven-bit)
+
+  ASCII       ISO 646-1 (US ASCII)
+  DUTCH       ISO 646 Dutch
+  FINNISH     ISO 646-10 (Swedish/Finnish)
+  FRENCH      ISO 646 French
+  CANADIAN    ISO 646 Canadian
+  GERMAN      ISO 646 German
+  ITALIAN     ISO 646 Italian
+  NORWEIG     ISO 646 Norweigian
+  PORTU       ISO 646 Protuguese
+  SPANISH     ISO 646 Spanish
+  SWEDISH     ISO 646-10 (Swedish/Finnish)
+  SWISS       ISO 646 Swiss
+  UK          ISO 646 UK
+
+    Level 1 known depreciated character set identifiers
+
+  ISO-10      ISO 646-10 (Swedish/Finnish)
+
+    Level 2 character sets (eight-bit, ASCII based)
+
+  CP437       IBM codepage 437 (Western European)
+  CP850       IBM codepage 850 (Latin-1)
+  CP865       IBM codepage 865 (Nordic)
+  CP866       IBM codepage 866 (Russian)
+
+  LATIN-1     ISO 8859-1 (Western European)
+  LATIN-2     ISO 8859-2 (Eastern European)
+  LATIN-5     ISO 8859-9 (Turkish)
+
+  MAC         MacIntosh character set
+
+    Level 2 obsolete character set identifiers (see note)
+
+  IBMPC       IBM PC character set
+  +7_FIDO     IBM codepage 866
+
+
+5. Obsolete indentifiers
+------------------------
+
+  Since the "IBMPC" identifier, initially used to indicate IBM
+  codepage 437, eventually evolved into identifying "any IBM
+  codepage", there exists in some implementations an additional
+  control line, "CODEPAGE", identifying the messages codepage:
+
+        ^ACODEPAGE: xxx
+
+  This use is depreciated in favour of the "CPxxx" identifiers
+  defined above. If found in incoming messages, however, it should be
+  used as an override of the "CHRS: IBMPC" identifier.
+
+  The character set "+7_FIDO" is currently in use as an identifier for
+  CP866. This use is depreciated, and "CP866" is recommended instead.
+  Implementations should treat "+7_FIDO" as a synonym for "CP866".
+
+  FSC-54 also defined control lines for style changes, "CHRC". These
+  are not implemented in any software known to the author, and are
+  depreciated.
+
+  Levels 3 and 4, as defined by FSC-54, are also considered "obsolete"
+  since there currently are no known implementations of them. All
+  levels not documented here are considered reserved for future use.
+
+
+6. Notes
+--------
+
+  The character set identifier applies to all parts of the message,
+  including the header information, and the tear and Origin lines.
+
+  FSC-54 documents file formats for mapping files that could be used
+  for storing character translation data. These are not documented
+  here.
+
+
+A. Author contact data
+----------------------
+
+  Peter Karlsson
+  Fidonet: 2:206/221
+  E-mail: pk@abc.se
+
+
+B. Acknowledgements
+-------------------
+
+  Duncan McNutt (original FSC-0054 author).
+
+
+C. History
+----------
+
+  Rev.1, 19990904: Based on FSC-0054, by Peter Karlsson
+
