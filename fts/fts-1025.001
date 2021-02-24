@@ -1,0 +1,912 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:  FTS-1025
+Revision:     1
+Title:        Simple E-Mail Attach Transport (S.E.A.T.)
+Author:       Charles Cruden,
+              Vincent Danen,
+              Brent Shellenberg
+              Ramon van der Winkel
+Issue Date:   15 May 2004
+Review Date:  15 May 2006
+----------------------------------------------------------------------
+Contents:
+              1. The Purpose
+              2. Reading this document
+              3. Implementation
+              4. Specifying compliancy
+              5. Required implementation
+              6. Recommended implementation
+              7. Optional implementation
+              8. Last Notes
+----------------------------------------------------------------------
+
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Technical Standard (FTS).
+
+  This document specifies an optional Fidonet standard protocol for
+  the Fidonet community.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+Introduction
+------------
+
+  This document describes a consistent way of sending FTN style mail
+  as an attachment to an internet e-mail. It provides a clearly
+  delineated minimum specification, a recommended specification as
+  well as several option extensions.
+
+
+1. The Purpose
+--------------
+  With the popularity of the internet being utilized as a replacement
+  for long distance calls to transfer FTN style mail, came about a
+  problem.  Though the idea is exciting and beneficial to all, every
+  developer that went this route did their work on their own (thus
+  creating a large sea of software that wasn't compatible with
+  anything else).
+
+  The purpose of this document (and discussions that have been ongoing
+  in the Sysop's Tech Net and NET_DEV) is to define a basic standard
+  of common ground that can ensure that everyone's software has the
+  ability to communicate with others.  As much as the FTS-1 document
+  of Fidonet makes sure that FTN style mailers can communicate, this
+  document is to do the same thing for internet e-mail attachment
+  software.
+
+
+2. Reading This Document
+------------------------
+  This document uses examples to show working "real life" copies of
+  what a properly formatted S.E.A.T. message looks like, making it
+  easier to get a visual idea of how the whole thing works.
+
+
+3. Implementation
+-----------------
+  This document is divided into three sections: required, recommended
+  and optional implementations.  Each defines a level of
+  compatibility with S.E.A.T.  In order for a program to be considered
+  S.E.A.T. compatible, it must implement all the encodings and
+  keywords presented in the "required" section of this document: this
+  will be defined as S.E.A.T. level one compatible.  This provides a
+  method for sending files of any size through email, but does not
+  provide a means for assuring their correct delivery. Developers are
+  strongly encouraged not to stop at providing S.E.A.T. level one
+  support but to include level two support - implementation of all the
+  encodings and keywords presented in the both the "required" and
+  "recommended" sections of this document.  Level two support provides
+  for reliable transmission of files through email.
+
+  S.E.A.T. levels three and four are defined as programs which
+  implement respectively some or all of the encodings and keywords
+  presented in the "optional" portion of this document, as well as
+  providing S.E.A.T. level  two support.  Although these extensions
+  are not required of any  implementation, they provide certain
+  features which future users would  find useful.
+
+  Note that a program cannot be considered to provide support for
+  S.E.A.T. at a given level without providing support for ALL the
+  levels beneath.
+
+
+4. Specifying compliancy
+------------------------
+  When a program specifies that it is S.E.A.T. compatible, it must
+  also provide the level of S.E.A.T. which it implements.  i.e.
+  "This program is S.E.A.T. level three compatible."  All level four
+  compatible programs must also provide the revision of S.E.A.T. which
+  they are compatible with, so that other developers may be aware
+  which extensions the author claims to support. It is recommended,
+  though not required, that all authors provide this information as
+  well.
+
+
+5. Required implementation
+--------------------------
+  S.E.A.T. level one describes the minimum set of encodings and
+  keywords which a program must support in order to be considered
+  S.E.A.T. compatible. Quickly, these are:
+    Encodings:
+      UUencode
+    Keywords:
+      Ftn-File
+      Ftn-File-Id
+      Ftn-Crc32
+      Ftn-Encoding
+      Ftn-Seg
+      Ftn-Seg-Id
+      Ftn-Seg-Crc32
+  S.E.A.T. level one programs must correctly generate these keywords
+  for each file they send, and must be able to decode any incoming
+  message which uses exclusively keywords from this set.
+
+  Note that this implicitly requires any S.E.A.T. compatible mailer to
+  support files split across multiple messages.
+
+
+  5.1 Attachment Example
+  ----------------------
+  All control information for each attached file is placed in the
+  message body text. The only exception to this is the subject line,
+  which must always start with a fixed character string to identify
+  (to mailer software) the e-mail message as a SEAT packet.
+
+  Control lines must be confined to more than 255 characters in total
+  length, and unless otherwise specified, may not have any "white
+  space" (ie: no blank characters other than the space that directly
+  follows the control line identifier). This document displays the use
+  of basic uuencoding of files. All implementations must provide it as
+  a bare minimum.
+
+  --snip--
+  From: ARCmail <brents@sk.sympatico.ca>
+  To: Steven Lager <onsite@accel.net>
+  Subject: FTN Mail Transport
+  Date: Thu, 16 Oct 1997 02:26:47
+  Organization: GUNN Data Systems
+  Reply-To: Brent Shellenberg <brents@sk.sympatico.ca>
+  X-Mailer: INetFTN v0.02-Beta
+
+  Ftn-File: AA3D1EAC.TH0
+  Ftn-File-Id: AA3D1EAC.TH0.876796006.50DC7A2B
+  Ftn-Crc32: 50DC7A2B
+  Ftn-Encoding: uuencode
+  Ftn-Seg: 1-1
+  Ftn-Seg-Id: 50DC7A2B-1-1-brents@sk.sympatico.ca
+  Ftn-Seg-Crc32: 50DC7A2B
+
+  begin 644 AA3D1EAC.TH0
+  M4$L#!!0````(`%834".2#K[O=0$``#("```,````,C,U,#$S-4(N4$M4;5$]
+  M;]LP$*7LK0"+S)EN:1$K%D4QK>UPBF3+:H?80:D.G0K:D2W!BAB(=!!O^;GY
+  M#UE""G6+MCE^X'B\]^[XZ"$/2?0.G:`>.D5#]/2AAY[[+_WW/?3+;NUPYC*/
+  MOK->%W&Y[A2-8+DV<#D&H(RS$:<4Q76-DK9H#(BRJ.NB617M%N6%-BC^EL8\
+  MFXF?29K'V,N_SCB(+%V7"AX8H33,5'U[CKUKD;FKB%)N%PTCF--I,IZ.(^S=
+  M=*!2F>V^^0N5EY4&.R486XM@3`C!MADP90$K&QKB_]K"V/<AWIM2M;#<_*:]
+  M:=6FT+I2C:SAX]OAC8.(D('O.Y(TN)95S6'E2N@KO2/Z<'<O3;569"T!8"X?
+  MPR01',XNZ&@P^LP"RB83.&,3,ADX$AP$P9L/`Q^6;;6M&@[9]\4"9M)($`=M
+  MBCL-%B+U3AJEFB&(G3W_P_]'Q`$6:;H(DA^=LD[5B$)D=P;1A?6CRR[$/H5.
+  MYCC_<LS#]J=?`5!+`0(4`!0````(`%834".2#K[O=0$``#("```,````````
+  M``$`(``````````R,S4P,3,U0BY02U102P4&``````$``0`Z````GP$`````
+  `
+  end
+  --snip--
+
+
+  5.2 Breakdown Of The Above Example
+  ----------------------------------
+
+  5.2.1 Message Subject
+  ---------------------
+  The message subject must always start with "FTN Mail Transport".
+  Software should treat it case insensetively, and implementations
+  may place anything extra after the string.
+
+    Basic:          Subject: FTN Mail Transport
+    Modified:       Subject: FTN Mail Transport - Sysop's Tech Net
+
+  Mailer software (and encoders/decoders) should simply ignore
+  anything after the basic subject line text.
+
+  5.2.2 Control Information
+  -------------------------
+  In order for mail to be acknowledged as received, or in order to do
+  other system level operations on the received files, control lines
+  are required. These lines are placed in the message body, and must
+  always be treated case insensetive.  All Ftn-* lines must occur
+  before the actual file to be  transmitted.  Because certain lines
+  are optional and certain lines can occur more than once, order is
+  not important: it is suggested though that  implementations follow
+  the order given in this document wherever possible. There must
+  additionally be no extra text between the last Ftn-* line and the
+  headers indicating the start of the encoded file.  Blank lines may
+  be inserted, but that is all.
+
+  Systems may choose to place text in the message before the Ftn-*
+  lines.  No more than 10 lines of text should be given though, and
+  none of the lines may start with Ftn-.
+
+  5.2.3 Transmission keywords
+  ---------------------------
+
+  These are keywords used in the transmission of files.
+
+  Ftn-File: AA3D1EAC.TH0
+
+    This is simply the filename of the file that is attatched to the
+    message. Though this may seem redundant, it will allow for quick
+    and easy parsing of the message body for the received filename.
+
+    Long filenames and non-DOS filenames are permitted.  Systems
+    running under DOS should munge the filename to something
+    appropriate and  inform the user of the original filename.  When
+    sending the filename, the case and spacing provided after Ftn-File
+    must exactly match that of the file on the original filesystem.
+
+  Ftn-File-Id: AA3D1EAC.TH0.876796006.50DC7A2B
+
+    The Ftn-File-Id line is a free form text string that identifies a
+    complete file. It must be a unique string for each file sent from
+    a system, and is generally used for requesting the complete resend
+    of a file (explained in the section describing NAKs below).
+
+  Ftn-Crc32: 50DC7A2B
+
+    The value after the control string is the calculated Crc32 value
+    (hexadecimal) of the entire file (fused back together). This is
+    provided largely for multipart file attachments, but must be
+    present for all attachments to make parsing easier.
+
+    The algorithm used here is based on the polynomial 0x04C11DB7 (or
+    the reflected version, 0xEDB88320), with an initial CRC value of
+    0xFFFFFFFF and finalised by an XOR with 0xFFFFFFFF.  This is
+    compatible with [JAM], PKZIP, Zmodem, Ethernet and many others.
+
+    Implementers are referred to [ISO 3309] or [ITU-T V.42] for the
+    formal CRC32 specification, [RFC 1952] or [RFC 2823] for sample
+    code, and "A PAINLESS GUIDE TO CRC ERROR DETECTION ALGORITHMS"
+    [Williams93] for a detailed explanation of table-driven CRC
+    algorithms.
+
+  Ftn-Encoding: uuencode
+
+    The Ftn-Encoding line is a simple line that declares the type of
+    encoding used for the attachment. This is provided for simplicity
+    reasons (in parsing the e-mail message) as well to draw some
+    boundaries of what is required for a certain standard level. The
+    following values are valid for this (and future) revisions:
+
+      uuencode
+      Base64
+
+    If a system doesn't support the encoding given in this line, it
+    should respond with an Ftn-Error line and the error code UE
+    (unsupported encoding).
+
+  Ftn-Seg: 1-1
+
+    This identifies the number of "parts" in which attached file is
+    being sent. The values make up a descriptor of what file segment
+    is being received from how many parts. For instance, 1-1 simply
+    means the attached file segment is 1 of 1 (so no further segments
+    will follow).  If the value was 2-5, this would mean the contained
+    segment is part 2 of 5.
+
+  Ftn-Seg-Id: 50DC7A2B-1-1-brents@sk.sympatico.ca
+
+    The Ftn-Id line is a unique identification line for a file part
+    that is used primarily to send acknowledgements back to the
+    sender. The actual method the developer may use to create this
+    line is purely up to the imagination. It is intended to be a free
+    form text string that is simply "copied" for use in ack messages.
+
+  Ftn-Seg-Crc32: 50DC7A2B
+
+    This line contains the calculated Crc32 value of the file part
+    that is contained in the message. Unlike the Ftn-Crc32 line, this
+    is ONLY for the encoded piece that is contained within the single
+    message.
+
+  5.3 Large File Splitting
+  ------------------------
+  Splitting of files MUST be done prior to the creation of the
+  encoded message. The uuencoding or Base64 methods described for use
+  with this revision are not to have any splitting/fusing method of
+  their own. Simply chop the file up into multiple temporary files,
+  and encode each seperately. Not all systems will require that the
+  files be sliced, but some may. This option (of splitting in general)
+  should be adjustable by the system operator. Also keep in mind that
+  those that are using standard e-mail clients to decode the inbound
+  mail packets will probably not be able to fuse the files back
+  together. An option for not splitting large files is therefore good
+  practice.
+
+
+  5.4 Additional Message Body Text
+  --------------------------------
+  It would be desirable to have implementations avoid placing too
+  much "noise" in the message text body (ie: advertisements or other
+  text that is not relevant to the transfer of the file attachments).
+  Since this method of transport is generally going to be done by
+  automated encoders/decoders, it probably won't be seen anyway, so
+  it would merely be a waste of space in the users' pop mail boxes.
+
+
+  5.5 Receiving files under DOS
+  -----------------------------
+  Implementors of a S.E.A.T. compatible mailer for DOS should note
+  that the Ftn-File line provides for the possibility of long
+  filenames being sent. Since DOS doesn't provide support for files
+  outside its 8.3 filename format, a way of mungeing filenames from
+  long to 8.3 name formats must be provided. It is recommended,
+  though not required, that a format similar to the Win95 method of
+  mungeing files is provided.  The first six valid (under DOS)
+  characters of the filename form the start of the new filename.
+  These are followed by a dash (-) and a number (0 through 9).  If
+  there is a period (.) in the original filename, the first three
+  characters following the last period form the extension of the new
+  filename.  When the mungeing process results in a filename that
+  already exists, the number should be incremented until there is no
+  conflict.  Each additional digit in the number means one less
+  character is taken from the start of the original filename.
+
+  If the original filename fits into the 8.3 format, it should be
+  used.
+
+  Some examples:
+    Original name          Munged name
+      MailForYou.Zip         MAILFO-0.ZIP
+      Bobs Your Uncle        BOBS-0.
+      LOTS.O.DOTS.ZIP        LOTS-0.ZIP
+      053F31CD.MO0           053F31CD.MO0
+
+
+6. Recommended implementation
+-----------------------------
+  S.E.A.T. level two provides a means for reliably transferring files
+  through email, ensuring that except in the case of a long term mail
+  problem, all files sent will arrive at their destination without
+  modification.  S.E.A.T. level two also provides support for error
+  detection and correction in the S.E.A.T. keywords of a given
+  message, vital to supporting the optional keywords in levels three
+  and above.
+
+  S.E.A.T. level two defines the following keywords:
+    Ftn-Date
+    Ftn-Receipt
+    Ftn-Cancel
+    Ftn-Error
+
+  6.1 Transmission keywords
+  -------------------------
+
+  Ftn-Date: 34C7D356
+
+    The value after the control string is the UNIX time/date stamp of
+    the file as stored on the sending end's system, printed in
+    hexadeciaml format. This may be used by some implementations to
+    re-stamp file dates on the local system.
+
+  6.2 Response keywords
+  ---------------------
+  These control lines are sent in response to files sent by other
+  SEAT mailers.  They may be sent alone, or as part of the control
+  lines preceeding a transmitted file.
+
+  6.2.1 ACK Example (Single ACK)
+  ------------------------------
+  Acknowledging a received section of a file is a simple task. The
+  Ftn-Seg-Id line (described above) is all thats needed to return an
+  acknowledgement.
+
+      Example (ACKing the above attachment example):
+
+      --snip--
+      From: ARCmail <onsite@accel.net>
+      To: Brent Shellenberg <brents@sk.sympatico.ca>
+      Subject: FTN Mail Transport
+      Date: Thu, 16 Oct 1997 02:30:00
+      Organization: Some Guy's BBS
+      Reply-To: Steven Lager <onsite@accel.net>
+      X-Mailer: INetFTN v0.01-Beta
+
+      Ftn-Receipt: 50DC7A2B-1-1-brents@sk.sympatico.ca Ack
+      --snip--
+
+  6.2.2 ACK Example (Multiple ACKs)
+  ---------------------------------
+  Acknowledgements may also come with multiple ACKs in a single
+  message.  Software should look for this, and be prepared to act on
+  it at any time.
+
+      Example (ACKing the above attachment example):
+
+      --snip--
+      From: ARCmail <onsite@accel.net>
+      To: Brent Shellenberg <brents@sk.sympatico.ca>
+      Subject: FTN Mail Transport
+      Date: Thu, 16 Oct 1997 02:30:00
+      Organization: Some Guy's BBS
+      Reply-To: Steven Lager <onsite@accel.net>
+      X-Mailer: INetFTN v0.01-Beta
+
+      Ftn-Receipt: 54DC7A2B-1-1-brents@sk.sympatico.ca Ack
+      Ftn-Receipt: 53DC7A2B-1-2-brents@sk.sympatico.ca Ack
+      Ftn-Receipt: 53DC7A2B-2-2-brents@sk.sympatico.ca Ack
+      Ftn-Receipt: 52DC7A2B-1-1-brents@sk.sympatico.ca Ack
+      --snip--
+
+  6.2.3 NAK Example
+  -----------------
+  A NAK has two purposes when dealing with file acknowledgements. The
+  first method is similar the ACK procedures for dealing with getting
+  a resend of an individual file segment. The second method is for
+  requesting a total resend of a complete file.
+
+  NAKing A File Segment
+  ---------------------
+
+  A NAK should be sent when there is a problem decoding a received
+  file segment, or a segment is missing after a long period of time
+  (implementation of timers is the resposibility of the developer).
+
+	Example (NAKing the above attachment example):
+
+	--snip--
+	From: ARCmail <onsite@accel.net>
+	To: Brent Shellenberg <brents@sk.sympatico.ca>
+	Subject: FTN Mail Transport
+	Date: Thu, 16 Oct 1997 02:30:00
+	Organization: Some Guy's BBS
+	Reply-To: Steven Lager <onsite@accel.net>
+	X-Mailer: INetFTN v0.01-Beta
+
+	Ftn-Receipt: 50DC7A2B-1-1-brents@sk.sympatico.ca Nak
+	--snip--
+
+	As with ACKs, NAKs may come in multiples in the same message.
+
+  NAKing A Complete File (complete resend)
+  ----------------------------------------
+
+  The only difference in this method is that the ID line used in the
+  Ftn-Receipt line is the Ftn-File-Id line and NOT the Ftn-Seg-Id
+  line.  To use show the difference between this method and the
+  simple method of NAKing a file segment, this example (again) uses
+  the example from this document:
+
+	--snip--
+	From: ARCmail <onsite@accel.net>
+	To: Brent Shellenberg <brents@sk.sympatico.ca>
+	Subject: FTN Mail Transport
+	Date: Thu, 16 Oct 1997 02:30:00
+	Organization: Some Guy's BBS
+	Reply-To: Steven Lager <onsite@accel.net>
+	X-Mailer: INetFTN v0.01-Beta
+
+	Ftn-Receipt: AA3D1EAC.TH0.876796006.50DC7A2B Nak
+	--snip--
+
+  With the possibility of a system requesting a total resend of a
+  file, comes the possibility that the file no longer exists on the
+  sending system (as in the case of echomail bundles or TIC files).
+  SEAT provides a method for the sender to tell the receiver that the
+  requested resend file no longer exists through the use of the
+  Ftn-Cancel line. In taking the above example for requesting a
+  complete resend, the sending system would respond with a message
+  such as:
+
+	--snip--
+	From: ARCmail <brents@sk.sympatico.ca>
+	To: Steven Lager <onsite@accel.net>
+	Subject: FTN Mail Transport
+	Date: Thu, 16 Oct 1997 02:30:00
+	Organization: GUNN Data Systems
+	Reply-To: Brent Shellenberg <brents@sk.sympatico.ca>
+	X-Mailer: INetFTN v0.01-Beta
+
+	Ftn-Cancel: AA3D1EAC.TH0.876796006.50DC7A2B
+	--snip--
+
+
+  6.2.4 ACKs/NAKs Within An Attachment Message
+  --------------------------------------------
+  ACK/NAK lines may be sent along with a message that contains an
+  e-mail attachment. This cuts down on the number of e-mail messages
+  that are sent, and can generally clear the clutter from your spool
+  directory. Using the document example, this example is modified to
+  show this usage of ACK/NAK lines. Please note that these control
+  lines can be anywhere in the message text boundary.
+
+      --snip--
+      From: ARCmail <brents@sk.sympatico.ca>
+      To: Steven Lager <onsite@accel.net>
+      Subject: FTN Mail Transport
+      Date: Thu, 16 Oct 1997 02:26:47
+      Organization: GUNN Data Systems
+      Reply-To: Brent Shellenberg <brents@sk.sympatico.ca>
+      X-Mailer: INetFTN v0.01-Beta
+
+      Ftn-File: AA3D1EAC.TH0
+      Ftn-File-Id: AA3D1EAC.TH0.876796006.50DC7A2B
+      Ftn-Date: 876796006
+      Ftn-Crc32: 50DC7A2B
+      Ftn-Encoding: uuencode
+      Ftn-Seg: 1-1
+      Ftn-Seg-Id: 50DC7A2B-1-1-brents@sk.sympatico.ca
+      Ftn-Seg-Crc32: 50DC7A2B
+      Ftn-Receipt: 437D8EAA-1-1-onsite@accel.net Ack
+      Ftn-Receipt: E7F352CB-1-1-onsite@accel.net Nak
+
+      begin 644 AA3D1EAC.TH0
+      M4$L#!!0````(`%834".2#K[O=0$``#("```,````,C,U,#$S-4(N4$M4;5$]
+      M;]LP$*7LK0"+S)EN:1$K%D4QK>UPBF3+:H?80:D.G0K:D2W!BAB(=!!O^;GY
+      M#UE""G6+MCE^X'B\]^[XZ"$/2?0.G:`>.D5#]/2AAY[[+_WW/?3+;NUPYC*/
+      MOK->%W&Y[A2-8+DV<#D&H(RS$:<4Q76-DK9H#(BRJ.NB617M%N6%-BC^EL8\
+      MFXF?29K'V,N_SCB(+%V7"AX8H33,5'U[CKUKD;FKB%)N%PTCF--I,IZ.(^S=
+      M=*!2F>V^^0N5EY4&.R486XM@3`C!MADP90$K&QKB_]K"V/<AWIM2M;#<_*:]
+      M:=6FT+I2C:SAX]OAC8.(D('O.Y(TN)95S6'E2N@KO2/Z<'<O3;569"T!8"X?
+      MPR01',XNZ&@P^LP"RB83.&,3,ADX$AP$P9L/`Q^6;;6M&@[9]\4"9M)($`=M
+      MBCL-%B+U3AJEFB&(G3W_P_]'Q`$6:;H(DA^=LD[5B$)D=P;1A?6CRR[$/H5.
+      MYCC_<LS#]J=?`5!+`0(4`!0````(`%834".2#K[O=0$``#("```,````````
+      M``$`(``````````R,S4P,3,U0BY02U102P4&``````$``0`Z````GP$`````
+      `
+      end
+      --snip--
+
+  6.2.5 Errors
+  ------------
+  Errors may occur when the message generated at one system uses
+  features which aren't available on another (for example using
+  an encoding type that the other doesn't support).  In this case,
+  the system which generates the error should respond with an
+  Ftn-Error line. The syntax of an Ftn-Error line is
+
+      Ftn-Error: <error code> <parameter>
+
+  where <error code> is one of the following codes, and <parameter>
+  is as defined for the given code.
+
+  CA: cryptographic algorithm unsupported
+    When a program receives a file encrypted with a cryptographic
+    algorithm it doesn't support, it should send this code back, with
+    the parameter being the entry in the Ftn-Crypt field.  A system
+    which receives this error should notify the user of the problem
+    and treat the file as being NACK'ed, though where possible, it
+    would be desireable not to have the file resent until the systems
+    have worked out an algorithm which they both can use.
+  UE: unsupported encoding
+    These are generated when the encoding given in the Ftn-Encoding
+    line is not supported by the system which received the message.
+    The parameter is the Ftn-File-ID of the file that was sent.
+  UK: unsupported keyword
+    If a mailer finds an Ftn- control line which it doesn't recognize,
+    it should respond with an unsupported keyword error, and give the
+    unrecognized keyword as the parameter.
+  UM: unsupported MIME format
+    These are generated when the Content-Type or
+    Content-Transfer-Encoding strings in the MIME header are not
+    understood by the receiving system.  The parameter is the
+    Ftn-File-ID of the file that was sent.
+
+  (Other error codes may be added as new features are added to the
+  specification.)  Error codes are case insensitive.
+
+  An example of sending an Ftn-Error line is:
+
+      --snip--
+      From: ARCmail <onsite@accel.net>
+      To: Brent Shellenberg <brents@sk.sympatico.ca>
+      Subject: FTN Mail Transport
+      Date: Thu, 16 Oct 1997 02:30:00
+      Organization: Some Guy's BBS
+      Reply-To: Steven Lager <onsite@accel.net>
+      X-Mailer: INetFTN v0.01-Beta
+
+      Ftn-Error: UE 54DC7A2B-1-1-brents@sk.sympatico.ca
+      --snip--
+
+  Like Ftn-Receipt and Ftn-Cancel, Ftn-Error lines can be sent more
+  than one to a file, and can be sent as part of the control lines
+  of another file.
+
+  The system which generates an Ftn-Error line should notify the user
+  that an error has occurred and should explain what the error was.
+  The system which receives an Ftn-Error line should also notify the
+  local user that a problem occurred, explain what the error was and
+  to whom the original message was intended.  When the parameter of
+  an Ftn-Error line is an Ftn-File-ID, Ftn-Error means that the file
+  with the given ID has not been received correctly (as if a Nak had
+  been received).  It is up to the developer to decide whether this
+  will mean the file will be resent with the problem fixed, or whether
+  the local user will be requested to fix the problem, though wherever
+  possible, the first choice is preferred.
+
+
+  6.3 Time Allowances For ACKs
+  ----------------------------
+  It is up to the developer to decide the time frame to be allowed
+  for the ACKs to be returned to the sender's system.  3 days would be
+  sufficient.  Keep in mind that this means that there needs to be a
+  copy stored on the user's hard drive for that length of time (in
+  case no ACK is received, or the other system responds with a NAK).
+  If the time period passes, the sender should resend the segments in
+  question.  The receiver of the file(s) should simply ignore (erase)
+  any segments belonging to files that have already been received.
+  An easy way to accomplish this to maintain a data file containing
+  the Ftn-Id lines (or the Crc32 value).  As an note to developers,
+  you should have your encoding scheme be able to not require acks at
+  all, as some users may wish to transfer files to other parties that
+  use simple e-mail clients that don't have the ability to react to
+  the Ftn-* control lines (eg. S.E.A.T. level one mailers).
+
+
+
+7. Optional implementation
+--------------------------
+  The keywords and encodings given here are optional for any developer
+  to implement.  Although they provide extended functionality to
+  programs, their implementation may be too difficult or time
+  consuming for some.
+
+  S.E.A.T. optional keywords are:
+    Ftn-Freq
+    Ftn-Auth
+    Ftn-Crypt
+  S.E.A.T. optional encodings are:
+    Base64
+
+
+  7.1 Example message for optional implementations
+  ------------------------------------------------
+  Note that the MD5 and Crc32 values here are just fillers and have
+  not been calculated to match the contents of the message.
+
+      --snip--
+      From: ARCmail <brents@sk.sympatico.ca>
+      To: Steven Lager <onsite@accel.net>
+      Subject: FTN Mail Transport
+      Date: Thu, 16 Oct 1997 02:26:47
+      Organization: GUNN Data Systems
+      Reply-To: Brent Shellenberg <brents@sk.sympatico.ca>
+      X-Mailer: INetFTN v0.02-Beta
+      MIME-Version: 1.0
+      Content-Type: multipart/mixed; boundary=SomeUniqueStringThing
+
+      Ftn-File: AA3D1EAC.TH0
+      Ftn-File-Id: AA3D1EAC.TH0.876796006.50DC7A2B
+      Ftn-Date: 876796006
+      Ftn-Crc32: 50DC7A2B
+      Ftn-Encoding: Base64
+      Ftn-Seg: 1-1
+      Ftn-Seg-Id: 50DC7A2B-1-1-brents@sk.sympatico.ca
+      Ftn-Seg-Crc32: 50DC7A2B
+      Ftn-Auth: c349f4d113a4d38afd5327c3328d6c37
+      Ftn-Crypt: Blowfish
+
+      --SomeUniqueStringThing
+      Content-Type: application/octet-stream; name=AA3D1EAC.TH0
+      Content-Transfer-Encoding: Base64
+      Content-Disposition: inline; filename=AA3D1EAC.TH0
+
+      //xQAAABXAwAAAAAAAAAAAACiAAAAAAAAAAHAAcAKAAAAElCTV9MUwDDAAAA
+      ACwBHAAAAcQBxAFIAAABDT01QTRTAFtSRVFVRVNURVJdLFtBUEldLFtCT09L
+      FUUlOU1RBTExdLFtVUE1FWFRdRVSU0VSVkVSXSxbRE9TTEFOQVBJXSxbR1VJ
+      JUEJPQVJEXSxbTVNHUE9QVVBdR1JTkdVSV0A5QAAAAAAAAAIAAgA2wAAAAIA
+      AUkVMRUFTRQA1AAgBAAAAAAAAA0AAAADAAMABQEAAFZFUlNJT04AMDQAKAEA
+      GAAYAIAEAAAIAAgAmAQAAT1NSMBJAQAAAAAAAAYABgBAAQAAAwADAEYBAABP
+      0MABwAQAAAAAAAAUABQBhAQAAAYBAABQQVRIAEs6XElCTUxBTgAAAAAAAAAA
+      IAQAAEQARAJEBAABJTlNUVFlQTRSWShSRVFVRVNURVIpAI4CAAC/AQAAAAAA
+      2AQAASUJNX0xBTlgA4QEAAAAAAgA1wEAAAIAAgDfAQAAUkVMRUFTRQA1AAQC
+      ACAAIAPkBAAADAAMAAQIAAFZF04AMTIAJAIAAAAAAAAGAAYAHAIAAAIAAgAi
+      SRUwAMgBFAgAAAAAAAAYABgA8AADAEICAABPU1ZFUgA0MABsAgAAAAAAAAUA
+      ACgAKAGICAABQQVRIAEs6XElCQAAAAAAAAAAAAgACACEAgAAAgACAIwCAABS
+      IADEAAAAAAKoCAAAAAAAACAAIABJQk1fVVBNAMwCAAAAAAAACAAIAMICAAAC
+      AAFJFTEVBU0UANQDvAgAAAAAAADkAgAAAwADAOwCAABWRVJTSU9OADA0AA8D
+      ABgAGAAcDAAACAAIADQMAAE9TDIAMAMAAAAAAAAGAAYAJwMAAAMAAwAtAwAA
+      VIANDAAAAAAAAAAAAAFAAUASAMAACgBNAwAAUEFUSABLOlxNVUdMSUIACy==
+
+      --SomeUniqueStringThing--
+      --snip--
+
+
+  7.2 MIME Headers and Base64 encoding
+  ------------------------------------
+  Mime headers can be a touchy subject when trying to implement an
+  easy to use decodable scheme. Many programs tend to use different
+  flavours of MIME headers, and can therefore create a bit of a
+  headache when trying to decode them.  These simple guidelines will
+  ensure that a file can be decoded by  standard MIME mail programs
+  as well as SEAT compatible readers.  It is important to understand
+  that they are intended merely as a subset of MIME that will be,
+  nevertheless, compatible with MIME enabled mail readers. S.E.A.T.
+  does not require that a given mailer be able to correctly interpret
+  any MIME message.  Wherever possible though, authors are encouraged
+  to make more robust MIME parsers.
+
+  Base64 Encoded Messages
+  -----------------------
+  There are required control lines that need to be placed in the
+  message header in order for e-mail clients to correctly determine
+  that a message is a MIME format message. These two lines are
+  basically:
+
+      MIME-Version: 1.0
+      Content-Type: multipart/mixed; boundary=<boundary string>
+
+  The boundary string is a unique string that you create for your
+  MIME format messages. Implementations should be aware that for
+  the Content-Type: line as mentioned above, some e-mail readers
+  place quotations around the <boundary string>.
+
+  Other changes required to an e-mail message to make it MIME
+  compliant:
+
+      Following the Ftn-* control lines:
+
+      --<boundary string>
+      Content-Type: application/octet-stream; name=<filename>
+      Content-Transfer-Encoding: Base64
+      Content-Disposition: inline; filename=<filename>
+
+      (Base64 encoding of the file part goes here)
+
+      --<boundary string>--
+
+  Note that this forces MIME implementations to use Base64 encoding
+  and the prescribed Content-Type.  Future revisions may allow
+  different Content-Transfer-Encodings and Content-Types.  Developers
+  who choose to support the MIME encoding should check the
+  Content-Type and Content-Transfer-Encoding strings to ensure their
+  program can interpret them correctly: if it can't, an Ftn-Error
+  response is required with  the UM (unsupported MIME format) error.
+  If the guidelines given here are followed explicitly, there should
+  be no problems.  Developers who want to provide more MIME support
+  in their programs are encouraged to examine the MIME RFCs (RFCs
+  2045-2049), especially 2045, to ensure their program is compliant.
+  The MIME RFCs can be found at
+    http://info.internet.isi.edu:80/in-notes/rfc/files.
+
+  For ease of implementation, developers must ensure that the
+  Content- lines are sent in the order given above.
+
+  7.3 Optional keywords
+  ---------------------
+
+  7.3.1 Transmission keywords
+  ---------------------------
+  Ftn-Freq: FILEMASK.EXT
+
+    This line allows for standard file requesting. The format of
+    FILEMASK.EXT may contain any valid DOS filename or wildcards, and
+    may be accompanied by a password such as:
+
+    Ftn-Freq: THEFILES.RAR |PASSWORD
+
+    The | character is not part of the password itself, but rather a
+    seperator between the filename and password. The single space
+    between the filemask and password is required, and must not be
+    more than one single space. Please note that this file name/mask
+    may include long file names as used in more advanced operating
+    systems.  Although the FILEMASK.EXT may match more than one file
+    locally, only one FILEMASK.EXT at a time may be provided after the
+    Ftn-Freq.
+
+
+  Ftn-Auth: c349f4d113a4d38afd5327c3328d6c37
+
+    This field can be used as both error detection and authentication
+    for messages sent.  The field's value is the MD5 digest of the
+    file enclosed in the message, printed in hexadecimal.  (Developers
+    are referred to RFC 1321 for an implementation of MD5.)  Nearly
+    all errors in  transmission will be detected by discrepancies in
+    the value given here and the one calculated on the reconstructed
+    message. This field can be used in addition to the Ftn-Crc32 field
+    for verifying a file has arrived intact.  It should not be used in
+    replacement though, in case the receiving system doesn't support
+    the Ftn-Auth keyword.
+
+    The Ftn-Auth value can also be used by systems to setup a system
+    of authentication of messages.  Two systems wanting to make sure
+    files are transmitted unmodified and from the source they say
+    they're transmitted from can establish a session level password.
+    The digest value is calculated on a string formed by adding the
+    file's bytes to the end of the session level password.
+
+    Session level passwords should be case and space sensitive.  They
+    must match exactly.  This is to discourage would-be forgers from
+    trying to find the password by brute force.  It is suggested, but
+    not required, that passwords be at least 10 characters long, again
+    to discourage brute force attacks against them.
+
+
+  Ftn-Crypt: Blowfish
+
+    Systems wishing to establish even more secure connections can use
+    encryption to hide the contents of the files they are
+    transmitting. The Ftn-Crypt field's value is the name of the
+    encryption algorithm used.  Suggested implementations include
+       Blowfish
+       IDEA
+       DES
+       PGP2            (PGP version 2.x or lower)
+       PGP5            (PGP version 5.0 or higher)
+    There may still be implementation differences beyond just the
+    algorithm used, as most allow different block sizes and stream
+    types.  In order to ensure that one implementation can talk to
+    the other, block based encryption algorithms (such as Blowfish,
+    IDEA, etc.) must use 64 bit blocks and CFB encoding.
+
+    Because encryption replaces the files with encrypted copies, the
+    CRC and MD5 digest values generated in the Ftn-Crc32,
+    Ftn-Part-Crc32 and Ftn-Auth must be calculated to match that of
+    the actual file transmitted.  That is to say, first the MD5 and
+    CRC values are calculated, and then the file is encrypted.  This
+    allows implementations to detect files corrupted by both
+    transmission errors and bad passwords.  The response to either
+    type of error is still an Ftn-Receipt: <Id> NACK line.
+
+    The main point of attack on most of the encryption algorithms
+    used will be a brute force attack on the password, where
+    applicable.  In systems which use passwords, the two systems must
+    use passwords which match exactly, case-sensitively.  (i.e. the
+    password Something would not work to decrypt a file encrypted with
+    the password something.)
+
+    Systems can introduce their own encryption algorithms if they so
+    desire, but when using the Ftn-Crypt line, their strings must be
+    preceeded by X-.  For instance, one value might be Ftn-Crypt:
+    X-Mycrypt
+
+    If a system supporting the Ftn-Crypt field receives a file
+    encrypted with an algorithm it doesn't recognize, it should
+    respond with an Ftn-Error: CA line.  (See the Ftn-Error section
+    for more details.)
+
+8. Last Notes
+-------------
+  The control lines and format outlined in this document must all be
+  followed correctly. All control lines for a given level should be
+  present (regardless of whether or not you feel they are required).
+  Even in the case of a single non-split message, the control lines
+  should all be in place to make parsing easier, and to assure all
+  software receives all the information it may require to function.
+  Also, it is imperative that all implementations provide basic
+  uuencoding as the bare minimal encoding method.
+
+
+A. References
+-------------
+
+  JAM
+    "Joaquim-Andrew-Mats Message Base Proposal" Revision 1, 1993.
+
+  ISO 3309
+    International Organization for Standardization, "Information
+    Processing Systems--Data Communication High-Level Data Link
+    Control Procedure--Frame Structure", ISO 3309, October 1984,
+    3rd Edition.
+
+  ITU-T V.42
+    International Telecommunications Union, Error-correcting
+    Procedures for DCEs Using Asynchronous-to-Synchronous Conversion,
+    ITU-T Recommendation V.42, 1994, Rev. 1.
+
+  RFC 1952
+    "GZIP file format specification version 4.3"
+
+  RFC 2823
+    "PPP over Simple Data Link (SDL) using SONET/SDH with ATM-like
+    framing"
+
+  Williams93
+    "A PAINLESS GUIDE TO CRC ERROR DETECTION ALGORITHMS" version 3.
+    Ross N. Williams, 19 August 1993
+    ftp://ftp.rocksoft.com/papers/crc_v3.txt
+
+
+B. Author contact data
+----------------------
+
+  Charles Cruden
+  Fidonet: 1:342/806
+
+
+C. History
+----------
+
+  Rev.1, 20040515: Initial release (was: FSP-1015.001).
+                   FTSC changes:
+                     * Fixed formatting & removed FSP annotations.
+                     * Added references for CRC32 algorithm.
+                     * Removed obsolete author contact information.
+
+**********************************************************************
