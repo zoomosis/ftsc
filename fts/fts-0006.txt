@@ -1,0 +1,876 @@
+FTS-0006
+
+
+
+
+
+
+
+
+
+
+                            YOOHOO and YOOHOO/2U2
+
+                    The netmail handshake used by Opus-CBCS
+             and other intelligent Fidonet mail handling packages
+
+
+                This document obsoletes and replaces FTS-0003
+
+
+
+
+
+
+
+
+
+
+LEGAL STUFF
+-----------
+
+The original  protocol and documentation are by Wynn Wagner III.  Updates
+have been made  to  this  document  by Vincent E.  Perriello, who also is
+responsible for most of the sample routine included with this document.
+
+They are released to  the public domain for any use whatsoever as long as
+you don't modify any transmitted  structure  or try to make money hawking
+either the sample code or this document as if you owned them.
+
+If you choose to use the  method  or  the  sample  routines,  you  do  so
+entirely at your own risk.  It  is  possible that the routines will cause
+physical damage to your equipment, an invasion of  fire ants, the plague,
+or an extended visit from in-laws.  If any  of  that  stuff  (or anything
+else) happens, you accept the consequences totally.
+
+
+CREDITS
+-------
+
+Fido  and  Fidonet  are  registered  trademarks of Tom Jennings and  Fido
+Software.
+
+SEAdog is a product of System Enhancement Associates.
+
+The ZModem protocol was designed by Chuck Forsberg.  The Sealink protocol
+is copyrighted  by System Enhancment Associates.  The TeLink protocol was
+designed and first implemented by Tom Jennings.
+
+The state charts in this document were done by Vince Perriello.
+
+Rick Huebner designed  and  implemented  the  basic  WaZOO  file  request
+method.  Update request functionality was added by Vince Perriello.
+
+YooHoo and YooHoo/2u2                                              Page 2
+Overview
+
+
+
+UPFRONT
+-------
+
+YOOHOO and YOOHOO/2U2 are  the  initial  handshakes  for the WaZOO e-mail
+protocol.  They are designed to let two systems establish a common ground
+for a netmail session while making  sure  that non-WaZOO software doesn't
+get upset by material it can't understand.
+
+The YOOHOO procedure begins as a single  byte  (0xf1).   If the system on
+the other end doesn't reply to that byte,  no  further  YOOHOO  or  WaZOO
+transmissions are attempted.  To a non-WaZOO netmail system,  the  YOOHOO
+byte will simply seem like a byte of debris.
+
+The  calling  system  initiates  the  YOOHOO  by  sending  the  attention
+character.   If the receiving system seems interested, the calling system
+sends a  128  byte packet containing such information as system and sysop
+names as well as a "capability mask." A 16-bit CRC protects the integrity
+of the 128-byte packet.
+
+In response, the receiving  system  prepares  a  128  byte packet to send
+back.  This is the YOOHOO/2U2 procedure.
+
+
+
+FEATURES
+--------
+
+The features of YOOHOO and YOOHOO/2U2 include
+
+         * non-interference with systems that don't understand the
+           handshake
+
+         * almost foolproof method for identifying a remote system
+           and establishing a common ground for transmission
+
+         * built-in room to expand the capabilities of WaZOO without
+           having to resort to a kludge
+
+
+
+USAGE
+-----
+
+A calling system simply uses  a  routine  that  transmits both YooHoo and
+TSYNC  handshake initiating characters to the  called  system.    If  the
+called system responds with an XMODEM 'NAK',  an FTS-0001 session will be
+initiated.  If an 'ENQ' is received, the  `YooHoo_Sender()'  routine will
+be invoked to handle the session negotiation.
+
+A  receiving  system  can call a routine like `YooHoo_Receiver()'  if  it
+detects the YOOHOO character, or just drop into the FTS-0001  logic if it
+sees a TSYNC.
+
+This simple method allows a mailer to take care of both the TSYNC and the
+YOOHOO handshakes.
+
+YooHoo and YooHoo/2u2                                              Page 3
+WaZOO Protocols
+
+
+
+PROTOCOLS
+---------
+
+Currently there are two WaZOO methods in use:
+
+         DietIFNA ... similar to the method described by the FidoNet
+                      Technical Standards Committee.
+
+                      VARIATION:  * file attaches don't even attempt to
+                                    do a modem7 file name.
+
+                                  * SEAlink run-ahead is based on the
+                                    baud rate and can be as high as 24
+                                    packets for 9600 baud.
+
+                                  * If the calling system transmits a
+                                    .REQ file for file requests, the
+                                    receiving system can respond to it.
+                                    See "WaZOO File Requests" (below)
+                                    for information on the .REQ file.
+
+                                  * When there is nothing to send, a
+                                    system should remain quiet.  In
+                                    other words, the end of a session
+                                    can be determined by a timeout.
+
+                                  * Under no circumstances should "BARK"
+                                    file request logic be activated
+                                    during a DietIFNA session. File
+                                    requests, if any, should be
+                                    transmitted using a .REQ file.
+
+         ZedZap ..... a zmodem variant. The originator does a batch send
+                      then goes into a receive batch mode.  The called
+                      system does receive then send. In the event of a
+                      file request (see description below) made by the
+                      called system, one more turnaround is made to
+                      service the request.
+
+                      VARIATION:  * Unlike the true zmodem protocol
+                                    described by Chuck Forsberg, ZedZap
+                                    routines must be able to handle a
+                                    batch mode that has no actual files.
+                                    In other words, it is possible for
+                                    there to be a init sequence
+                                    followed immediately by a ZFIN.
+
+                                  * The maximum packet size is based on
+                                    the baud rate.  For example, at 2400
+                                    baud it's 2048 bytes.  At 9600 baud,
+                                    the packets are 8192 bytes. THIS IS
+                                    A SIGNIFICANT VARIATION FROM STRICT
+                                    ZMODEM IMPLEMENTATION. (There's
+                                    another YooHoo capability bit for
+                                    those systems which cannot handle
+                                    this block size)
+
+YooHoo and YooHoo/2u2                                              Page 4
+WaZOO Filename conventions
+
+
+
+WaZOO FILENAMES
+---------------
+
+
+         MESSAGE BUNDLES...xxxxxxxx.PKT
+
+                           Normal (unarchived) messages are sent in a file
+                           name that has a tag of .PKT.  The "x" characters
+                           should be hex digits.
+
+                           IMPLEMENTATION NOTE
+                           -------------------
+                           There is no real requirement that a .PKT file be
+                           part of a netmail session.  Opus 1.03 and below
+                           require a .PKT file for DietIFNA, but this is
+                           a mistake that will be corrected.  The correct
+                           way to do things is to send only what needs to
+                           be sent.  If the calling system is doing a "poll"
+                           then only the YooHoo and a SEAlink (or TeLink)
+                           end-of-batch sequence should be all that is
+                           required.
+
+
+         LZ BUNDLES........xxxxxxxx.{MO|TU|WE|TH|FR|SA|SU}#
+
+                           Message bundles are often shipped in an archive
+                           that has been compressed with some LZ utility.
+
+                           The file name consists of a name with hex digits.
+                           The tag  is  one  of  seven  two-character
+                           prefixes ("MO","TU","WE","TH","FR","SA" or "SU")
+                           and a number (0-9).
+
+
+         FILE REQUESTS.....xxxxxxxx.REQ
+
+                           This is explained below.
+
+                           In a nutshell, the file name consists of the
+                           receiving system's Fidonet address expressed
+                           as two 4-digit hex numbers.  The file tag is .REQ.
+
+YooHoo and YooHoo/2u2                                              Page 5
+Flow of a DietIFNA Session
+
+
+
+DIETIFNA FLOW AND NOTES
+-----------------------
+
+         All file transfer is done using either Sealink or TeLink. In the
+         case of TeLink, the modem7 file name transfer part is not used,
+         and the file name is extracted from the first block.
+
+         The sealink run-ahead (number of blocks in the slide) is based
+         on the baud rate:  BlocksToSlide = BaudRate / 400, up to a max
+         of 24 blocks.
+
+
+
+         The calling system:
+
+                  * Send YooHoo
+
+                  * Receive YooHoo/2u2
+
+                  * Send bundles, files, file request (.REQ) files
+                    (in that order)
+
+                  * Receive bundles, files, requested files (in that order)
+
+
+         Receiving system:
+
+                  * Receive YooHoo
+
+                  * Send YooHoo/2u2
+
+                  * Receive bundles, files, file requests (in that order)
+
+                  * Send bundles, files, and respond to file requests that
+                    arrived from the remote system.
+
+YooHoo and YooHoo/2u2                                              Page 6
+Flow of a ZedZap session
+
+
+
+ZEDZAP FLOW
+-----------
+
+         The calling system:
+
+                  * Send YooHoo
+
+                  * Receive YooHoo/2u2
+
+                  * Send bundles, files, file request (.REQ) files
+                    (in that order)
+
+                  * Receive bundles, files, file requests
+
+                  * If a file request (.REQ) file came in,
+                    respond to it
+
+
+         Receiving system:
+
+                  * Receive YooHoo
+
+                  * Send YooHoo/2u2
+
+                  * Receive bundles, files, file requests
+
+                  * Send bundles, files, our file requests, and
+                    respond to file requests that arrived from the
+                    remote system.
+
+                  * If we sent a .REQ file in the preceding step,
+                    wait for the other system to respond.
+
+YooHoo and YooHoo/2u2                                              Page 7
+WaZOO File Requests
+
+
+
+WAZOO FILE REQUESTS
+-------------------
+
+Rick Huebner, who adapted the ZModem routines for Opus, designed the
+.REQ file-based file request system.
+
+
+REQ FILE:
+
+A WaZOO file request is based on a request file.  The name of a request
+file is similar to the .OUT and .FLO files used by Opus-CBCS.
+
+         TEMPLATE: netnode.REQ
+
+         EXAMPLE:  00010002.REQ   ... a request being sent to 1/2
+
+The .REQ file is simply a text file that contains the files we want from
+the remote system.  Those file names can include wildcards, but should
+not contain a path.  Optionally, there can be a password... if the sending
+system requires one.
+
+The "netnode" part of the file name is built from the remote systems net
+and node numbers.  Both numbers become 4-character hex numbers in the
+file name.
+
+Let's say we're requesting THIS.ARC and all node lists from 12/2.  The
+file name would be 000C0002.REQ.  The contents would look like this:
+
+                  this.arc
+                  nodelist.*
+
+If the sysop of 12/2 requires a password of THAT to get the file THIS.ARC,
+the REQ file contents would have to change:
+
+                  this.arc !that
+                  nodelist.*
+
+Transaction-level passwords (of 6 or fewer characters) follow the file name:
+
+                  <filename><single-space-character>!<password><cr>
+
+YooHoo and YooHoo/2u2                                              Page 8
+WaZOO File Requests
+
+
+
+
+If the request is of the "update" genre, the type of update and the time,
+expressed as a UNIX-style long decimal ASCII number, follows the name, or
+in the event that there is a transaction-level password, the password. For
+example, an update request for file NEWOPUS.*, where you already have a file
+dated 1-January 1989, 00:00 and you live on the East Coast (GMT+06) would be:
+
+                  NEWOPUS.* +599634000
+
+The sign is required, it indicates the type of update request. A '+' means
+that all files matching the filespec "NEWOPUS.*" newer than the shown time
+will be sent, a '-' means that all matching files with dates up to and
+including the indicated time will be sent.
+
+
+The complete format of an action line in an REQ file is, then:
+
+          <filename>[<space>!<password>][<space><+/-><time>]<cr>
+
+
+
+MECHANISM:
+
+During the WaZOO session, the .REQ file is simply transmitted to the
+other system.  It goes "as is" like any other file.
+
+The other system can ignore the request, send some of the files, or send
+all of the files.  There is no accounting or responsibilities on the
+part of the remote system.
+
+If your implementation is unable to process the update information for any
+reason, then you should process the line as a "regular" file request.
+
+
+
+NOTE:
+
+In the YooHoo packet, there's a bit that lets you know if the remote
+system currently accepts .REQ files.  This will be a clue as to whether
+a .REQ file would be a waste of time or not. Procedurally it's probably
+best to not send a .REQ file to a system which indicates that it won't
+process it.
+
+YooHoo and YooHoo/2u2                                              Page 9
+Structures and Definitions
+
+
+
+STRUCTURES AND DECLARATIONS
+---------------------------
+
+
+#define ACK    0x06
+#define NAK    0x15
+#define ENQ    0x05
+#define YOOHOO 0xf1
+#define TSYNC  0xae
+
+struct   _Hello
+    {
+    word     signal;           /* always 'o'     (0x6f)                   */
+    word     hello_version;    /* currently 1    (0x01)                   */
+    word     product;          /* product code                            */
+    word     product_maj;      /* major revision of the product           */
+    word     product_min;      /* minor revision of the product           */
+    char     my_name[60];      /* Other end's name                        */
+    char     sysop[20];        /* sysop's name                            */
+    word     my_zone;          /* 0== not supported                       */
+    word     my_net;           /* out primary net number                  */
+    word     my_node;          /* our primary node number                 */
+    word     my_point;         /* 0== not supported                       */
+    byte     my_password[8];   /* This is not necessarily null-terminated */
+    byte     reserved2[8];     /* reserved by Opus                        */
+    word     capabilities;     /* see below                               */
+    byte     reserved3[12];    /* for non-Opus systems with "approval"    */
+    };                         /*          total size 128 bytes           */
+
+
+
+/*------------------------------------------------------------------------*/
+/* YOOHOO<tm> CAPABILITY VALUES                                           */
+/*------------------------------------------------------------------------*/
+#define Y_DIETIFNA 0x0001  /* Can do fast "FTS-0001"  0000 0000 0000 0001 */
+#define FTB_USER   0x0002  /* Full-Tilt Boogie        0000 0000 0000 0010 */
+#define ZED_ZIPPER 0x0004  /* Does ZModem, 1K blocks  0000 0000 0000 0100 */
+#define ZED_ZAPPER 0x0008  /* Can do ZModem variant   0000 0000 0000 1000 */
+#define DOES_IANUS 0x0010  /* Can do Janus            0000 0000 0001 0000 */
+#define Bit_5      0x0020  /* reserved by FTSC        0000 0000 0010 0000 */
+#define Bit_6      0x0040  /* reserved by FTSC        0000 0000 0100 0000 */
+#define Bit_7      0x0080  /* reserved by FTSC        0000 0000 1000 0000 */
+#define Bit_8      0x0100  /* reserved by FTSC        0000 0001 0000 0000 */
+#define Bit_9      0x0200  /* reserved by FTSC        0000 0010 0000 0000 */
+#define Bit_a      0x0400  /* reserved by FTSC        0000 0100 0000 0000 */
+#define Bit_b      0x0800  /* reserved by FTSC        0000 1000 0000 0000 */
+#define Bit_c      0x1000  /* reserved by FTSC        0001 0000 0000 0000 */
+#define Bit_d      0x2000  /* reserved by FTSC        0010 0000 0000 0000 */
+#define Bit_e      0x4000  /* reserved by FTSC        0100 0000 0000 0000 */
+#define WZ_FREQ    0x8000  /* WZ file req. ok         1000 0000 0000 0000 */
+
+YooHoo and YooHoo/2u2                                              Page 10
+State Tables
+
+
+
+ +--------------------------------------------------------------------------+
+ |                                                                          |
+ |  YOOHOO<tm>: SENDER (CALLING System)                                     |
+ |                                                                          |
+ |  ##   Status/Action  Stimulus            Action (comment)       Goto     |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  s1 | Set 30.second |                   |                     |  s2      |
+ |     | failsafe      |                   |                     |          |
+ |     | timer         |                   |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  s2 | Send YOOHOO   |                   |                     |  s3      |
+ |     | character     |                   |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  s3 | Send TSYNC    |                   |                     |  s4      |
+ |     | character     |                   |                     |          |
+ |     | (SEE NOTE #1) |                   |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  s4 | Read char     | Nothing in 3 sec  | report not a WaZOO  | return   |
+ |     |               | or lost carrier   |                     |          |
+ |     |               | or timer elapsed  |                     |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received ENQuire  | send handshake      |  s8      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received 'C'      | Other end may be    |  s5      |
+ |     |               |                   | SEAdog responding   |          |
+ |     |               |                   | to the TSYNC.  Need |          |
+ |     |               |                   | further checking.   |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received NAK      | Could be a FTS-0001 |  s6      |
+ |     |               |                   | mailer responding   |          |
+ |     |               |                   | to the TSYNC.  Need |          |
+ |     |               |                   | further checking.   |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received 01 Hex   | Other end may be    |  s7      |
+ |     |               |                   | SEAdog responding   |          |
+ |     |               |                   | to the TSYNC.  Need |          |
+ |     |               |                   | further checking.   |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received debris   | try again           |  s4      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  s5 | Read char     | Nothing in 3 sec  | Pretend other side  | return   |
+ |     |               |                   | is FTS-0001 mailer  |          |
+ |     |               |                   | responding to TSYNC |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Timer elapsed     | report not a WaZOO  | return   |
+ |     |               | or Carrier lost   |                     |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received ENQuire  | send handshake      |  s8      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received NAK      | Could be a FTS-0001 |  s6      |
+ |     |               |                   | mailer responding   |          |
+ |     |               |                   | to the TSYNC.  Need |          |
+ |     |               |                   | further checking.   |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received 01 Hex   | Other end IS a      | return   |
+ |     |               | Received 00 Hex   | SEAdog responding   |          |
+ |     |               | Received 'C'      | to the TSYNC        |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received debris   | try again           |  s4      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  s6 | Read char     | Nothing in 3 sec  | report not a WaZOO  | return   |
+ |     |               | or lost carrier   |                     |          |
+ |     |               | or timer elapsed  |                     |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received ENQuire  | send handshake      |  s8      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received 'C'      | Other end may be    |  s5      |
+ |     |               |                   | SEAdog responding   |          |
+ |     |               |                   | to the TSYNC.  Need |          |
+ |     |               |                   | further checking.   |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received NAK      | It IS a FTS-0001    | return   |
+ |     |               |                   | mailer responding   |          |
+ |     |               |                   | to the TSYNC        |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received 01 Hex   | Other end may be    |  s7      |
+ |     |               |                   | SEAdog responding   |          |
+ |     |               |                   | to the TSYNC.  Need |          |
+ |     |               |                   | further checking.   |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received debris   | try again           |  s4      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  s7 | Read char     | Nothing in 3 sec  | report not a WaZOO  | return   |
+ |     |               | or lost carrier   |                     |          |
+ |     |               | or timer elapsed  |                     |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received ENQuire  | send handshake      |  s8      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received 'C'      | Other end may be    |  s5      |
+ |     |               |                   | SEAdog responding   |          |
+ |     |               |                   | to the TSYNC.  Need |          |
+ |     |               |                   | further checking.   |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received NAK      | Might be a FTS-0001 |  s6      |
+ |     |               |                   | mailer responding   |          |
+ |     |               |                   | to the TSYNC.  Need |          |
+ |     |               |                   | further checking.   |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received 01 Hex   | Other end may be    |  s7      |
+ |     |               |                   | SEAdog responding   |          |
+ |     |               |                   | to the TSYNC.  Need |          |
+ |     |               |                   | further checking.   |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received FE Hex   | Other end IS a      | return   |
+ |     |               |                   | SEAdog responding   |          |
+ |     |               |                   | to the TSYNC        |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received debris   | try again           |  s4      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  s8 | Send HELLO    | Successful        | Looks like WaZOO    |  s9      |
+ |     | (see hello    |                   |                     |          |
+ |     |     chart)    +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Not successful    | Repeat whole thing  |  s2      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  s9 | Read char     | Nothing in 5 sec  | repeat whole thing  |  s2      |
+ |     |               | or lost carrier   |                     |          |
+ |     |               | or timer elapsed  |                     |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received YOOHOO   | Another WaZOO, go   |  s10     |
+ |     |               |                   | process receive     |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received debris   | Repeat whole thing  |  s2      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ | s10 | Process other | Information       | Report Success      |  return  |
+ |     | side's YOOHOO | Successfully      |                     |          |
+ |     | (See "Receive | Exchanged         |                     |          |
+ |     | Hello Packet" |                   |                     |          |
+ |     | chart)        +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Failure           | Repeat whole thing  |  s2      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ +--------------------------------------------------------------------------+
+
+
+         NOTE #1. Sending the TSYNC character is needed only if you
+                  are also supporting the FTS-0001 method.  TSYNC is
+                  not part of YooHoo/WaZOO.
+
+
+ +--------------------------------------------------------------------------+
+ |                                                                          |
+ |  YOOHOO: RECEIVER   (CALLED system)                                      |
+ |                                                                          |
+ |                                                                          |
+ |  ##   Status/Action  Stimulus            Action (comment)       Goto     |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  v1 | Got YOOHOO    |                   | Smells interesting  |  v3      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  v2 | Got TSYNC     |                   | Report FTS-0001     | return   |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  v3 | Get HELLO     | Successful        | Let's send ours now |  v4      |
+ |     | packet from   |                   |                     |          |
+ |     | remote (see   +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     | "Receive Hello|                   |                     |          |
+ |     | packet")      | Not successful    | Report failure      | return   |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  v4 | Look for ENQ  | Timer elapsed?    | 10 sec. timeout     |  v5      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Character not ENQ | Debris              |  v4      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | ENQ received      | Transmit Hello      |  v6      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  v5 | Clear inbound | Count expired?    | 5 retrys, failed.   |  return  |
+ |     | Send YOOHOO   |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Count not expired | Try again           |  v4      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  v6 | Send HELLO    | Successful        | Success             |  return  |
+ |     | (see "Send    |                   |                     |          |
+ |     | Hello" chart) +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Not successful    | Repeat whole thing  |  v1      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ +--------------------------------------------------------------------------+
+
+
+
+
+ +--------------------------------------------------------------------------+
+ |                                                                          |
+ | SEND HELLO PACKET                                                        |
+ |                                                                          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  h1 | Disable XON   |                   |                     |  h2      |
+ |     | Disable ^C/^K |                   |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  h2 | Send Header   | Transmit the 128  |                     |  h3      |
+ |     |               | byte HELLO struct |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  h3 | Clear inbound |                   |                     |  h4      |
+ |     | buffer        |                   |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  h4 | Send CRC      | Transmit the 16   |                     |  h5      |
+ |     |               | bit CRC of HELLO  |                     |          |
+ |     |               | as two bytes, MSB |                     |          |
+ |     |               | followed by LSB   |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  h5 | Read char     | Received ACK      | Success             |  return  |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received '?'      | Try header again    |  h2      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received ENQ      | Might be out of sync|  h5      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Received debris   | Might be line noise |  h5      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Time out          | Failure             |  return  |
+ |     |               | (30 sec timer)    |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ +--------------------------------------------------------------------------+
+
+
+
+ +--------------------------------------------------------------------------+
+ |                                                                          |
+ |  RECEIVE HELLO PACKET                                                    |
+ |                                                                          |
+ |                                                                          |
+ |  ##   Status/Action  Stimulus            Action (comment)       Goto     |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  r1 | Clear buffers |                   |                     |  r2      |
+ |     | Disable XON   |                   |                     |          |
+ |     | Disable ^C/^K |                   |                     |          |
+ |     | Set timer     |                   |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  r2 | Send ENQuire  |                   | Let other end know  |  r3      |
+ |     |               |                   | we heard YOOHOO.    |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  r3 | Watch for Hex | Timeout           | 10 sec. elapsed.    |  r4      |
+ |     | 1f (Header)   |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Carrier loss      | Report failure      | return   |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Got header char   | Get Hello string    |  r5      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Got a YooHoo      | Resync - send ENQ   |  r2      |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Character not     | Keep watching       |  r3      |
+ |     |               | header (0x1f)     |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  r4 | Bump          | Count expired?    | No YooHoo, 10 retrys| return   |
+ |     | Retry         |                   |                     |          |
+ |     | Count         +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Still a few turns | Try again           |  r2      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  r5 | Receive 128   | Nothing for 30sec | Report failure      | return   |
+ |     | bytes (hello) |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Got all 128 bytes |                     |  r6      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  r6 | Get CRC       | One or both CRC   | Short packet        |  r7      |
+ |     | (two bytes,   | characters timed  |                     |          |
+ |     | MSB followed  | out (over 10 sec) |                     |          |
+ |     | by LSB)       |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Error             | CRC isn't what it   |  r7      |
+ |     |               |                   | should be           |          |
+ |     |               |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | CRC compares      | Successful transfer |  r8      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ |  r7 | Error handler | Count expired?    | 10 failures to get  | return   |
+ |     | Send '?'      |                   | hello. Hang up.     |          |
+ |     | (0x3f)        |                   |                     |          |
+ |     |               +- - - - - - - - - -+- - - - - - - - - - -+- - - - - |
+ |     |               |                   |                     |          |
+ |     |               | Count not expired | Try again           |  r3      |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ |     |               |                   |                     |          |
+ | r8  | Clear inbound |                   | Report success      | return   |
+ |     | Send ACK      |                   |                     |          |
+ |     | Send YOOHOO   |                   |                     |          |
+ |     |               |                   |                     |          |
+ | ----+---------------+-------------------+---------------------+--------- |
+ +--------------------------------------------------------------------------+
+
+
+
+
+
+                                      ###
+
+
