@@ -1,0 +1,423 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:  FTA-1004
+Revision:     23
+Title:        FTSC File List
+Author:       Administrator
+Date:         2017-12-05
+----------------------------------------------------------------------
+Status of this document
+-----------------------
+
+  This document is an FTSC Administrative Document (FTA).
+  Distribution of this document is unlimited.
+
+Contents
+--------
+  1. Administrative Documents
+  2. Fidonet Technical Standards
+  3. Fidonet Standards Proposals
+  4. Fidonet Reference Library
+
+----------------------------------------------------------------------
+
+
+1. FTSC Administration
+----------------------
+
+  FTA-1000.002  Charter
+  FTA-1001.003  Operations
+  FTA-1001.004  Operations
+  FTA-1001.005  Operations
+  FTA-1001.006  Operations
+  FTA-1001.007  Operations
+  FTA-1002.002  Document Submission and Publication Standard
+  FTA-1002.003  ,,
+  FTA-1003.004  Membership List
+  FTA-1003.005  ,,
+  FTA-1003.006  ,,
+  FTA-1003.007  ,,
+  FTA-1003.008  ,,
+  FTA-1003.009  ,,
+  FTA-1003.010  ,,
+  FTA-1003.011  ,,
+  FTA-1003.012  ,,
+  FTA-1003.013  ,,
+  FTA-1003.014  ,,
+  FTA-1003.015  ,,
+  FTA-1003.016  ,,
+  FTA-1003.017  ,,
+  FTA-1003.018  ,,
+  FTA-1003.019  ,,
+  FTA-1003.020  ,,
+  FTA-1003.021  ,,
+  FTA-1003.022  ,,
+  FTA-1003.023  ,,
+  FTA-1003.024  ,,
+  FTA-1004.004  File List
+  FTA-1004.005  ,,
+  FTA-1004.006  ,,
+  FTA-1004.007  ,,
+  FTA-1004.008  ,,
+  FTA-1004.009  ,,
+  FTA-1004.010  ,,
+  FTA-1004.011  ,,
+  FTA-1004.012  ,,
+  FTA-1004.013  ,,
+  FTA-1004.014  ,,
+  FTA-1004.015  ,,
+  FTA-1004.016  ,,
+  FTA-1004.017  ,,
+  FTA-1004.018  ,,
+  FTA-1004.019  ,,
+  FTA-1004.020  ,,
+  FTA-1004.021  ,,
+  FTA=1004.022  ,,
+  FTA-1005.003  Product Codes
+  FTA-1006.002  Keywords to indicate requirement levels
+  FTA-1007.002  Intellectual Property Rights
+  ftscprod.002  Product ID List
+  ftscprod.003  ,,
+  ftscprod.004  ,,
+  ftscprod.005  ,,
+  ftscprod.006  ,,
+  ftscprod.007  ,,
+  ftscprod.008  ,,
+  ftscprod.010  ,,
+  ftscprod.011  ,,
+  ftscprod.012  ,,
+  ftscprod.013  ,,
+  ftscprod.014  ,,
+  ftscprod.015  ,,
+  ftscprod.016  ,,
+  ftscprod-017  ,,
+  ftscprod.018  ,,
+  ftscprod.019  ,,
+  FTSCALL.ZIP   Archive of all documents
+
+2. Fidonet Technical Standards
+------------------------------
+
+  FTS-0001.016  Basic Fidonet Technical Standard
+  FTS-0004.001  Echomail specification
+  FTS-0005.003  ** Obsoleted by FTS-5000 and FRL-1003 **
+  FTS-0006.002  YOOHOO and YOOHOO/2U2
+  FTS-0007.003  SEAlink protocol extension
+  FTS-0008.003  Bark file-request protocol extension
+  FTS-0009.001  Message identification and reply linkage
+  FTS-1024.001  Raw ifcico mail transfer protocol
+  FTS-1025.001  Simple E-Mail Attach Transport (S.E.A.T.)
+  FTS-1026.001  Binkp/1.0 Protocol specification
+  FTS-1027.001  Binkp/1.0 optional protocol extension CRAM
+  FTS-1028.001  Binkp protocol extension Non-reliable Mode
+  FTS-1029.001  Binkp optional protocol extension Dataframe Compression
+  FTS-1030.001  Binkp optional protocol extension CRC Checksum
+  FTS-4000.001  Control paragraphs
+  FTS-4001.001  Addressing control paragraphs
+  FTS-4008.002  Time zone information (TZUTC)
+  FTS-4009.001  Netmail tracking (Via)
+  FTS-5000.001  The Distribution Nodelist
+  FTS-5000.002  ,,
+  FTS-5000.004  ,, 
+  FTS-5000.005  ,,
+  FTS-5001.001  Nodelist Flags and Userflags
+  FTS-5001.002  ,,
+  FTS-5001.004  ,,
+  FTS-5001.005  ,,
+  FTS-5001.006  ,,
+  FTS-5002.001  Pointlist formats
+  FTS-5002.002  Pointlist formats
+  FTS-5003.001  Character set definition in Fidonet messages
+  FTS-5004.001  DSN Distributed Nodelist
+  FTS-5005.001  Advanced Binkleyterm Style Outbound flow and control
+  FTS-5005.002  ,,
+  FTS-5005.003  ,,
+  FTS-5006.001  Tick file format
+
+
+3.  Fidonet Standards Proposals
+-------------------------------
+
+  FSP-1001.002  ** Obsoleted by FRL-1004 **
+  FSP-1002.002  ** Obsoleted by FRL-1007 **
+  FSP-1003.001  ** Obsoleted by FRL-1001 **
+  FSP-1004.001  ** Obsoleted by FRL-1002 **
+  FSP-1005.006  ** Obsoleted by FRL-1015 **
+  FSP-1006.001  ** Obsoleted by FRL-1008 **
+  FSP-1007.001  ** Obsoleted by FRL-1009 **
+  FSP-1008.002  ** Obsoleted by FRL-1010 **
+  FSP-1009.001  ** Obsoleted by FRL-1011 **
+  FSP-1010.001  ** Obsoleted by FRL-1005 **
+  FSP-1011.001  ** Obsoleted by FRL-1006 and FSP-1018 to FSP-1023 **
+  FSP-1011.002  ,,
+  FSP-1011.003  ,,
+  FSP-1012.003  ** Obsoleted by FRL-1016 **
+  FSP-1013.001  ** Obsoleted by FRL-1020 and FTS-5003
+  FSP-1014.001  ** Obsoleted by FRL-1012 **
+  FSP-1015.001  ** Obsoleted by FTS-1025 **
+  FSP-1016.001  ** Obsoleted by FRL-1033 **
+  FSP-1016.003  ** Obsoleted by FRL-1033 **
+  FSP-1017.001  ** RESERVED ** [Carol Shenkenberger]
+                FAQ on IP Connectivity Nodelistings
+  FSP-1018.001  Binkp/1.0 Protocol specification Obsoleted by FTS-1026
+  FSP-1018.002  ,, 
+  FSP-1019.001  Binkp 1.0 optional extension CRAM, Obsoleted  FTS-1027
+  FSP-1020.001  Binkp optional protocol extension CRC Checksum
+                ** Obsoleted by FRL-1022 and FTS-1030 **
+  FSP-1021.001  Binkp 1.0 optional extension Multiple Batch.> FRL-1018
+  FSP-1022.001  ** Obsoleted by FRL-1013 **
+  FSP-1023.001  Binkp protocol extension Non-reliable Mode >> FTS-1028    
+  FSP-1024.000  Binkp/1.1 Protocol specification
+  FSP-1025.001  ** Obsoleted by FRL-1019 **
+  FSP-1026.002  Translation of a Fidonet Address into an Internet
+                Domain Name  >> FRL-1026.002 
+  FSP-1027.001  Binkp extensions: No Dupes mode and No Dupes
+  FSP-1028.001  FTN Address Format  ** Obsoleted by FRL-1028 ** 
+  FSP-1028.002  FTN Address Format  ** Obsoleted by FRL-1028 **
+  FSP-1029.001  Serial number allocation in Message IDs
+                ** Obsoleted by FRL-1029.001 **
+  FSP-1029.002  Serial number allocation in Message IDs
+                ** Obsoleted by FRL-1029.002 **
+  FSP-1030.002  Unicode character set in FidoNet messages
+                ** Obsoleted by FRL-1021 and FTS-5003
+  FSP-1031.001  ** RESERVED ** [Alex Shakhaylo, 2:461/701]
+                Binkp optional protocol extension Multiple One-Way
+                Batch Mode
+  FSP-1032.001  Binkp optional protocol extension Dataframe
+                Compression ** Obsoleted by FRL-1031 and FTS-1029 **
+  FSP-1033.001  The ICM flag   ** Obsoleted by FRL-1017 **
+  FSP-1034.001  Advanced BinkleyTerm Style Outbound flow and control
+                files
+  FSP-1035.002  DNS Distributed nodelist
+                ** Obsoleted by FRL-1035  and FTS-5004 **
+  FSP-1036.001  IPv6 numbers in the nodelist ** Obsoleted by FRL-1036
+  FSP-1037.001  Reserved for Squish messagebase format, Stas Degteff
+  FSP-1038.001  The INO4 Flag  ** Obsoleted by FRL-1038 **
+  FSP-1039.001  TIC file format ** Obsoleted by FTS-5006 and FRL-1039
+  FSP-1040.001  SRIF file request interface
+
+
+4. Fidonet Reference Library
+----------------------------
+
+  FSC-0001      ** Obsoleted by FTS-0001 **
+  FSC-0002      ** Obsoleted by FTS-0005 **
+  FSC-0003.001  FidoNet Route Files Explained
+  FSC-0004.001  Zones and Zonegates explained primitively
+  FSC-0005.001  Opus 1.01 Netmail passwording scheme
+  FSC-0006      ** Obsoleted by FTS-0006 **
+  FSC-0007.002  RFC-822-style msg header proposal
+  FSC-0008      ** Obsoleted by FSC-0015 **
+  FSC-0009.001  Nodelist Flag Draft Document
+  FSC-0010.001  Dutchie 2.80 SEAlink File Resynch
+  FSC-0011.001  Experiences/corrections to FSC-0001
+  FSC-0012      ** Obsoleted by FTS-0004 **
+  FSC-0013      ** Obsoleted by FTS-0008 **
+  FSC-0014.001  Binary-style msg proposal
+  FSC-0015.001  FOSSIL 5.0 Documentation
+  FSC-0016.001  FidoNet Mail Session Startup
+  FSC-0017.001  Archive Philosophy and Document Naming
+  FSC-0018      ** Obsoleted by FTA-1004 **
+  FSC-0019      ** Obsoleted by FTS-0007 **
+  FSC-0020.001  Alternate Nodelist Flag Proposal
+  FSC-0021.001  VFOSSIL, OS/2 Video FOSSIL Appendage
+  FSC-0022      ** Obsoleted by FSC-0090 **
+  FSC-0023.001  Bundle naming convention proposal
+  FSC-0024.001  Binary bundle proposal
+  FSC-0025.001  AVATAR Video Spec
+  FSC-0026      ** Obsoleted by FTA-1004 **
+  FSC-0027.001  ** Obsoleted by FTS-0005 **
+  FSC-0028.001  Proposed file-forwarding standard
+  FSC-0029      ** Not used **
+  FSC-0030.001  Proposal for message identification
+  FSC-0031.001  Proposed message id/linkage standard
+  FSC-0032.001  Proposed message quoting standard
+  FSC-0033.001  Proposal for message identification
+  FSC-0034.002  Gateways to and from FidoNet(r)
+  FSC-0035.001  Transparent gateways to/from FidoNet
+  FSC-0036.001  Group Mail specification
+  FSC-0037.001  AVATAR 0+ Video Spec
+  FSC-0038.001  A Domain Proposal For Fidonet
+  FSC-0039.001  A type-2 packet extension proposal
+  FSC-0039.004  A type-2 packet extension proposal
+  FSC-0040.001  Proposed modem handling extension
+  FSC-0041      ** Obsoleted by FTS-0009 **
+  FSC-0042.001  A modified gateway agreement
+  FSC-0043.002  Some hints on recognizing control lines in Fidonet ...
+  FSC-0044.002  Improved duplicate detection
+  FSC-0045.001  Proposed new packet header
+  FSC-0046.005  Product ID for FidoNet message handlers
+  FSC-0047.001  The ^ASPLIT kludge line
+  FSC-0048.002  Proposed type-2 packet extension
+  FSC-0049.001  Passing domain information during FTS-0006 sessions
+  FSC-0050.001  Character set identifier for FidoNet msg editors
+  FSC-0051.003  System-independent way of transferring special cha ...
+  FSC-0052.001  A proposal for making the PATH zone aware
+  FSC-0053.002  Specifications for the ^aFLAGS field
+  FSC-0054.004  The CHARSET proposal
+  FSC-0055.001  Security passwords in nodelist updates
+  FSC-0056.001  EMSI/IEMSI protocol definition
+  FSC-0057.003  Echo Area Managers - Specifications for Requests
+  FSC-0058.002  A New Way Of Addressing In FidoNet
+  FSC-0059.001  Newsgroup Interchange within FidoNet
+  FSC-0060.001  Calculation and Usage of CRC's  ** Do not use **
+                ** The documented algorithm contains an error **  
+  FSC-0061.001  Proposed Guidelines for the FileBone
+  FSC-0062.003  Nodelist Flag Indicating Online Times
+  FSC-0063.001  Proposal For FidoNet Messages
+  FSC-0064.007  InterDomain Message ID, Gating, Linking and Addressing
+  FSC-0065.001  Type 3 ASCII: A Proposal
+  FSC-0066.002  Type 3 Binary: A Proposal
+  FSC-0067.001  A Proposal For Sensible New Kludge Lines
+  FSC-0068.001  A Proposed Replacement For FTS-0004
+  FSC-0069.001  A FidoNet (FTN) Domain Name Service
+  FSC-0070.002  Improving FidoNet/UseNet Gating and Dupe Checking
+  FSC-0071.001  Distributed FREQ (DFREQ) Specifications
+  FSC-0072.001  The HYDRA File Transfer Protocol
+  FSC-0073.001  Encrypted message identification for Fidonet
+  FSC-0074.001  Proposed echomail specification to replace FTS-0004
+  FSC-0075.001  ISDN capability flags in the Nodelist
+  FSC-0076.001  A Proposal for NetMail AreaTags
+  FSC-0077.001  Type-10 Packet Format
+  FSC-0078.001  Gateway between Fidonet compatible networks
+  FSC-0079.002  RTF Mail: message formatting in Type-2 message packet
+  FSC-0080.002  Describing FidoNet with a layered model
+  FSC-0081.001  A type-3 packet proposal
+  FSC-0082.001  Proposed new packet type
+  FSC-0083.001  Proposed standard for message IDS on FTN systems
+  FSC-0084.001  EDX1: Electronic Data Exchange standard level 1
+  FSC-0085.001  Proposal for "NOZIP" and "ERX" nodelist flags
+  FSC-0086.001  SRIF: Description of new Standard Requestion ...
+  FSC-0087.001  File forwarding in FidoNet technology networks
+  FSC-0088.001  Compatibility & Link Qualifier Extens ... EMSI ...
+  FSC-0089.001  The INTL: netmail addressing control line
+  FSC-0090.001  FTSC Product Codes and Application Form
+  FSC-0091.001  ISDN nodelist flags (supersedes FSC-0075)
+  FSC-0092.001  New control lines for forwarded messages
+  FSC-0093.002  Reduced seen-by lines
+  FRL-1001.001  Suggested use of Nodelist Fields
+  FRL-1002.001  Standard Fidonet Addressing
+  FRL-1003.003  The Distribution Nodelist
+  FRL-1004.002  Timezone information in FTN messages
+  FRL-1005.001  Via kludge specification
+  FRL-1006.001  Binkp - a protocol for transferring FidoNet mail over
+                reliable connections
+  FRL-1007.001  Numeric reply indication in FTN subject lines
+  FRL-1008.001  Kludge for specifying addition e-mail reply addresses
+  FRL-1009.001  Multiple recipient address specification to gateway
+  FRL-1010.001  New control lines for forwarded messages
+  FRL-1011.001  Year 2000 issues in FTN software
+  FRL-1012.001  Moderating by Voting echomail distribution system
+  FRL-1013.001  Binkp optional protocol extension Multiple Password
+  FRL-1014.001  Hudson Message Base (HMB) locking semantics
+  FRL-1015.001  Zone 2 nodelist flags
+  FRL-1016.001  Integration of IP-Nodes in the nodelist
+  FRL-1017.001  The ICM flag
+  FRL-1018.001  Binkp/1.0 optional protocol extension Multiple Batch
+  FRL-1019.001  IPv6 colon substitution in the nodelist
+  FRL-1020.001  Character set definition in Fidonet messages
+  FRL-1021.001  Unicode character set on Fidonet messages
+  FRL-1022.001  Binkp optional protocol extension CRC Checksum
+  FRL-1026.001  Translation of a Fidonet Address into an Internet
+                Domain Name
+  FRL-1026.002  Translation of a Fidonet Address into an Internet
+                Domain Name
+  FRL-1028.002  FTN Address Format
+  FRL-1032.001  Binkp optional protocol extension Dataframe Compression
+  FRL-1035.001  DNS Distributed nodelist
+  FRL-1036.001  IPv6 numbers in the nodelist
+  FRL-1038.001  The INO4 flag
+  FRL-1039.001  Tic file format
+
+
+A. History
+----------
+
+  Rev.1, 1997-10-09: First non-draft release. Author Adrian Walker.
+  Rev.2, 1997-12-19: Cleanup draft. Reformatted document slightly.
+                     Changed FRL back to FSC for the old historic
+                     proposals.
+  Rev.3, 1997-12-29: Added FSP's up to 1009. Added revision numbers.
+  Rev.4, 1999-07-05: Added FTA-1006 and FTA-1007;
+                     Added FSP-1010 to FSP-1012;
+                     Added FTS-5000 to FTS-5001;
+                     Added FRL-1001 to FRL-1002;
+                     Updated obsolete status accordingly.
+  Rev.5, 2005-07-13: Appended versions for FTA documents;
+                     Updated FTSCPROD.010;
+                     Updated FTS-5000.002 and FTS-5001.002;
+                     Added FTS-1024, FTS-1025, FTS-4000, FTS-4001,
+                         FTS-4008, FTS-4009, FTS-5002;
+                     Added FSP-1013 to FSP-1033;
+                     Added FRL-1002 to FRL-1017;
+                     Updated obsolete status accordingly.
+  Rev.6, 2009-11-18: Added FSP's up to 1035
+                     Updated version numbers of FSP's and FTS's
+                     Updated obsolete status when applicable 
+
+  Rev.7, 2010-02-28: Added FSP's up to 1037
+                     Added FRL-1019 (was FSP-1025)
+                     Updated version numbers of FSP's and FTS's
+                     Updated obsolete status when applicable 
+
+  Rev.8, 2012-09-21: Added FTS-5003
+                     Added FRL-1020 (was FSC-1013)    
+                     Updated obsolete status when applicable
+
+  Rev.9. 2013-11-03: Added FRL-1021
+                     Added FTA-1003.018
+                     Added FTS-5000.004
+                     Added FTS-5001.004
+                     Added FTS-5004.001
+                     Added FRL-1026.001 and .002 (was FSP-1026)  
+                     Added FRL-1035.002  (was FSP-1035)
+                     Added FRL-1036.001  (Was FSP-1036)
+                     Added FTS-1038.001
+                     Updated obsolete status when applicable
+
+  Rev.10, 2014-06-20: Added FTA-1002.003
+                      Added FTS-5000.005
+                      Added FTSCPROD.014, .015, .016
+                      Updates status of FSC-0018 and FCS-0026                         
+                      Updates status of FSP-1026 
+                      Corrected some typos
+                      Reformatted to comply with FTA-1002.003      
+
+  Rev.11, 2014-07-01: Added files unlisted, but present on FTSC.ORG
+                      Added FTS-5001.005
+                      Added FRL-1038.001 and obsoleted FSP-1038.001 
+                      Corrected some typos.
+
+  Rev.12, 2014-09-21: Added comment to FSC-0060 about error
+                      Added FRL-1022 and FTS-1030, obsoleted FSP-1020  
+                      Added FRL-1032, obsoleted FSP-1032
+
+  Rev.13, 2014-12-16: Added FRL-1029.001 and 002, obsoleted FSP-1029.*
+                      Added FRL-1033.001 and 003, obsoleted FSP-1016.*
+
+  Rev.14, 2015-01-10  Added FRL-1028.002, obsoleted FSP-1028.002
+
+  Rev.15, 2015-03-29  Added FTS-5005.002.
+
+  Rev.16, 2015-12-08  Added FSP-1039.001 and FTA-1003.021
+
+  Rev.17  2016-10-31  Added FTS-5005.003 
+
+  Rev.18  2016-11-08  Added FTSCPROD.017, FTS-5006.001, FTA-1004.018
+                      Added FRL-1039.001, obsoleted FSP-1039.001
+
+  Rev.19  2016-12-18  Added FTA-1003.022, obsoleted fta-1003.021
+
+  Rev.20  2017-08-1   Added FTSCPROD.018
+
+  Rev.21  2017-08-16  Added FTSCPROD.019, FTS-5001.006
+
+  Rev.22  2017-12-04  Added FTA-1003.023
+
+  Rev.23  2017-12-05  Added FTA-1003.024
+
+  Rev.24  2018-03-11  Added FSP-1040.001
+
+**********************************************************************
