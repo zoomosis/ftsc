@@ -1,0 +1,578 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:  FTS-5000
+Revision:     2
+Title:        The Distribution Nodelist
+Author(s):    FTSC Members, Administrator and Honoured Guests
+
+Issue Date:   26 January 2005
+Review Date:  26 January 2007
+
+======================================================================
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Standard (FTS).
+
+  This document specifies a Fidonet standard for the Fidonet
+  community.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+Abstract
+--------
+
+  Current practice for Fidonet Technology Networks (FTN) is to
+  maintain a nodelist used to store the details of the nodes in the
+  network, and the network structure.
+
+
+Contents
+--------
+
+  1.  Introduction
+  2.  Supersessions
+  3.  Purpose
+  4.  Publication and Distribution
+  5.  Content
+      5.1  Comment Lines
+      5.2  Special Header
+      5.3  Data lines
+  6.  Nodediffs
+  7.  Segments
+
+  A.  References
+  B.  History
+
+======================================================================
+
+
+1. Introduction
+---------------
+
+  Fidonet is a peer-to-peer network utilising multiple different, and
+  often incompatible, communication technologies that are independent
+  of Fidonet itself, and is organised into a particular hierarchy for
+  both technical and management purposes.
+
+  For direct communication, it is necessary that the originating node
+  know in advance the exact method and capabilities of the destination
+  node in order to determine if, when, and how a direct Fidonet mail
+  session can be established.  For routing and management, the stated
+  hierarchy must also be known.
+
+  All this information is collected into a file called the "nodelist."
+
+  While nodelists of various flavours and completeness are in use, the
+  "Distribution Nodelist" is the official record of all Fidonet nodes,
+  their operators, their capabilities and their relation to each other
+  in the network hierarchy.  In essence, the nodelist defines Fidonet.
+
+
+2. Supersessions
+----------------
+
+  FTS-0005 superseded and replaced the documents known under the names
+  of FSC-0002, and FTS-0002.
+
+  This document supersedes and replaces FTS-0005.
+
+
+3. Purpose
+----------
+
+  Along with the companion technical standard (FTS-5001) this document
+  defines the format and content of Fidonet's distribution nodelist.
+
+  Unlike most FTSC documents, the nodelist standards are not only
+  aimed at developers, but also at maintainers of Fidonet (and other
+  Fidonet Technology Networks) nodelist segments.  While nodelist
+  segment maintainers should try to be quite strict in their adherence
+  to this document, it is recommended that software developers be
+  prepared to accept deviations from this standard, especially with
+  regard to field and line size.
+
+  It is assumed you're already familiar with Fidonet structure and
+  addressing terminology.
+
+
+4. Publication and Distribution
+-------------------------------
+
+  The Distribution Nodelist uses the filename NODELIST.nnn, where nnn
+  is the day-of-year of publication, starting at 001 for the first day
+  of January.  Partial and/or alternate nodelists must use some other
+  base filename (i.e. in place of NODELIST).
+
+  For actual distribution, NODELIST.nnn is packed into an archive file
+  named NODELIST.Pnn, where nn are the last two digits of day-of-year
+  and P is the compression format used as listed below:
+
+        A = .arc
+        J = .arj
+        L = .lzh
+        R = .rar
+        Z = .zip
+
+  The ZIP format is presently the official Fidonet standard, although
+  others may be distributed in addition.
+
+
+5. Content
+----------
+
+  The nodelist is a flat text file containing any number of lines,
+  using only the ASCII (7 bit) character set.
+
+  For the remainder of this document, characters in the range 00h to
+  1Fh, plus 7Fh, shall be called "control characters," and characters
+  in the range 20h to 7Eh shall be called "printable ASCII."
+
+  Every line must be terminated with a carriage return (^M, 0Dh) and a
+  line feed (^J, 0Ah), in that order.  The file itself must be
+  terminated with a single EOF character (^Z, 1Ah), and no other data
+  following.  Future implementations should accept nodelists with the
+  EOF (^Z) character omitted.  No other control characters are
+  permitted anywhere in the nodelist.
+
+  Where the operating system uses a different format for text files
+  software that reads the nodelist should also be able to handle
+  nodelists stored in that format.  Where CRCs are to be calculated
+  (see section 5.2) the calculations must be done as if the nodelist
+  has the exact binary format described above.
+
+  For compatibility with certain broken segment processors, nodelist
+  maintainers must limit all lines to at most 157 characters (plus
+  terminator).  It is very likely this limitation will be removed in
+  the future, therefore future software implementations should be able
+  to process lines of up to 1024 characters, and individual fields of
+  up to 255 characters (unless otherwise specified).
+
+
+5.1. Comment Lines
+------------------
+
+  Comment lines begin with a semicolon (3Bh) in the first character
+  position followed by zero or more alphabetic characters called
+  "interest flags."  A program which processes the nodelist may use
+  comment interest flags to determine the disposition of a comment
+  line.  The remainder of a comment line (with one exception, treated
+  below) is free-form ASCII text.
+
+  There are five interest flags defined as follows:
+
+     ;S This comment is of particular interest to Sysops.
+
+     ;U This comment is of particular interest to BBS users.
+
+     ;F This comment should appear in any formatted "Fido List."
+
+     ;A This comment is of general interest (shorthand for ;SUF).
+
+     ;E This comment is an error message inserted by a nodelist
+        generating program.
+
+     ;  This comment may be ignored by a nodelist processor.
+
+
+5.2. Special Header
+-------------------
+
+  The first line of a nodelist is a special comment line containing
+  identification data for the particular edition of the nodelist. The
+  following is an example of the first line of a nodelist:
+
+  ;A FidoNet Nodelist for Friday, July 3, 1987 --
+       Day number 184 : 15943
+
+  Please note that the above line has been split in the sole interest
+  of readability. It should appear on just one line.
+
+  This line contains the general interest flag, the week day, full
+  date, the 3-digit publication date (described in section 4), and
+  ends with a 5-digit decimal check value.  The publication date and
+  check value are padded to length with leading zeros, if necessary.
+
+  The check value is derived as follows:
+
+     Beginning with the first character of the second line, a 16-bit
+     cyclic redundancy check (CRC) is calculated for the entire file,
+     including carriage return and line feed characters, but not
+     including the terminating EOF character. The check polynomial
+     used is the same one used for many file transfer protocols:
+
+          2**16 + 2**12 + 2**5 + 2**0
+
+  The CRC may be used to verify that the file has not been edited. The
+  importance of this will become evident in the discussion of NODEDIFF
+  below. CRC calculation techniques are well documented in the
+  literature, and will not be treated further here.
+
+  The first line will certainly be different from the above in the
+  case of nodelist segments for individual zones, regions, networks or
+  hubs; it will also be different for other Fidonet Technology
+  Networks.
+
+  Except for the day number and the CRC, developers shouldn't make any
+  assumption on the format of this line. The suggested parsing
+  algorithm is to find the last colon in the line, and then scan
+  backwards to get the day of issue.
+
+
+5.3.  Data lines
+----------------
+
+  A nodelist data line contains no less than seven (7) variable length
+  fields separated by commas (2Ch), defined below.  Each data line is
+  a record/entry for an individual Fidonet node.
+
+  Printable ASCII characters except for commas and spaces are allowed
+  in all string fields unless specified otherwise.  Underscores (5Fh)
+  are always used in place of spaces (20h).
+
+  Field 1: Keyword
+
+    Type: string;  Length: 1 to 6.
+
+    The keyword field defines the type of node, and will either be
+    empty or contain exactly one of the keywords defined below,
+    grouped by functional class.
+
+    No other keywords are valid in the distribution nodelist at this
+    time, but private nodelist distributions may include other node
+    types by marking them appropriately in this field.  One common
+    example is the "Point" keyword.  See FTS-5002 for the pointlist
+    specification.
+
+    It is recommended that future implementations allow for keywords
+    of up to 32 characters, and gracefully ignore any entries using
+    unrecognised keywords.
+
+    Full/Member Nodes -- these are the system numbers of individual
+    Fidonet members.  See [Policy] for details on Fidonet membership.
+
+      <empty>
+        Defines a normal node entry.
+
+      Pvt
+        In the past, this keyword merely defined a Private node (see
+        Policy v4.07, Section 2.1.9) - i.e. a node that is
+        operational, but not publically available for direct contact.
+
+        Due to software limitations over Field 6, this keyword has
+        been "borrowed" to allow listing of systems that do not have a
+        PSTN/ISDN line available, but instead utilise some other form
+        of communication detailed elsewhere in the entry.
+
+        In either case, if the originating node cannot contact the
+        destination node, mail may instead be routed via its Hub or
+        Host.
+
+        Pvt entries are only allowed as members of local networks.
+
+      Hold
+        Defines a node which is operational but cannot be publically
+        contacted.  This is expected to be a temporary condition.
+
+        Mail may be sent to such nodes, routed via its Hub, Host or
+        Coordinator, or held locally by the originating node until the
+        Hold keyword is removed.
+
+      Down
+        Defines a node which is not operational.  This is expected to
+        be (semi-)permanent.  Mail may NOT be sent or routed to it.
+
+    Administrative Nodes -- these nodes indicate the beginning of a
+    branch in the Fidonet addressing/management hierarchy.
+
+    Each branch may contain one or more administrative nodes of lower
+    tier, or any of the above member node types unless stated
+    otherwise.
+
+    Since the nodelist is a flat file, a branch is simply terminated
+    at the next administrative node of equal or higher tier (or EOF).
+
+    Member nodes are always part of an administrative branch, and may
+    never appear at the top level of the nodelist.
+
+    In order from highest to lowest:
+
+      Zone
+        Begins the definition of a geographic zone and defines its
+        coordinator.  A zone is also a logical region AND net.
+
+        Normal nodes immediately below a Zone node, and before any
+        other administrative nodes, are Zone Independent Nodes.
+
+      Region
+        Begins the definition of a geographic region and defines its
+        coordinator.  A region is also a logical net.
+
+        Normal nodes immediately below a Region node, and before any
+        other administrative nodes, are Region Independent Nodes.
+
+      Host
+        Begins the definition of a local network (net) and normally
+        defines its coordinator (see FTS-5001 for the override flag).
+
+      Hub
+        Begins the definition of a routing subunit within a multilevel
+        local network.
+
+
+  Field 2: Node number
+
+     Type: integer;  Range: 1 to 32767;  Length: 1 to 5.
+
+     For member nodes and Hubs (which are treated as member nodes as
+     far as addressing goes), this number is the node number, and must
+     be unique within their local network.
+
+     For a Zone entry, this number is the zone number.  A region and
+     net number of equal value is implied, and the node number is
+     zero.  Zone numbers must be unique across the entire network.
+
+     For a Region entry, this number is the region number.  A net
+     number of equal value is implied, and the node number is zero.
+     Region numbers must be unique within each zone, but it is
+     recommended future Region numbers be unique across the entire
+     network for better 2D compatibility.
+
+     For a Host entry, this number is the net number, and the node
+     number is zero.  As with Region numbers, net numbers must be
+     unique within each zone, but should be fully unique if possible.
+
+     Because the node number zero is reserved for Zone, Region and
+     Host entries, the value "0" is strictly forbidden in this field.
+
+
+  Field 3: Node name
+
+     Type: string.
+
+     This is the name by which the system is known.
+
+     Alternatively, this field may be used by IP nodes for a domain
+     name, static IP address or E-Mail address for email tunnelling
+     programs.
+
+     NOTE: There may be formatting limitations on this field for IP
+     capable systems; consult the section on IP flags in FTS-5001.
+
+
+  Field 4: Location
+
+     Type: string.
+
+     This is the physical location of the node.
+
+     Generally, this is expressed as the primary local location (town,
+     suburb, city, etc.) and where applicable, an underscore followed
+     by the abbreviation of the regional geopolitical administrative
+     district (state, province, department, county, etc.).
+
+
+  Field 5: Sysop name
+
+     Type: string;  Length: 1 to 36.
+
+     This is the name of the Fidonet member responsible for the node.
+
+
+  Field 6: Phone number (PSTN or ISDN)
+
+     Type: string;  Length: 3 to 29 (theoretically);  Characters:
+     digits and dashes, or the exact string "-Unpublished-"
+
+     This field contains two or more numeric subfields separated by
+     dashes (2Dh).  The first field is the country code. The rest of
+     the phone number should be formatted according to local customs.
+
+     The various parts of the phone number are frequently used to
+     derive cost and routing information, as well as what number is to
+     be dialled. A typical example of the data in a phone number field
+     is 1-800-555-0100, corresponding to country 1 (USA), area 800
+     (area code), exchange 555, and number 0100.
+
+     Alternatively, this field may contain the string "-Unpublished-"
+     if the node has no conventional phone number, and uses the "Pvt"
+     or "Hold" keywords.  It is recommended that software be able to
+     recognise this string as an indicator to never attempt to dial
+     this node by PSTN/ISDN, no matter what the keyword.
+
+     This field may also contain the static IP address of an IP-only
+     node in decimal format with periods replaced with dashes, and
+     prefixed with a country code of 000.  This method should only be
+     used in exceptional circumstances, since it risks conflict with
+     conventional dialling, and is almost always better to list a
+     fully qualified domain name in a field that allows it.
+
+
+  Field 7: DCE speed (required, but obsolete)
+
+     Type: string;  Length: 1+
+
+     In the past, this field was used to show the maximum modem speed
+     supported by the node, but has since been obsoleted in favour of
+     the more accurate modem flags.
+
+     Commonly accepted values in this field are: 300, 1200, 2400,
+     4800, 9600, 14400, 16800, 19200, 28800 and 33600.  These values
+     are normally enforced by segment processing software; deviations
+     risk the entire entry being declared in error and dropped from
+     the nodelist or segment.
+
+     Systems without a listed PSTN line must use 300, including ISDN
+     and IP only nodes.  All others may use whichever value is most
+     appropriate.  Because this field is now of little value except
+     for human readers, most PSTN capable systems currently list at
+     most 9600.  Nodelist maintainers should confirm with their
+     Coordinator(s) before listing higher rates.
+
+
+  Field 8+: Flags (optional)
+
+     Type: string;  Length: varied;  Characters: varied.
+
+     Any remaining fields from position eight (8) onward are flag
+     fields.  Note there may or may not be a trailing comma after
+     Field 7 if there are no flags listed.
+
+     See FTS-5001 for details on the flag fields, including length
+     restrictions.
+
+
+6. Nodediffs
+------------
+
+  The nodelist, even in archive form, is a substantial document (or
+  file).  To reduce bandwidth usage/waste and transmission times, a
+  smaller file called a "nodediff" is generated using the previous
+  week's nodelist.  The nodediff is actually an editing script which
+  contains only new or changed lines between the two nodelists, plus a
+  number of editing commands.
+
+  The nodediff file is named and archived in the same way as the full
+  Distribution Nodelist, except with a base filename of NODEDIFF.
+
+  The first line of NODEDIFF.nnn is an exact copy of the first line of
+  LAST WEEK'S nodelist. This is used as a first-level confidence check
+  to insure that the right file is being edited. The second and sub-
+  sequent lines are editing commands and editing data.  There is no
+  terminating EOF (^Z) character on a nodediff.
+
+  There are three editing commands and all have the same format:
+
+          <command><number>
+
+     <command> is a 1-letter command; A, C, or D.  <number> is an
+     integer from 1 to 32767 (inclusive), and defines the number of
+     lines to be operated on by the command. Each command appears on a
+     line by itself. The commands have the following meanings:
+
+     Ann - Add the following nn lines to the output file.
+
+     Cnn - Copy nn unchanged lines from the input to the output file.
+
+     Dnn - Delete  nn lines from the input file.
+
+  The following illustrate how the first few lines of NODEDIFF.213
+  might look:
+
+     ;A Friday, July 25, 1986 -- Day number 206 : 27712
+     D2
+     A2
+     ;A Friday, August 1, 1986 -- Day number 213 : 05060
+     ;A
+     C5
+
+  This fragment illustrates all three editing commands. The first line
+  is the first line from NODELIST.206.  The next line says "delete the
+  first two lines" from NODELIST.206.  These are the identification
+  line and the line following it. The next command says "add the next
+  two lines" to NODELIST.213.  The two data lines are followed by a
+  command which says "copy five unchanged lines" from NODELIST.206 to
+  NODELIST.213.  Notice that the first line added will ALWAYS contain
+  the new nodelist's CRC.
+
+  Since only the differences will be distributed, it is important to
+  insure the accuracy of the newly created nodelist. This is the
+  function of the CRC mentioned above. It is sufficient for a program
+  designed to perform the above edits to pick the CRC value from the
+  first line added to the output file, then compute the CRC of the
+  rest of the output file. If the two CRCs do not agree, one of the
+  input files has been corrupted. If they do agree, the probability is
+  very high (but not 100%) that the output file is accurate.
+
+
+7. Segments
+-----------
+
+  Segments are partial nodelists, usually containing only one complete
+  branch of nodes, starting at the relevant zone, region, host or hub
+  node.  The Distribution Nodelist is also referred to as a composite
+  nodelist, as it is compiled from multiple zone-lists.
+
+  The format and structure is the same as the Distribution Nodelist,
+  including the header, with a base filename of local invention,
+  usually derived from the contents of the segment (e.g. N712LIST.nnn
+  or N712SEG.nnn for a segment containing all the nodes in Net 712).
+
+  To generate the Distribution Nodelist, segments propagate up through
+  the network's administrative hierarchy, each tier compiling segments
+  from the tier immediately below, then passing on the resulting
+  segment to the next tier upstream.
+
+  For example, a Network Coordinator will collect Hub Segments from
+  all the hubs in the same local network, compile it into a Network
+  Segment, and forward it on to the Regional Coordinator.  And so on.
+
+  Segments can also be sent back downstream - this is most commonly
+  done with Zone Nodelists.  Nodes that do not need to attempt direct
+  contact with nodes in other zones can use the Zone Nodelist instead
+  of the full composite nodelist, saving on storage space and
+  transmission time.
+
+
+A. References
+-------------
+
+  [FTS-0005] "The distribution nodelist", Ben Baker, Rick Moore.
+  February 1989. Obsoleted by this document.
+
+  [Policy] "FidoNet Policy Document" v4.07 - June 9, 1989.
+
+
+B. History
+----------
+
+   Rev.1, 19990627: Initial Release. Principal Author David Hallford
+   Rev.2, 20000424: Re-draft by Gino Lucrezi, with input from others,
+                    especially Andreas Klein. Major changes:
+                    - notes on parsing line 1
+                    - baud rate
+                    - different use of fields for IP nodes
+                    - notes to developers and maintainers
+                    - notes on pointlists
+                    - notes on line and field limits
+                    - revised definition of "Hold" nodes.
+                    - clarification on hub node numbers
+                    - clarification on point phone numbers
+                    - clarification on the former "speed" field
+   Rev.2, 20040817: Re-re-draft by FTSC.
+                    - Added Introduction and Segments sections.
+                    - More allowances for IP listings.
+                    - Reorganised/reindexed Content section.
+                    - Added length limits to fields where they could
+                      be determined.
+                    - clarification on usage of Keywords.
+                    - clarification on special node numbers.
+                    - ZCs authorise that ZIP is now the default
+                      archival/compression tool for distributed files.
+
+**********************************************************************
