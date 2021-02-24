@@ -1,0 +1,103 @@
+;
+; code,name,environment,function,contact,net address
+;
+00,Fido,MS-DOS,BBS/packer/mailer,Tom Jennings,1:125/111
+01,Rover,MS-DOS,Packer/mailer,Bob Hartman,1:104/501
+02,SEAdog,MS-DOS,Packer/mailer,Thom Henderson,1:107/542.1
+03,DROPPED
+04,Slick/150,HP-150,Packer/mailer,Jerry Bain,1:170/220
+05,Opus,MS-DOS,BBS/mailer/tosser/scanner,Doug Boone,1:119/5
+06,Dutchie,MS-DOS,Packer/mailer/tosser/scanner,Henk Wevers,2:500/1
+07,DROPPED
+08,Tabby,Macintosh,Packer/mailer,Michael Connick,1:107/412
+09,DROPPED
+0A,Wolf/68k,CP/M 68k,Packer/mailer,Robert Heller,1:321/153
+0B,QMM,QNX,Packer/mailer,Rick Duff,1:167/201
+0C,FrontDoor,MS-DOS,Packer/mailer,Joaquim Homrighausen,3:632/308
+0D,DROPPED
+0E,DROPPED
+0F,DROPPED
+10,DROPPED
+11,MailMan,MS-DOS,Outbound manager,Ron Bemis,1:124/1113
+12,OOPS,MS-DOS,Outbound manager,Tom Kashuba,1:167/1
+13,GS-Point,Atari ST,Packer/mailer,Harry Lee,1:321/202
+14,BGMail,????,????,Ray Gwinn,1:265/1
+15,DROPPED
+16,DROPPED
+17,DROPPED
+18,DROPPED
+19,BinkScan,MS-DOS,Packer,Shawn Stoddard,1:362/101
+1A,D'Bridge,MS-DOS,Packer/mailer,Chris Irwin,1:18/68
+1B,BinkleyTerm,MS-DOS,Mailer,Vince Perriello,1:141/491
+1C,Yankee,MS-DOS,Packer,Randy Edwards,1:132/555
+1D,DROPPED
+1E,Daisy,Apple ][,Packer/mailer,Raymond & Ken Lo,3:700/1
+1F,Polar Bear,????,BBS/packer/mailer,Kenneth McLeod,1:101/190
+20,The-Box,MS-DOS/Atari ST,Packer/mailer,Jac Kersing & Arjen Lentz,2:286/202 & 2:286/201
+21,STARgate/2,OS/2,Packer/mailer,Shawn Stoddard,1:362/101
+22,TMail,MS-DOS,Packer/tosser/scanner,Larry Lewis,3:713/600.1701
+23,TCOMMail,MS-DOS,Packer/mailer,Mike Ratledge,1:372/888
+24,Bananna,Macintosh,Packer/mailer,Joe Keenan,1:109/401
+25,RBBSMail,MS-DOS,Packer/tosser/scanner,Jan Terpstra,2:512/10
+26,Apple-Netmail,Apple ][,Packer/mailer,Bill Fenner,1:129/87
+27,Chameleon,Amiga,Mailer,Juergen Hermann,2:241/2.12
+28,Majik Board,MS-DOS,BBS/packer/mailer,Dale Barnes,1:375/11
+29,QMail,MS-DOS,Packer/tosser/scanner,Greg Dawson,1:106/111
+2A,Point And Click,Amiga,Packer,Rob Tillotson,1:201/40.302
+2B,Aurora Three Bundler,MS-DOS,Packer,Oliver McDonald,????
+2C,FourDog,MS-DOS,Packer,Shay Walters,1:376/12
+2D,MSG-PACK,MS-DOS,Packer,Tom Hendricks,1:261/662
+2E,AMAX,MS-DOS,Outbound manager,Alan Applegate,1:104/36
+2F,Domain Communication System,????,????,Hal Duprie,1:101/106
+30,LesRobot,????,FidoNet/ARPANET Gateway,Lennart Svensonn,2:501/2
+31,Rose,MS-DOS,Packer/mailer,Glen Jackson,1:100/617
+32,Paragon,Amiga,BBS/packer/mailer,Jon Radoff,1:322/545
+33,BinkleyTerm/oMMM/ST,Atari ST,Mailer/packer,Peter Glasmacher,1:143/9
+34,StarNet,Atari ST,BBS/mailer,Eric Drewry,1:322/566
+35,ZzyZx,MS-DOS,Packer/tosser/scanner,Claude Warren,1:104/62
+36,QEcho,MS-DOS,Tosser/scanner,The QuickBBS Group,1:363/1701
+37,BOOM,MS-DOS,Outbound manager,Andrew Farmer,1:163/115
+38,PBBS,Amiga,Packer/mailer,Todd Kover,1:261/1028
+39,TrapDoor,Amiga,Mailer,Maximilian Hantsch,2:310/3.24
+3A,Welmat,Amiga,Mailer,Michael Richardson,1:163/109.10
+3B,NetGate,MS-DOS,Tosser/scanner,David Nugent,3:632/348
+3C,Odie,MS-DOS,Mailer,Matt Farrenkopf,1:105/4.76
+3D,Quick Gimme,CPM-80/MS-DOS,File requestor,Laeeth Isaacs,2:254/18
+3E,dbLink,MS-DOS,File requestor,Chris Irwin,1:18/68
+3F,TosScan,MS-DOS,Packer/tosser/scanner,Joaquim Homrighausen,3:632/308
+40,Beagle,MS-DOS,BBS/mailer,Alexander Holy,2:310/11.32
+41,Igor,MS-DOS,Mailer,Harry Lee,1:321/202
+42,TIMS,MS-DOS,Packer/mailer,Bit Bucket Software,1:104/501
+43,Isis,MS-DOS,Packer/mailer,Mike Bryeans,????
+44,AirMail,MS-DOS,Packer/mailer,Joaquim Homrighausen,3:632/308
+45,XRS,MS-DOS,Message editor/packer,Mike Ratledge,1:372/888
+46,Juliet Mail System,Amiga,Packer,Gregory Kritsch,1:163/109.30
+47,Jabberwocky,Macintosh,Message editor/packer,Eric Larson,1:260/330
+48,XST,MS-DOS,Packer/tosser/scanner,Wayne Michaels,1:380/100
+49,MailStorm,Amiga,Packer/tosser/scanner,Russel Miranda,1:268/106
+4A,BIX-Mail,????,BIX mailer,Bob Hartman,1:104/501
+4B,IMAIL,MS-DOS,Packer/tosser/scanner,Fabiano Fabris,2:310/11.22
+4C,FTNGate,MS-DOS,Internetwork gateway/packer,Jason Steck,1:104/424
+4D,RealMail,MS-DOS,Usenet/FTS-0001 packer,Taine Gilliam,1:372/42
+4E,Lora-CBIS,MS-DOS,BBS/mailer,Marco Maccaferri,2:332/16
+4F,TDCS,PDP-11,Packer/tosser/scanner/mailer,Terry Ebdon,2:254/6
+50,InterMail,MS-DOS,Packer/mailer,Peter Stewart,1:135/21
+51,RFD,MS-DOS,Announcement generator,Doug Belkofer,1:234/10
+52,Yuppie!,MS-DOS,Point editor/packer/tosser/scanner,Leo Moll,2:242/2
+53,EMMA,MS-DOS,Packer/tosser/scanner,Johan Zwiekhorst,2:292/100
+54,QBoxMail,QDOS,Packer/tosser/scanner/mailer,Jan Bredenbeek,2:283/500
+55,Number 4,MS-DOS,Point system,Ola Garstad,2:502/15
+56,Number 5,MS-DOS,BBS/mailer,Ola Garstad,2:502/15
+57,GSBBS,MS-DOS,BBS/packer,Michaelangelo Jones,1:260/209
+58,Merlin,MS-DOS,BBS/packer/mailer,Mark Lewis,2:258/25
+59,TPCS,MS-DOS,BBS/packer,Mikael Kjellstrom,2:201/211
+5A,Raid,MS-DOS,Tick utility,George Peace,1:270/101
+5B,Outpost,MS-DOS,BBS/packer/mailer,Mike Dailor,1:260/236
+5C,Nizze,MS-DOS,BBS/packer,Tomas Nielsen,2:205/202
+5D,Armadillo,Macintosh,Packer,Erik Sea,1:221/109
+5E,rfmail,Unix,Packer/mailer,Heikki Suonsivu,2:504/1
+5F,Msgtoss,MS-DOS,Tosser/scanner,Mike Zakharoff,1:343/36
+60,InfoTex,MS-DOS,BBS/packer/mailer/tosser/scanner,Jan Spooren,2:295/20
+61,GEcho,MS-DOS,Packer/tosser/scanner,Gerard van der Land,2:283/1.5
+62,CDEhost,MS-DOS,Packer,Dennis D'Annunzio,1:379/28
+63,Pktize,MS-DOS,Packer,Joaquim Homrighausen,3:632/308
