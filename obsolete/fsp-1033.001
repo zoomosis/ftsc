@@ -1,0 +1,114 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FSP-1033
+Revision:       1
+Title:          The ICM flag.
+Author(s):      Michiel van der Vlist
+
+Revision Date:  14 June 2004
+Review Date:    14 June 2006
+----------------------------------------------------------------------
+Contents:       0. Status of this document.
+                1. Introduction.
+                2. The ICM flag.
+                3. Clarification.
+                4. References.
+                5. Contact Info.
+----------------------------------------------------------------------
+
+0. Status of this document
+--------------------------
+
+  This document is a Fidonet Standards Proposal (FSP).
+
+  This document proposes a Fidonet standard for the Fidonet
+  community.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+  This proposed standard is meant as an addition to FTS-5001 and
+  should be integrated with it if and when this is proposal is
+  accepted as a standard.
+
+
+1. Introduction
+---------------
+
+  One of the problems with the present nodelist format is that
+  there is no way for dual capable systems (PSTN-IP) to specify
+  different on-line times for the PSTN section and the IP
+  section. There is the CM flag to signal 24/7 capability but there
+  is no way to signal 24/7 capability for IP combined with limited
+  opening hours for PSTN.
+
+  The use of IP is gradually increasing but PSTN will still be an
+  important factor for quite some time, so sysops may want to find
+  a means to eliminate the cost of a dedicated PSTN line without
+  completely dropping PSTN support. One solution is to share the
+  line with a voice line and to only support limited opening
+  hours on the PSTN side. They will be ZMH only or carry a Txy flag
+  to signal opening hours. They can not fly the CM flag. Yet if the
+  node has a dsl or cable connection, the IP mailer can very well
+  be online 24/7. The proposed ICM flag takes care of this.
+  
+
+2. The ICM flag
+---------------
+
+        ICM    Indicates that the node is available for mail 24 hours
+               a day by means of one or more of the IP protocols as
+               mentioned in FTS-5001 section 1 paragraph H.
+
+               This flag may only be used in combination with one or
+               more of the flags mentioned in FTS-5001 1.H.(f.e IBN)
+
+               This flag must not be used in combination with the CM
+               flag.
+
+               If the node flies any Tyz, #?? or !?? flags in
+               addition to the ICM flag, those other flags are
+               assumed to only apply to PSTN connects.
+
+3. Clarification
+----------------
+
+  PSTN only node:    -  Flies CM flag when available 24/7.
+
+  IP only node:      -  When available 24/7 flies either CM flag or
+                        ICM flag. (But not both) CM is preferable
+                        as all existing software will recognise it.
+
+  PSTN/IP node:      -  Flies CM flag when both PSTN and IP sections
+                        are available 24/7.
+                     -  Flies ICM flag when PSTN section is only
+                        available during limited hours but IP
+                        section is available 24/7.
+                     -  Never flies both. 
+
+4. References
+-------------
+
+  [FTS-5000] The distribution nodelist
+
+  [FTS-5001] Nodelist flags and user flags.
+
+5. Contact Data
+---------------
+
+  Michiel van der Vlist
+  Fidonet:  2:280/5555
+  E-mail:   pa0mmv (at) vrza.org
+
+
+History
+-------
+
+   Rev.1, 20040614: Initial Release.
+                    Principal author Michiel van der Vlist.
+
+**********************************************************************
+
+
