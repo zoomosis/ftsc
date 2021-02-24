@@ -1,0 +1,156 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTS-4000
+Revision:       1
+Title:          CONTROL PARAGRAPHS
+Author(s):      FTSC
+
+Revision Date:  1 October 2000
+Expiry Date:    1 October 2002
+----------------------------------------------------------------------
+Contents:
+                1. Credits
+                2. General
+                3. General format of control paragraphs
+                4. Control tags
+                5. Length of control paragraphs
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Standard (FTS).
+
+  This document specifies a Fidonet standard for the Fidonet
+  community.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+1. Credits
+----------
+
+  This document is based on the work of Randy Bush and many others.
+
+
+2. General
+----------
+
+  The size and complexity of FidoNet has increased over the years.
+
+  Although a number of attempts have been made, new packet file
+  formats which may have accomodated those changes in the network have
+  not gained common acceptance.
+
+  To be able to add new addressing and other control information in
+  the old packet formats, it has become common practice to use control
+  paragraphs (also called kludges or kludge lines) embedded in the
+  packed message text body.
+
+
+3. Control paragraphs
+---------------------
+
+  A control paragraph shall be contained within a separate paragraph
+  of text as defined in separate FTSC documents. A control paragraph
+  may not contain any other message text.
+
+  Each control paragraph shall start with a <SOH> character.
+  Non-control paragraphs must not start with a <SOH> character.
+
+  The general format of a control paragraph shall be:
+
+    <SOH><control tag>": "<string><CR>
+
+  where <string> is some sort of value related to the control
+  paragraph in question.
+
+  For historical reasons certain control tags use the following
+  paragraph format:
+
+    <SOH><control tag>":"<string><CR>
+
+  This format shall however not be used for new control tags.
+
+  If no data value is required for a certain control paragraph, the
+  general format for such a paragraph shall be:
+
+    <SOH><control tag>":"<CR>
+
+  Developers may introduce new control tags on an experimental basis
+  as they see fit. Control tags which are documented in FTSC documents
+  must however not be used in any other way than according to those
+  FTSC documents.
+
+  Consequently each program processing FidoNet packet files should
+  retain any control paragraph containing an unknown control tag
+  verbatim and at as unchanged a position within the message body as
+  possible. This is particularly essential for copies of messages
+  which are to be sent to another system.
+
+  The ASCII character set should be used in control paragraphs.
+
+  It is known that certain programs use non-ASCII characters in
+  control paragraphs.
+
+  If a control paragraph contains non-ASCII characters and the message
+  contains information about the character set used, it should be
+  assumed that that character set is also used in the control
+  paragraph in question.
+
+  If a control paragraph contains non-ASCII characters and the message
+  contains no information about the character set used, the character
+  set used in the control paragraph in question may be considered
+  undetermined.
+
+  The <LF> and soft <CR> characters (character codes 10 and 141
+  respectively) should not be used within a control pragraph. If they
+  are, they should be disregarded by any program processing such a
+  message or copies thereof.
+
+  If a program processing packet files encounters non-ASCII or
+  non-printable ASCII characters in control paragraphs in messages
+  which will be passed on to other programs or systems, those
+  characters should be passed along unchanged.
+
+
+4. Control tags
+---------------
+
+  Control tags and the accompanying data values are specified in
+  separate FTSC documents.
+
+
+5. Length of control paragraphs
+-------------------------------
+
+  The contents of control paragraphs are generally intended for the
+  programs processing the message (or the copies of the message) and
+  not for presentation on the user interface level.
+
+  Control paragraphs should therefore be kept as concise as possible.
+
+  Traditionally most control paragraphs were limited to 80 characters
+  or less. However, a control paragraph may in principle be of any
+  length whenever required.
+
+  For obvious reasons, each system has some maximum size for a message
+  body and for a packet file. Furthermore the file transfer protocols
+  for FidoNet sessions specified separately may also impose maximum
+  sizes on files to be transferred from one FidoNet system to another.
+
+  There may be specific limits to the length of certain control
+  paragraphs as specified by other FTSC documents.
+
+
+
+A. History
+----------
+
+   Rev.1, 20001001: Initial Release.
+                    Principal author Goran Eriksson.
+
+**********************************************************************
