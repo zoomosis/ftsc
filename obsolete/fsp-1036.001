@@ -1,0 +1,128 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FSP-1036
+Revision:       1
+Title:          IPv6 numbers in the nodelist. 
+Author(s):      Michiel van der Vlist
+
+Date:           9 March 2010
+----------------------------------------------------------------------
+Contents:
+                1. Introduction.
+                2. The problem.
+                3. The solution.
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Standards Proposal (FSP).
+
+  This document proposes a Fidonet standard for the Fidonet
+  community.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+1. Introduction
+---------------
+
+  In addition to the classic modem connection over telephone lines,
+  FidoNet increasingly makes use of the InterNet for its links.
+  This means InterNet contact information needs to be in the nodelist.
+  Up to now, this has been in the form of IP quads and fqdn's. (Fully
+  Qualified  Domain Names). 
+  In the future the need to have IPv6 addresses in the nodelist may
+  very well arise.
+
+  There is a problem however.
+
+
+2. The Problem
+--------------
+
+  The format of an IPv6 address is:
+
+    Eight hexadecimal values in the range 0-FFFF separated by a colon.
+    One or more successive zero values may once be represented by
+    two successive colons. F.e. 1234::6789:abcd expands to
+    1234:0:0:0:0:0:6789:abcd.
+
+  The problem is that the colon is already in use to separate a nodelist
+  flag from its parameter(s), that some flags may carry a variable number
+  of parameters and that the colon is also used to separate parameters
+  from each other.
+
+  E.g. a flag carrying both a host name and a port number:
+
+    FLAG:fido.vlist.eu:24555
+
+  Having the same character for separating parameters as for separating
+  individual items within a multidimensional parameter creates a parsing
+  problem.
+
+  Does 1234::6789:abcd:5678 resolve to address 1234:0:0:0:0:0:6789:abcd
+  with a port number of 5678 or does it resolve to just an address of
+  1234:0:0:0:0:6789:abcd:5678 and no port number specified?
+
+
+3. The Solution
+---------------
+
+  Whenever an IPv6 address is to appear as a parameter in the
+  nodelist the address shall be encased in square brackets.
+
+  This follows the practise described in RFC 2732 paragraph 2
+  and RFC 3986 paragraph 3.2.2 for literal IPv6 addresses in
+  URL's and URI's.
+
+  Example: FLAG:[2002:4f87:44d5::1]:443
+
+
+References
+----------
+
+  [FTS-5]    "The distribution nodelist", Ben Baker, Rick Moore.
+             February 1989. Obsoleted by FTS-5000.
+
+  [FTS-5000] "The distribution nodelist".
+             FTSC Members, Administrator and Honoured Guests
+             Jan 2005.
+
+  [FTS-5001] "Nodelist flags and userflags".
+             FTSC Members, Administrator and Honoured Guests
+             Jan 2005.
+
+  [RFC1883]  S. Deering, R. Hinden. Internet Protocol, version 6 (IPv6)
+             Dec 1995
+
+  [RFC1884]  S. Deering, R. Hinden. IP Version 6 Addressing Architecture.
+             Dec 1995
+ 
+  [RFC2732]  R. Hinden, B. Carpenter, L. Masisnter.
+             Format for Literal IPv6 Addresses in URL's
+             Dec 1999.
+
+  [RFC3986]  T. Berners Lee, R. Fielding, L. Masinter.
+             Uniform Resource Identifier (URI): Generic Syntax
+             Jan 2005.
+
+
+Contact Data
+------------
+
+  Michiel van der Vlist
+  Fidonet:  2:280/5555
+  E-mail:   pa0mmv at vrza dot org
+  E-mail:   administrator at ftsc dot org
+
+History
+-------
+
+   Rev.1, 20100309: Initial Release.
+                    Principal author Michiel van der Vlist.
+
+**********************************************************************
