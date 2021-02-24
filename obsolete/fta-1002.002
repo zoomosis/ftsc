@@ -1,0 +1,114 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTA-1002
+Revision:       2
+Title:          Document Submission and Publication Standard
+Author:         Administrator
+Revision Date:  29 November 1997
+Expiry Date:    29 December 1999
+----------------------------------------------------------------------
+Contents:
+                1. FSP Submissions
+                2. FSP Content Guidelines
+                3. FTS Format
+                4. Reformatting
+----------------------------------------------------------------------
+
+
+1. FSP Submissions
+------------------
+
+  Documents being submitted for consideration as future Technical
+  Standards must conform to the following format:
+
+  1. The submission must be in the form of a single document.
+  2. The document must be in ASCII text (Decimal 32 through 126 only).
+  3. A title must be provided.
+  4. Archives must contain only the single text document.
+  5. Programs and additional text files may not be submitted.
+
+  Note: The document may be submitted in archived or uncompressed
+        format.
+
+
+2. FSP Content Guidelines
+-------------------------
+
+  Standards Proposals should be written with the following guidelines
+  in mind:
+
+   1. Descriptions of implementations should be concise.
+   2. Plain language should be used in preference to technical jargon.
+   3. History and operational advice should be avoided.
+   4. Data on technical structure and usage statistics is encouraged.
+   5. Explanations should be clear to less-experienced programmers.
+
+
+3. FTS Format
+-------------
+
+  For ease of reading and consistency, all Technical Standards
+  documents, and Standards Proposal documents after a FSP number has
+  been assigned, shall use the following format:
+
+  3.1 A standard FTSC banner at the top of the document
+  -----------------------------------------------------
+
+  1. FTSC publication number.
+  2. Revision number.
+  3. Short title of document
+  4. Author of document.
+  5. Date of last revision
+  6. Last date for review (2 years after last revision)
+  7. Summary of contents of document
+
+
+  3.2 Text, paragraphs and margins
+  --------------------------------
+
+  Major Header titles and Introductory text alignment are to be left
+  flush (i.e. starting in column 1) with a maximum line length of 70
+  columns, to permit easy conversion to a Fidonews posting if accepted
+  as an FSP.
+
+  The major paragraph title is left flushed and underlined with dashes
+  ('-').
+
+  Text is indented two spaces from the major paragraph title. In
+  sub-paragraphs, text is indented to below the title.
+
+  Generally, decimal numbering is used.
+
+
+  3.3 A brief history of revisions
+  --------------------------------
+
+  The format of the revision history is:
+
+    Rev.x, yyyymmdd: <short comments>
+
+  See this document and the newest FSP's for examples of the document
+  formatting in action.
+
+
+4. Reformatting
+---------------
+
+  The FTSC reserves the right to reformat submitted documents at any
+  time to conform to the format specified in this document, to convert
+  to the documents to markup formats for publication in a variety of
+  formats, or any other reformatting to that may be necessary.
+
+
+A. History
+----------
+
+  Rev.1, 19971107: First non-draft release. Author Adrian Walker.
+  Rev.2, 19971229: Author changed to Administrator. Reformatted and
+                   updated the format specification. Revision number
+                   added.
+
+
+**********************************************************************
