@@ -1,0 +1,306 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTS-5002
+Revision:       1
+Title:          POINTLIST FORMATS
+Author(s):      Michiel van der Vlist
+
+Revision Date:  1 October 2000
+Expiry Date:    1 October 2002
+----------------------------------------------------------------------
+Contents:
+                1. Purpose
+                2. Formats
+                2.1 The "Boss" format.
+                2.2 The "Point" format.
+                2.3 The "Fake Net" format.
+                2.4 The "FidoUser" format.
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Standard (FTS).
+
+  This document specifies a Fidonet standard for the Fidonet
+  community.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+Introduction
+------------
+
+  This paper attempts to document the formats of four types
+  of pointlists in use in FidoNet.
+  Current practice for Fidonet Technology Networks (FTN) is to
+  maintain pointlists on net, region and possibly zone level
+  to store the details of the points participating in communication
+  via the network.
+
+1. Purpose
+----------
+
+  The concept of points was introduced into the FidoNet community
+  by Henk Wevers as an easy and fast way for users to get their mail
+  by using an FTN compatible mailer.
+
+  During the course of FidoNet history points have become a major
+  source of flow in FidoNet echomail. In order to suggest a netmail
+  address for a point with a known name but unknown address pointlists
+  are distributed on various levels. Unfortunately there has been
+  little or no coordination on the format of those lists. It has
+  mostly been up to the whim of the local list keeper.
+
+  This document is a first attempt to coordinate those efforts due to
+  Henk Wevers, Joaquim Homrighausen and others.
+
+
+2. Formats
+----------
+
+  Four formats for maintaining pointlists are used by the FidoNet
+  community and other networks using the FidoNet technology.
+
+
+2.1 The "Boss" format
+---------------------
+
+  This is an extension of the St. Louis nodelist format, the
+  list of points is a distributed separately from the nodelist.
+
+  The list contains of one or more lines of the format:
+
+  Boss,<zone>:<net>/<node>[,[<additional fields>]]
+
+  Where <additional fields> may be a copy of fields 3-8 of the
+  corresponding nodelist entry of the boss node. The second comma
+  and following fields are however optional and are usually omitted.
+  Current node/pointlist parsers ignore the additional fields but
+  some pointlist keepers include the second comma anyway just to be
+  on the safe side.
+
+  Directly below the 'Boss' line is a list of the points entered as
+  if they were nodes. The first field of a point entry must be empty.
+  The telephone number field may contain the actual number if the
+  point is online or "-Unpublished-" if it is not.
+
+
+  Example:
+
+  ;A Sample pointlist for Friday Aug 2 1996 day 044 : 12345
+  ;
+  Boss 1:1/1,
+  ,1,First_point_of_node_1,Somewhere,John_Doe,-Unpublished-,300
+  ,2,Joe'sPoint,Cybercity,Tom_Jennings,1-234-567-890,9600,V34,XX,U,ENC
+
+  Known exceptions/additions to FTS-5000/5001:
+
+  In some countries (f.e. Netherlands) one may find a NOZMH flag in
+  combination with callable points. Such a point is not online
+  during ZMH but can be called at (an)other time(s) which is
+  specified by one or more Tyz flags as defined FSC-5001.
+
+  The 16 bit checksum in the first line is not always present in some
+  distributed lists. Since the checksum is only really needed for diff
+  processors, this is not a problem if diffs are not used.
+
+  The "Boss" format is the preferred format for future distribution.
+
+
+2.2 The "Point" format.
+-----------------------
+
+  This is also an extension of the St. Louis nodelist format as
+  described in FTS-5000. The node- and pointlist are not
+  distributed separately, it is a combined list. It is not
+  used very much in FidoNet, but in Othernets one encounters
+  it occasionally.
+
+  Points are entered in the nodelist immediately below their bossnode
+  with the word "Point" (without the quotes) in the first field. The
+  rest of the line has the same format as an entry for a node as per
+  FTS-5000. The telephone number field usually contains
+  "-Unpublished-" (without the quotes) but it need not be so. If the
+  point is online at certain times, it may contain the actual
+  telephone number.
+
+
+  Example:
+
+  ;A Node/pointlist for net 999 Friday Aug 2 1996 day 214 : 27158
+  ;A
+  Host,999,Net_999,Simcity,Joe_Host,9-876-543-210,9600,V34,XX
+  ,666,Just_a_Node,Simcity,Joe_Grunt,9-012-345-678,9600,VFC
+  Point,1,Point_1,Simcity,Joe_Point,-Unpublished-,300
+  Point,2,Point_2,Simcity,Joes_Brother,9-345-678-901,9600,V34,XX,U,Txz
+
+
+2.3 The "fake net" format.
+-------------------------
+
+  Fake nets were introduced as a way of allowing points using 2D
+  software. The use of a fake net is largely abandoned, very few
+  software that can not handle 4D is still around, but some nets
+  still distribute pointlists in a format that reflects this
+  obsolete practise.
+
+  Technically the fake net list in not a pointlist but a nodelist.
+  It has the same format as a regular FTS-5000 nodelist. The boss
+  node is listed as the host and his points are listed as the leaf
+  nodes.
+
+  Example:
+
+  Host,32061,2446/301,Uedem,Lothar_Behet,49-2824-922240,9600,CM, ...
+  ,1,2446/301.1,Emmerich,John_Doe,49-2824-922240,9600,
+  ,2,2446/301.2,Goch,Jim_Doe,49-2824-922240,9600,
+  ,3,2446/301.3,Goch,Tom_Doe,49-2824-922240,9600,
+
+  In order to facilitate sending crash mail to a point, the telephone
+  number in the list is that of it's boss. Note that this would be
+  incorrect if it were a real nodelist. Listing a node with a tele-
+  phone number of another node that is not physically the same may
+  cause password errors in case these are defined for those nodes.
+
+  Also note that in this example the system name field contains
+  the actual node/point number for easy conversion of fake net/node
+  number to net/boss.point number.
+
+  Listing of the 3d number in the point lines is redundant. Some
+  only list the actual number in the Host line and use arbitrary
+  strings in the points system name field.
+
+  Host,10005,240/5496,Moisburg,Christian_Schmidt,49-4165-971143, ...
+  ,1,Chrissie.1,Moisburg,Christian_Schmidt,49-4165-971143,9600,
+  ,2,Chrissie.2,Buchholz,Steve_Tell,49-4165-971143,9600,
+
+  An alternative way to supply conversion information is used in
+  Denmark. The node number is supplied by the use of a UBOSS flag
+  (without a comma) in the line of the fake host:
+
+  Host,17010,NightCall,[..],[..],45-63121074,9600,V34,UBOSS:237/10
+  ,1,System,Location,Point_Name,-Unpublished-,9600,MO
+
+  Also note that the fake list format is less suitable for big list
+  since fake net number are restricted to the range 1-32767. As the
+  number of boss nodes grows the difficulty if assigning unique fake
+  net numbers increases.
+
+
+2.4 The FidoUser format
+-----------------------
+
+  As the name suggests the FidoUser format was originally intended to
+  be a list of users in FidoNet. It allowed BBS software to suggest a
+  fidonet address for netmail if the name of the recipient is known to
+  the sender.
+
+  It was first used by the Fido BBS programme for this purpose.
+
+  Due to the explosive growth, keeping a list of all FidoNet users
+  soon became impractical. The format of the list has survived for
+  pointlists.
+
+
+  First of all it needs to be noted that although the FidoUser list
+  looks like an ASCII text file, it is NOT.
+
+  It is a datafile consisting of equal length records. The last two
+  bytes of each record are a CR and a LF. The actual record length is
+  not specified, but all records must be of the same length.
+
+  The format of a record is:
+
+  <Keyword>, <Restofname>             [<zone>:]<net>/<node>[.<point>]
+
+  Records must be sorted on <Keyword>.
+
+  The zone number may be omitted. Default is the own zone. The
+  address must start on or after column 46. The record must be
+  padded with trailing blanks to make all records of equal length.
+
+  The keyword is the last word in the name. Usually this is the
+  surname, but in case of a compound surname it is the last of them.
+
+  Restofname usually is the first name, but it may be more than one
+  name and/or prefixes to the surname. Keyword and restofname are
+  separated by a comma and one space.
+
+
+  Examples:
+
+  Roche, Baptiste petit dit de la              2:500/128.6469
+  Vermeulen, Jan                               2:280/100.1
+  Vlist, Michiel van der                       2:500/9.5
+
+  It appears however that some software does not take kindly to spaces
+  in the name field. It is the old problem of BBS software that allows
+  only one first and one last name. Usually the problem is "solved" by
+  substituting dots or underlines in the names.
+
+  So one would also encounter:
+
+  Petit_dit_de_la_Roche, Baptiste              2:500/128.6469
+  Raaijmakers, Henk_Jan                        2:500/506.11
+  van_der_Vlist, Michiel                       2:500/555.5
+
+  Only ASCII characters are allowed. (No "high ASCII")
+
+  Known exceptions:
+
+  Dutchie 3, Timed and MBM 3.40 accept the IBM character set in the
+  name fields. They also accept that the address starts at column 37
+  and the address may be right justified without trailing blanks.
+
+  MakePl and PcMerge accept ASCII text files looking like FidoUser
+  lists. Last name and address must be separated by at least two
+  spaces or a tab character. Records need not be sorted and comment
+  lines starting with a semicolon are accepted. Some nets distribute
+  lists in the form of these ASCII "look alike" Fidouser lists.
+
+
+A. Acknowledgements
+-------------------
+
+  The following persons were helpful:
+
+  Marcel Wulffraat, Ruud Uphoff, Lothar Behet, Kaare Olsen.
+
+
+B. References
+-------------
+
+  [FTS-5]    "The distribution nodelist", Ben Baker, Rick Moore.
+             February 1989. Obsoleted by FTS-5000.
+
+  [FTS-5000] "The distribution nodelist". Colin Turner, Andreas Klein,
+             Michael McCabe, David Hallford, Odinn Sorensen.
+             June 1999.
+
+  [FTS-5001] "Nodelist flags and userflags". Colin Turner,
+             Andreas Klein, Michael McCabe, David Hallford,
+             Odinn Sorensen.
+             June 1999.
+
+
+C. Contact Data
+---------------
+
+
+  Michiel van der Vlist
+  Fideonet: 2:280/5300.5
+            2:280/5555
+  E-mail:   vlist@hccfido.hcc.nl
+            pa0mmv@vrza.org
+
+D. History
+----------
+
+   Rev.1, 20001001: Initial Release.
+                    Principal author Michiel van der Vlist.
+
+**********************************************************************
