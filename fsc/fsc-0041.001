@@ -1,0 +1,142 @@
+Document: FSC-0041
+Version:  001
+Date:     03/13/90
+
+
+
+
+                              MSGID / REPLY
+                A proposal for unique message identifiers
+                        and reply chain linkage
+
+                               jim nutt
+                           1:114/30@fidonet
+
+     
+
+     Information:
+
+         This FSC suggests a proposed protocol for the FidoNet
+         community, and requests discussion and suggestions for
+         improvements.  Distribution of this document is
+         unlimited.
+
+
+
+From a message originally posted in the NET_DEV conference:
+
+The following is a brief description of the proposed standard for
+generating msgid/reply 'kludge' lines in a message. Msgids have a number
+of uses besides simply being a unique message identifier. They can be
+used for dupe killing and reply linkage as well.
+
+
+MSGID
+
+    A MSGID line consists of the string ^AMSGID: followed by a space,
+the address of the originating system and a serial number unique to that
+message on the originating system.  i.e:
+
+        ^MSGID: zone:net/node.point@domain serialno
+
+It is not the intent to limit the address field of the msgid to fidonet
+style addresses,  they are used here simply for illustration;  messages
+originating from other types of systems should use an address appropriate
+to the originating system.  The serial number may be anything the
+developer's little heart desires,  AS LONG AS IT IS UNIQUE - NO TWO
+MESSAGES ON A SYSTEM MAY SHARE A SERIAL NUMBER!!  The serial number is
+formatted as an 8 character hexadecimal integer,  i.e.  a 32 bit word.
+Since this yields in the neighborhood of 4 billion unique numbers,  I
+don't think it will be a limit for most systems.  A common choice for
+the serial number is the number of seconds since 1 jan 1970 00:00:00
+gmt;  this is unique on a single user system and relatively easy to
+generate.  A more elaborate system will doubtless be necessary in the
+case of a multi-user system.
+
+
+REPLY
+
+    A REPLY line looks similiar to a MSGID line, and is in fact,  very
+close.  REPLY lines are generated using the MSGID line of the message
+being replied to.  The ^AMSGID: string in the MSGID line is replaced with
+^AREPLY: and then written to the text of the new message.  i.e.:
+
+        ^AREPLY: msgid of original message
+
+Again, this is very simple and as non-compute intense as possible
+
+
+GENERAL
+
+    For best results, MSGID and REPLY lines should be the first two lines
+of the message after extended addressing lines (FMPT, TOPT, INTL,
+DOMAIN), with MSGID appearing above REPLY.  This makes it unlikely that a
+MSGID will be damaged by something that doesn't destroy the binary
+message header as well.  As mentioned above,  it doesn't really matter
+what method is used in generating the serial number,  as long as it
+produces an eight digit hexadecimal number UNIQUE TO THE ORIGINATING
+SYSTEM.  Finally,  a MSGID SHOULD BE GENERATED ONLY AT MESSAGE CREATION.
+IT SHOULD NEVER,  EVER BE STRIPPED FROM A MESSAGE NOR SHOULD ONE BE ADDED
+TO A MESSAGE PASSING THROUGH A SYSTEM (whew,  all those caps wore me
+out!).  This is essential for a msgid to be useful,  without this
+restriction,  msgids are useless or worse.
+
+
+RATIONALE
+
+    Finally, what you've all been waiting for (I'm entering this in sixty
+line mode and the top has scrolled off) ... WHY you should use msgid and
+reply kludge lines.  Good question and one that has several answers,
+which I will cover one by one...
+
+   1) They eliminate the need for origin lines.  A msgid contains all the
+      information an origin line is technically there for.  It is in a
+      safer place than an origin line and much less likely to be
+      truncated or destroyed while leaving the rest of the message
+      intact.
+
+   2) Is related to 1) above, a msgid makes private replies to echomail
+      via netmail a trivial process, you know exactly what system
+      originated the message without worrying about parsing out the
+      origin line (and we all know how much fun THAT is).
+
+   3) True reply linkage is possible in echomail because you know exactly
+      which message the reply is to.  You just look for a message whose
+      msgid matches the reply in the current message.  And you already
+      have a database of msgids for dupe killing (more later).  This also
+      lets you track replies ACROSS echomail conferences ... some
+      fascinating possibilities there,  eh?
+
+   4) Annoying messages can be tracked more accurately.  Because msgids
+      are a 'hidden' line and therefore not normally visible or creatable
+      by your average user, they are considerably more difficult to forge
+      than an origin line (forging which is a trivial task).  Admittedly
+      this isn't going to stop a twit sysop,  but that 8 digit serial
+      number is going to be a problem for him ... if he copies one that
+      already exists,  the message will be killed as a dupe,  if he makes
+      one up,  chances are fairly good that that will be a dupe as well,
+      so it does make forgery a bit more difficult.
+
+   5) Accurate dupe killing is possible.  By maintaining a database of
+      msgids one can easily check to see if a message is a duplicate of
+      one already entered.  If it is stipulated that msgids must be
+      sequential, it becomes, once again,  trivial ... simply store the
+      highest serial number that has come from a particular address,
+      any messages that come in with a serial number lower than that can
+      be assumed dupes and killed.
+
+   6) Tracking of dupe generators is possible.  Since msgids are never
+      stripped and never added, the only msgid on a message should be the
+      one of the originating system.
+
+   7) Simplicity.  MSGID and REPLY kludgelines are very simple to
+      generate, they require no complex calculations and are easy to
+      parse.  And they give you all the benefits above.  So why NOT use
+      them?
+
+
+FINALLY
+
+    Your questions and comments are welcome and will be responded to as
+time permits. This is only the initial draft, there are a number of
+proposed extensions to this specification already.
