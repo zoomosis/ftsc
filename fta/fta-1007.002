@@ -1,0 +1,161 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTA-1007
+Revision:       2
+Title:          Intellectual Property Rights
+Author:         Administrator
+Revision Date:  17 January 1998
+Expiry Date:    Permanent Document
+----------------------------------------------------------------------
+Contents:
+                1. General Policy
+                2. Confidentiality Obligations
+                3. Rights and Permissions
+                4. Warrant
+----------------------------------------------------------------------
+
+
+Status of this document
+-----------------------
+
+  This document is an FTSC Administrative document (FTA), and
+  specifies a Fidonet Best Current Practice for the Fidonet community.
+  Distribution of this document is unlimited.
+
+
+Abstract
+--------
+
+  This document specifies how the FTSC handles intellectual property
+  rights.
+
+
+1. General Policy
+-----------------
+
+  In all matters of intellectual property rights and procedures, the
+  intention is to benefit the Fidonet community and the public at
+  large, while respecting the legitimate rights of others.
+
+
+2. Confidentiality Obligations
+------------------------------
+
+  No contribution that is subject to any requirement of
+  confidentiality or any restriction on its dissemination may be
+  considered in any part of the Fidonet standards process, and there
+  must be no assumption of any confidentiality obligation with respect
+  to any such contribution.
+
+
+3. Rights and Permissions
+-------------------------
+
+  In the course of standards work, the FTSC receives contributions in
+  various forms and from many persons. To best facilitate the
+  dissemination of these contributions, it is necessary to understand
+  any intellectual property rights relating to the contributions.
+
+
+3.1. All Contributions
+----------------------
+
+  By submission of a contribution, each person actually submitting the
+  contribution is deemed to agree to the following terms and
+  conditions on his own behalf, on behalf of the organization (if any)
+  he represents and on behalf of the owners of any propriety rights in
+  the contribution. Where a submission identifies contributors in
+  addition to the contributor(s) who provide the actual submission,
+  the actual submitter(s) represent that each other named contributor
+  was made aware of and agreed to accept the same terms and conditions
+  on his own behalf, on behalf of any organization he may represent
+  and any known owner of any proprietary rights in the contribution.
+
+  1. Some works (for example works of the U.S. Government) are not
+     subject to copyright. However, to the extent that the submission
+     is or may be subject to copyright, the contributor, the
+     organization he represents (if any) and the owners of any
+     proprietary rights in the contribution, grant an unlimited
+     perpetual, non-exclusive, royalty-free, world-wide right and
+     license to the FTSC under any copyrights in the contribution.
+     This license includes the right to copy, publish and distribute
+     the contribution in any way, and to prepare derivative works that
+     are based on or incorporate all or part of the contribution, the
+     license to such derivative works to be of the same scope as the
+     license of the original contribution.
+
+  2. The contributor acknowledges that the FTSC have no duty to
+     publish or otherwise use or disseminate any contribution.
+
+  3. The contributor grants permission to reference the name(s) and
+     address(es) of the contributor(s) and of the organization(s) he
+     represents (if any).
+
+  4. The contributor represents that contribution properly acknowledge
+     major contributors.
+
+  5. The contributor, the organization (if any) he represents and the
+     owners of any proprietary rights in the contribution, agree that
+     no information in the contribution is confidential and that the
+     FTSC may freely disclose any information in the contribution.
+
+  6. The contributor represents that he has disclosed the existence of
+     any proprietary or intellectual property rights in the
+     contribution that are reasonably and personally known to the
+     contributor. The contributor does not represent that he
+     personally knows of all potentially pertinent proprietary and
+     intellectual property rights owned or claimed by the organization
+     he represents (if any) or third parties.
+
+  7. The contributor represents that there are no limits to the
+     contributor's ability to make the grants acknowledgments and
+     agreements above that are reasonably and personally known to the
+     contributor.
+
+
+4. Warrant
+----------
+
+  By ratifying this document the FTSC warrants that it will not
+  inhibit the open and free access to FTSC documents for which license
+  and right have been assigned according to the procedures set forth
+  in this section, including drafts, proposals and standards. This
+  warrant is perpetual and will not be revoked by the FTSC or its
+  successors or assigns.
+
+
+A. References
+-------------
+
+  [RFC2026] "The Internet Standards Process -- Revision 3". Scott
+  Bradner. October 1996.
+
+
+B. Acknowledgements
+-------------------
+
+  This document is based on extracts from the original text of RFC2026
+  by Scott Bradner. Please read that document for further
+  acknowledgements.
+
+
+C. Author contact data
+----------------------
+
+  Odinn Sorensen
+  Fidonet: 2:236/77
+  E-mail:  odinn@goldware.dk
+  WWW:     http://www.goldware.dk
+
+
+D. History
+----------
+
+  Rev.1, 19971120: First release as draft.
+  Rev.2, 19980117: First release as official FTA. No changes from the
+                   draft.
+
+
+**********************************************************************
