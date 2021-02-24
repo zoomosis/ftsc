@@ -1,0 +1,438 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+  
+Publication:    FSP-1014
+Revision:       1
+Title:          Moderating by Voting echomail distribution system
+Author:         Amir Shabashvili 2:5049/12@fidonet
+                Adel Chepckunov 2:5049/57@fidonet
+Revision Date:  21 Sept 1999
+Expire Date:    21 Sept 2001
+----------------------------------------------------------------------
+Contents:
+  
+             1. Background
+             2. MV-system components
+             3. Vote transport protocol
+             4. Moderating by Voting process overview
+             5. MV-conference initializing procedure
+             6. Formats
+             7. List of MVS-compatible software
+             8. MV-System example
+----------------------------------------------------------------------
+
+
+Status of this document
+-----------------------
+  
+  This document is a Fidonet Standards Proposal (FSP).
+  
+  This document specifies an optional Fidonet standard protocol for
+  the Fidonet community, and requests discussion and suggestions for
+  improvements.
+  
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+Abstract
+--------
+  
+  Moderating by Voting establish additional procedures of FidoNet
+  echomail distribution for giving opportunity to every member of
+  echo-conference to take part in moderating process by sending
+  moderating messages. Moderating messages must be processed by
+  special software, then this information must be stored and used
+  for auto-moderating of incoming echo-stream on the nodes where
+  MV-System installed.
+
+  
+1. Background
+-------------
+  
+   Objectives
+  
+  This  document defines terminology basis, data structures, rules
+  and procedures of Moderating by Voting for better cooperation of
+  MV-systems software developers and for compatible software
+  developing.
+  
+  
+   Motivation for a MVS
+  
+  An idea of Moderating by Voting comes from authors real experience
+  in FidoNet echomail usage and moderating. We refer to FTS-0004,
+  FSC-0074 as to basic documents concerning echomail distribution.
+  
+  There are three well-known schemes of echo-conference "driving" and,
+  correspondingly, three kinds of echoes exists in FidoNet:
+  
+  - non-moderated;
+  - moderated in "Usenet" style (pre-moderated);
+  - moderated in "FidoNet" style;
+  
+  MVS introduce to the new moderating scheme, and we hope this method
+  will be helpful, for example for thouse popular R50 echoes, where
+  traffic is growing day by day and tend to flow out of moderator's
+  hands.
+  
+  
+   Terminology 
+  
+  Because of much number of new terms used in this document and some
+  of this terms are very important for MV System realization, we
+  place next glossary in the beginning of document:
+  
+  Moderating - echo-messages deletion process.
+  
+  Moderating by Voting System (MV System, MVS)- software for FidoNet
+  echoes auto-moderating.
+  
+  MV-conference, MV-echo, (Moderated by Voting Echo-Conference,MVE)
+  - moderated by voting echo-conference.
+  
+  Moderated Message (MM)- message which must (may) be moderated.
+  
+  Vote Message (VM) - message of special format which participant of 
+  echo-conference sends to all MV-Systems to express his opinion
+  about message he read (twit or anti-twit, vote "for" or "against").
+  
+  V-conference,V-echo,Twit-echo (Vote Transport Echo-Conference,VTE)-
+  echo-conference for  Vote messages transportation.
+  
+  Moderating by Voting indicator (MV-indicator,MVI) - part of message
+  header (AddressFrom, Subject or combination), used as moderating 
+  criterion in Vote Message.
+  
+  Twit-time - lifetime of moderating decision.
+  
+  Coordinator,V-Coordinator (VC) - System Operator, responsible for
+  some MV-echo(s) configuring and managing
+  
+  Configuring message (CM) - specially formatted message which VC
+  sends to all MV-systems for whole MV-bone (see below) parameters
+  configuration (for some MV-echo) 
+  
+  Moderating by Voting Criterion (MV-Criterion, MVC)- result of Vote
+  Messages processing, used as message filtering criterion in
+  moderating process.
+  
+  Moderating by Voting Base,Twit-Base (MVB) - database which contains
+  MV-Criterions.
+  
+  Moderating by Voting Bone (MV-bone) - set of FidoNet nodes using
+  MV-system for MV echoes distribution
+  
+  
+2. MV-system components
+-----------------------
+  
+  Name                 Function
+  
+  Vote transport       Protocol for VMM dissipation from source
+                       system to all  MV-systems of current MV-Bone.
+  
+  VMM Processor        MV-Criterions from Vote Messages construction.
+  
+  MV database          Vote processing, storing criterions in
+                       MV-Base.
+  
+  MV Executor          Makes decisions based on MV-Base info and
+                       moderated MV-echo parameters; moderating.
+  
+  MVFix                Answers on downlinks request; produce reports
+                       and info; statistics; configuring MV-system.
+  
+  
+  
+3. Vote transport protocol
+--------------------------
+  
+  Echomail transport (fts-0004, fsc-0074) is used as Vote transport
+  protocol. It is possible to use alternative transport types (for
+  example, netmail or file-transfer) for backup or testing purposes.
+  Special echo-conference must be used for vote transportation.
+  
+  
+4. Moderating by Voting process overview
+----------------------------------------
+  
+  - echo-conference participant meets message which annoys him and
+    sends moderating message.
+  - All MV-Systems catch votes from vote-transport echo area.
+  - Votes are being processed on every system using the same
+    algorithm for same echo area.
+  - resulted criterions are placed in MV-Base.
+  - every echo-message coming to the system with MVS installed must
+    be compared with criterions stored and then moderated, if needed.
+  
+  Remark:  See more detailed description in Addendum I.
+  
+  
+5. MV-conference initializing procedure
+---------------------------------------
+  
+  - Coordinator creates echo-conference by usual way on one or more
+    MV-Bone hubs (it is recommended to add .MV or _MV prefix to echo
+    tag, for example: RU.MV.ANEKDOT, for better echotags navigation).
+  - Coordinator places echo-conference rules in the conference,
+    which contains MV echo configuration parameters and point to
+    "START" time (HH/DD/MM/YY UTC).
+  
+  After this time MV mechanism must be used. Before "START" time
+  conference exists as non-moderated; moderating messages in
+  Vote-transport echo for this conference are allowed. Coordinator
+  can change "START" time, if he wants to.
+  
+      - 1st variant: 
+        every potential participant of echo discussion must notify
+        coordinator of MV-echo about his presence by netmail.
+      - 2nd variant: 
+        Coordinator collects info about planned population
+        of echo from his own sources.
+      - Coordinator sets MV-echo parameters depending on amount of
+        active participants of moderated echo.
+      - Coordinator puts specially formatted Configuring Message (CM)
+        in VT-echo.
+      - Based on this Configuring message all MV-systems update
+        configuration for this MV-echo area
+  
+  - MV-mode usage of conference begins since "START" time coming.
+  
+  
+6. Formats
+----------
+  
+  Vote message format
+  
+  Header:
+  
+  NameFrom    - VM-message source system Sysop name
+  AddressFrom - VM-message source system address
+  NameTo      - Name of moderated message sender
+  Subj        - subject of moderated message
+  
+  
+  Body:
+  One line, consist of fields with space(s) as delimiter
+  
+  NN    set of used symbols     destination
+  
+  1     0..9,"/",":","."        4D address
+  2     ASCII                   moderated echo-conference EchoTag,
+                                letter case is unimportant.
+  
+  3     1 ,  0                  0 - twit (vote "against"),
+                                1 - antitwit (vote "for").
+                                Must be used one symbol only.
+  
+  4     A, S                    MV-Indicators. A-AddressFrom,
+                                S-Subject of moderated message.
+                                Symbols may be used in
+                                combination. Letter case is
+                                unimportant.
+  
+  All information below the first line will be ignored.
+  
+  Example:
+
+  -------------------------------------------------------
+  From: Amirko Shaab                        2:5049/12.12
+    To: Amir Shabashvili                    
+  Subj: Hen cooks egg!
+  -------------------------------------------------------
+  2:5049/12 RU.ANEKDOT.VM 0 S
+  
+  
+  MV-Criterion format
+  
+  MV-Base record being used as moderating criterion must contain next
+  fields:
+  
+  Name              description
+  --------------------------------------------------------
+  EchoTag           Moderated echo name (or its number in
+                    configuration file)
+
+  M-indicators      One or more MV-indicators.
+  --------------------------------------------------------
+
+  Remark: You may add your own fields in MV-Base structure; one
+  possible example in Addendum below.
+  
+
+  Configuring message format
+  
+  NameFrom    - "Coordinator","VC"
+  AddressFrom - Vote Coordinator address
+  NameTo      - "MVFix","MVS"
+  AddressTo   - destination address (used in case of netmail
+                transportation)
+  Subject     - password (optional)
+  
+  Remark: message body must be defined by programmer; see example in
+  Addendum I.
+  
+  
+7. List of MVS-compatible software
+----------------------------------
+  
+  - Relax! packet processor. Author Adel Chepckunov , 2:5049/57,
+    written under GNU license, see:
+    ftp://ftp.n5049.z2.fidonet.net/pub/mvs
+  
+  
+8. MV-System example
+--------------------
+  
+  Configuration parameters
+
+  (may be set separately for every MV-conference)
+  
+  Name              Description
+  ------------------------------------------------------------------
+  TimeCollect      Votes collection time
+  
+  TimeCollectMax   Maximum vote collection time(if after
+                   TimeCollectMax moderating process is not started,
+                   criterion must be deleted)
+  
+  TimeMin          Minimum criterion action time
+  
+  TimeMiddle       Middle criterion action time
+  
+  TimeMax          Maximum criterion action time
+  
+  VotesMinA        Amount of votes "against" (twits) which is enough
+                   to activate criterion with combination of
+                   indicators during TimeMin action time.
+  
+  VotesMidA        Amount of twits which is enough to activate
+                   criterion with combination of indicators during
+                   TimeMiddle action time.
+  
+  VotesMaxA        Amount of twits which is enough to activate
+                   criterion with combination of indicators during
+                   TimeMax action time.
+  
+  VotesMinB        Amount of twits which is enough to activate
+                   criterion with one of Address,Address+Name,Name,
+                   Subject indicators during minimum interval
+                   (TimeMin).
+  
+  VotesMidB        Amount of twits which is enough to activate
+                   criterion with one of Address,Address+Name,Name,
+                   Subject indicators during minimum interval
+                   (TimeMiddle).
+  
+  VotesMaxB        Amount of twits which is enough to activate
+                   criterion with one of Address,Address+Name,Name,
+                   Subject indicators during minimum interval
+                   (TimeMax).
+  
+  PointSw          On - node only mode, Off - accept votes from
+                   points
+  ------------------------------------------------------------------
+
+  Remark: Time measured in 24h.
+  
+  
+  Algorithm
+  
+  - all installed MV-systems catch Vote Messages from VT-Echo and put
+    collected MV-Indicators in local MV-Bases.
+  - Set of collected and stored MV-Indicators forms Moderating
+    Criterions.
+  - Criterion must be launched in action after TimeCollect if number
+    of votes is equal or greater than VotesMinA (If after TimeCollect
+    criterion still is not working, it  must be deleted).
+  - the time criterion which is still working as moderating rule must
+    be equal to TimeMin, TimeMiddle or TimeMax, depending on number
+    of votes.
+    After the end of criterion's lifetime, it must be deleted from
+    MV-Base.
+  - Vote-message collection continues after time criterion activated
+    and moderating decision can be changed.
+  
+  Remark: Votes with more common indicators (Address, Subject)
+  take part in voting processes with more "soft" indicator
+  (Address+Subject), if exists.
+
+  
+  Configuring message
+  
+  Echo-mail or netmail transport must be used for Configuring
+  Messages transportation.
+  
+  Message body consist from one to three lines.
+  First line contains the command. Command starts with '%' symbol.
+  Next two lines contain additional information for this command.
+  Only 'CONFIG' command is described in this document.
+  
+
+   '%CONFIG' command
+  
+  'CONFIG' command is used for configuring of those MV Systems, which
+  receipt configuring message(s).
+  2nd line contains moderated conference echotag.
+  3rd line consists of the numerical fields delimited by space (' '):
+  TimeCollect TimeCollectMax TimeMin TimeMiddle TimeMax
+  VotesMinA,...,VotesMaxB
+  
+  All lines below 3rd line must be ignored.
+  
+  Example (case of netmail-transport):
+  ----------------------------------------------------
+  From: Coordinator                         2:5049/12
+    To: VMS                                 2:5049/57
+  Subj: <PASSWORD>                          
+  ----------------------------------------------------
+  %CONFIG
+  KAZAN.GENERAL.VM
+  4 7 30 60 90 10 15 20 15 30 50
+  
+  
+  MV-base structure
+
+  Field Name         Description
+  -------------------------------------------------------------------
+  CreationTime      The time criterion was created
+
+  EchoTag           Echotag of moderated conference (or its number in
+                    configuration file)
+
+  NVotesYes         Number of votes "Against" (twits)
+
+  NVotesNo          Number of votes "For" (anti-twits)
+
+  V-Addresses       List of addresses votes are accepted from (use
+                    this list for duplicated voices checking)
+
+  M-indicators      one or more moderating indicators.
+  -------------------------------------------------------------------
+  
+
+A. Author contact data
+----------------------
+
+Amir Shabashvili
+FidoNet: 2:5049/12
+E-mail: ashabash@zarech.ru
+WWW: http://ashabash.zarech.ru
+
+Adel Chepckunov 
+FidoNet: 2:5049/57@fidonet
+
+
+B. Acknowledgements
+-------------------
+
+The authors would like to thank Alex V. Ivanov for
+fixing of our poor English.
+
+
+C. History
+------------
+
+Rev.1, 19990921   First release.
