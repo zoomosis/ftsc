@@ -1,0 +1,696 @@
+FSC-0008
+
+
+
+
+
+
+
+
+
+
+ 
+                 Fundamentals of FOSSIL implementation and use
+                       Draft Version 4  August 10, 1987
+                      Vincent E. Perriello, VEP Software
+ 
+
+		 IFNA Address: Network 141 Node 491 (141/491)
+     Usenet address: ...decvax!envore!vaxine!spark!141!491!Vince_Perriello
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ Copyright (C) 1987, VEP Software, Naugatuck, CT 06770. All rights reserved.
+ 
+ This document may be freely used or copied by anyone interested in the data
+ contained herein. No fees may be charged for distribution of this document.
+ You will be held  accountable for all such charges,  and expected to either
+ reimburse those persons or organizations so charged,  or to make a donation
+ in the exact amount of those fees to the International FidoNet Association, 
+ to  assist  them in their  efforts to  advance the  technology of  personal 
+ computer telecommunications.
+
+Fundamentals of FOSSIL implementation and use                         Page 1
+Introduction
+
+
+
+ A. Objectives of this document
+
+    This document is directed at implementors or intellectuals.  It is meant
+    for use in implementing applications that can use FOSSIL drivers, or for
+    details needed to implement a new FOSSIL. As such it won't always go out
+    of its way to explain itself to the neophyte.
+
+    This document will have served its purpose to you if you are able to use
+    the data contained within to perform either of the above tasks.   If you
+    feel that necessary data has been omitted please contact Vince Perriello
+    at the above listed address so that the appropriate changes can be made.
+
+
+
+ B. Historical perspective
+ 
+    For those people who were not lucky enough to have an IBM PC or a system
+    nearly completely compatible, the world has not been very friendly. With
+    his implementation of the Generic Fido(tm) driver,  Tom Jennings made it
+    possible for systems that had nothing in common with an IBM PC except an
+    808x-class processor, and the ability to run MS-DOS Version 2 and above,
+    to run his Fido(tm) software. That was a lot to ask, and a lot of people
+    thought it was enough.
+
+    But not everyone.  While Thom Henderson was debugging Version 4.0 of his
+    SEAdog(tm) mail package,  an "extended" Generic driver was designed  (in
+    cooperation with Bob Hartman)   as a quick kludge to help him get past a
+    problem with certain UART chips.The new hook was quickly pounced upon by
+    Vince Perriello,  who, with almost DAILY prodding (ouch! it still hurts)
+    by Ken Kaplan,had been working with Henderson to get DEC Rainbow support
+    into SEAdog. Vince then coded a driver to use this hook and - Voila! - 
+    SEAdog 4.0 started working like a champ on the Rainbow.
+
+    At the same time something was rotten in the state of Texas. Wynn Wagner
+    started  encountering some serious  difficulties in his Opus development
+    effort. Specifically, he couldn't force the Greenleaf(tm) Communications
+    Libraries to behave in exactly the way he felt Opus required.  Enter Bob
+    Hartman.Having already enjoyed success in the effort with Thom Henderson,
+    he suggested to Wynn that with very few extensions,  any driver that was
+    already  SEAdog(tm) 4.0 compatible could drive Opus as well.  About that
+    time, Vince called Wynn to discuss porting Opus to the DEC Rainbow. Wynn
+    called Bob, Bob called Vince, and the FOSSIL driver came into existence.
+
+    FOSSIL is an acronym for "Fido/Opus/SEAdog Standard Interface Layer". To
+    say that the concept has gained wide acceptance in the FidoNet community
+    would be an understatement. Henk Wevers' DUTCHIE package uses the FOSSIL
+    communications services.   Ron Bemis' OUTER package uses FOSSIL services
+    for everything it does and as a result it is completely generic.   There
+    are already FOSSIL implementations for the Tandy 2000, Heath/Zenith 100,
+    Sanyo 555 and other "non-IBM" architectures. With each new 'port' of the
+    spec, the potential of a properly coded FOSSIL application grows!
+
+Fundamentals of FOSSIL implementation and use                         Page 2
+Basic conventions and calling method
+
+
+
+ C. Basic principles of a FOSSIL driver
+
+    1)  Interrupt 14H.
+
+    The one basic rule that the driver depends upon,  is the ability for ANY
+    target machine to allow the vector for INT 14H (usually pointing to BIOS
+    comm functions) to be "stolen" by the driver.  In a system where the INT
+    14H vector is used already, it must be possible to replace the "builtin"
+    functionality with that of a FOSSIL,  when an application that wants the
+    use of a FOSSIL is to be run on the target machine.
+
+
+    2)  How to install a FOSSIL driver in a system
+
+    There's no hard and fast way to do this. The FOSSIL might be implemented
+    as part of a device driver (like Ray Gwinn's X00.SYS) and therefore gets
+    loaded using a line in CONFIG.SYS at bootup time.  It might be done as a
+    TSR (terminate and stay resident) program, in which event you install it
+    by running the program  (DECcomm by Vince Perriello and Opus!Comm by Bob
+    Hartman work this way, for example).
+
+
+    3)  How an application can detect the presence of a FOSSIL
+
+    The driver has a "signature" that can be used to determine whether it is 
+    present in memory. At offset 6 in the INT 14H service routine is a word, 
+    1954 hex,  followed by a byte that specifies the maximum function number 
+    supported by the driver. This is to make it possible to determine when a
+    driver is present and what level of functionality it provides. Also, the
+    Init call (see below) returns a 1954 Hex in AX.  SEAdog(tm) looks at the
+    signature and Opus just goes for the Init. Fido doesn't do either.
+
+
+    4)  How to call a FOSSIL function
+
+    The FOSSIL driver is entered by issuing a software Interrupt 14 Hex from
+    the application  program. The code corresponding to the desired function 
+    should be in 8-bit register AH. For calls that relate to communications,
+    the port number will be passed from the application in register DX. When
+    DX contains a zero (0) it signifies use of COM1, or whatever the "first"
+    serial port on your machine is called. A one (1) in DX points the driver
+    at COM2, and so on. A value of Hex FF in DX is considered a special case
+    where the driver should do no actual processing but return SUCCESS.   In
+    the specific case of Init or Uninit with DX=FF,the FOSSIL should perform
+    all non-communications  processing  necessary  with such calls.  In some
+    machines  (H/Z-100 for example),  the FOSSIL must  assume control of the
+    keyboard in order to service the keyboard functions. 
+
+    For all functions, any registers not specifically  containing a function
+    return can be assumed to be preserved across the call.
+
+Fundamentals of FOSSIL implementation and use                         Page 3
+Communications functions
+
+
+
+D. Functions currently defined for FOSSILs
+
+
+    AH = 00H	Set baud rate 
+		Input:	AL = baud rate code
+			DX = port number
+
+    This works the same as the  equivalent IBM PC BIOS call,  except that it
+    ONLY selects a baud rate.  This is passed in the high order 3 bits of AL
+    as follows:
+
+		010 =   300 baud
+		011 =   600  ''
+		100 =  1200  ''
+		101 =  2400  ''
+		110 =  4800  ''
+		111 =  9600  ''
+		000 = 19200  '' (Replaces old 110 baud mask)
+		001 = 38400  '' (Replaces old 150 baud mask)
+
+    The low order 5 bits can be implemented or not by the FOSSIL, but in all
+    cases, if the low order bits of AL are 00011,  the result should be that
+    the communications device should be set to eight data bits, one stop bit
+    and no parity. This setting is a  MINIMUM REQUIREMENT  of Fido, Opus and
+    SEAdog.  For purposes of completeness,  here are the IBM PC "compatible"
+    bit settings:
+
+    Bits 4-3 define parity:     0 0       no parity 
+                                1 0       no parity 
+                                0 1      odd parity 
+                                1 1     even parity 
+  
+    Bit 2 defines stop bits:      0        1 stop bit;  
+                                  1      1.5 bits for 5-bit char;
+                                           2 for others 
+  
+    Bits 1-0 character length:  0 0        5 bits 
+                                0 1        6 bits 
+                                1 0        7 bits 
+                                1 1        8 bits 
+ 
+
+    AH = 01H	Transmit character 
+		Input:	AL = character
+			DX = port number
+		Output: AX contains status bits (see function 3)
+
+    AL contains the character to be sent.   If there is room in the transmit
+    buffer the return will be immediate,  otherwise it will wait until there
+    is room to store the character in the transmit buffer.  On return, AX is
+    set as in a status request (see function 3).
+
+Fundamentals of FOSSIL implementation and use                         Page 4
+Communications functions
+
+
+    AH = 02H	Receive character 
+		Input:	DX = port number
+		Output:	AL = input character
+
+    If there is a character  available in the  receive buffer,  returns with 
+    the next character in AL.  It will wait until a character is received if
+    none is available.
+
+
+    AH = 03H	Request status
+		Input:	DX = port number
+		Output:	AX = status bit mask (see below)
+
+    Returns with the line and modem status in AX.  Status bits returned are:
+
+		In AH:
+		Bit 0 =	RDA  - input data is available in buffer
+		Bit 5 = THRE - room is available in output buffer
+		Bit 6 = TSRE - output buffer is empty
+
+		In AL:
+		Bit 7 =	DCD  - carrier detect 
+
+    This can be used by the application to determine  whether carrier detect
+    (CD) is set,  signifying the presence/absence of a remote connection, as
+    well as monitoring both the input and output buffer status.
+
+
+    AH = 04H	Initialize driver 
+		Input:	DX = port number
+		      ( BX = 4F50H
+			CX = ^C flag address --- optional )
+		Output:	AX = 1954H if successful
+			BL = maximum function number supported
+			     (not counting functions 7E and above)
+			BH = rev of FOSSIL doc supported
+
+    This is used to tell the driver to begin  operations,  and to check that
+    the driver is installed. This function should be called before any other
+    communications calls are made.  At this point all interrupts involved in
+    supporting the comm port (specified in DX) should be set up for handling 
+    by the FOSSIL, then enabled.  If BX contains 4F50 hex,  then the address 
+    specified in BX:CX is that of a ^C flag byte in the application program,
+    to be incremented when  ^C is detected in the keyboard service routines.
+    This is an optional service and only need be supported on machines where
+    the keyboard service can't (or won't) perform an INT 1B or INT 23 when a
+    Control-C is entered.  DTR is raised by this call.
+
+    NOTE: Should an additional call to this service occur  (2 Inits or Init,
+    Read,Init, etc.) the driver should reset all buffers, flow control, etc.
+    to the INIT state and return SUCCESS.
+
+Fundamentals of FOSSIL implementation and use                         Page 5
+Communications functions
+
+
+    AH = 05H	Deinitialize driver
+		Input:	DX = port number
+
+    This is used to tell the driver that comm port operations are ended. The
+    function should be called  when no more comm port functions will be used
+    on the port specified in DX. DTR is NOT affected by this call.
+
+
+    AH = 06H	Raise/lower DTR
+		Input:	DX = port number
+			AL = DTR state to be set (1 = Raise, 0 = Lower)
+
+    This function is used to control the DTR line to the modem.	AL = 0 means 
+    lower DTR (disable the modem), and AL = 1 means to raise DTR (enable the 
+    modem).  No other function (except Init) should alter DTR.
+
+
+    AH = 07H	Return timer tick parameters
+		Output:	AL = timer tick interrupt number
+			AH = ticks per second on interrupt number in AL
+			DX = approximate number of milliseconds per tick
+
+    This is used to  determine the parameters of the timer tick on any given
+    machine.  Three numbers are returned:
+
+	AL =   Timer tick interrupt number
+	AH =   Ticks per second on interrupt number shown in AL
+	DX =   Milliseconds per tick (approximate)
+
+    Applications can use this for critical timing  (granularity of less than
+    one second) or to set up code  (such as a watchdog)  that is executed on
+    every timer tick. See function 16H (add/delete function from timer tick)
+    for the preferred way of actually installing such code.
+
+
+    AH = 08H	Flush output buffer
+		Input:	DX = port number
+
+    This is used to force any pending output.   It does not return until all 
+    pending output has been sent.  You should use this call with care.  Flow
+    control  (documented below)  can make your system hang on this call in a
+    tight uninterruptible loop under the right circumstances.
+
+
+    AH = 09H	Purge output buffer
+		Input:	DX = port number
+
+    This is used to purge any pending output.   Any output data remaining in
+    the output buffer (not transmitted yet) is discarded.  
+
+Fundamentals of FOSSIL implementation and use                         Page 6
+Communications functions
+
+
+    AH = 0AH	Purge input buffer
+		Input:	DX = port number
+
+    This is used to purge any pending input.   Any input data which is still
+    in the buffer is discarded.
+
+
+    AH = 0BH	Transmit no wait
+		Input:	DX = port number
+		Output:	AX = 1 if character was accepted and 0 if not.
+
+    This is exactly the same as the "regular"  transmit call, except that if
+    the driver is  unable to  buffer the character  (the buffer is full),  a
+    value of zero (0) is returned in AX. If the driver accepts the character
+    (room is available),  a one (1) is returned in AX.
+
+
+    AH = 0CH	Non-Destructive Read-ahead
+		Input:	DX = port number
+		Output:	AX = next character or FFFF if none available
+
+    Return in  AX  the next character in the receive buffer.  If the receive 
+    buffer is empty, return  FFFF.  The  character  returned  remains in the
+    receive buffer. Some applications call this "peek".
+
+    AH = 0DH	Keyboard read no wait
+		Output:	AX = IBM-style keyboard scan code or FFFF if
+			     no keyboard character available
+
+    Return in  AX the next character  (non-destructive read ahead)  from the
+    keyboard; if nothing is currently in the keyboard buffer, return FFFF in
+    AX.   Use IBM-style  function key mapping  in the high order byte.  Scan
+    codes for non-"function" keys are not specifically required,  but may be
+    included. Function keys return 0 in AL and the "scan code" in AH.
+
+
+    AH = 0EH	Keyboard input with wait
+		Output:	AX = IBM-style keyboard scan code
+
+    Return in AX the next character from the keyboard;  wait if no character
+    is available. Keyboard mapping should be the same as function 13.
+
+
+    AH = 0FH	Enable or Disable flow control on transmit
+		Input:	AL = bit mask describing requested flow control
+			DX = port number
+
+    This is used to stop output when the "other end" is overwhelmed, or when
+    a BBS user wants to stop a screen.
+
+    Two kinds of flow control are supported:
+
+		Bit 0 = 1	Enable Receiving of XON/XOFF
+		Bit 1 = 1	CTS/RTS
+	        Bit 2 is Reserved
+        	Bit 3 = 1   Enable Sending of XON/XOFF
+
+Fundamentals of FOSSIL implementation and use                         Page 7
+Communications functions
+
+
+    Flow control is enabled, or disabled, by setting the appropriate bits in
+    AL  for the types of flow control we want to ENABLE (value = 1),  and/or
+    DISABLE  (value = 0),  and calling this function.  Bit 2 is reserved for
+    DSR/DTR but is not currently supported in any implementation.
+
+    Applications  using this  function  should set all bits  ON  in the high 
+    nibble of AL as well.  There is a compatible  (but not identical) FOSSIL
+    driver implementation that uses the  high nibble as a control mask.   If
+    your application sets the high nibble to all ones,  it will always work,
+    regardless of the method used by any given driver.
+
+
+    AH = 10H	Extended Control-C / Control-K checking and transmit on/off
+		Input:	AL = flags byte
+			DX = port number
+		Output:	AX = status (see below)
+
+    This is used for BBS  operation,  primarily.  A bit mask is passed in AL
+    with the following flags:
+
+		Bit 0	enable/disable Control-C / Control-K checking
+		Bit 1	disable/enable the transmitter
+
+    The Enable (bit 0 = 1) and Disable (Bit 0 = 0) Control-C/Control-K check
+    function is meant primarily for BBS use. When the checking is enabled, a
+    Control-C or Control-K received  from the communications port will set a
+    flag internal to the FOSSIL driver,  but will not be stored in the input
+    buffer. The next use of this function will return the value of this flag
+    in register AX then clear the flag for the next occurrence. The returned
+    value is used by the BBS  software to determine whether output should be
+    halted or not.
+
+    The Disable (Bit 1 = 1) and Enable (Bit 1 = 0) Transmitter function lets
+    the application restrain the asynchronous driver from output in much the
+    same way as XON/XOFF would.
+
+
+    AH = 11H	Set current cursor location.
+		Input:	DH = row (line)
+			DL = column
+
+    This function looks exactly like like INT 10H, subfunction 2, on the IBM
+    PC. The cursor location is passed in DX: row in DH and column in DL. The
+    function treats the screen as a coordinate  system whose origin (0,0) is 
+    the upper left hand corner of the screen.
+
+
+    AH = 12H	Read current cursor location.
+		Output:	DH = row (line)
+			DL = column
+
+    Looks exactly like INT 10H,  subfunction 3,  on the IBM PC.  The current 
+    cursor location  (using the same coordinate  system as  function 17)  is 
+    passed back in DX.
+
+Fundamentals of FOSSIL implementation and use                         Page 8
+Communications functions
+
+
+    AH = 13H	Single character ANSI write to screen.
+		Input: AL = character to display
+
+    The character in AL is sent to the screen by the fastest method possible
+    that allows ANSI processing to occur (if available). This routine should
+    not be used in such a way that DOS output  (which is not re-entrant) can 
+    not be employed by some FOSSIL driver to perform the function  (in fact,
+    on the IBM PC that is likely to be how it's done).  On some systems such
+    as the DEC Rainbow this will be a very fast method of screen writing.
+
+
+    AH = 14H	Enable or disable watchdog processing
+		Input:	AL = 1 to enable or 0 to disable watchdog
+			DX = port number
+
+    When watchdog is enabled,   the state of the carrier detect (CD) line on
+    the comm port specified in DX should be constantly monitored. Should the
+    state of that line become FALSE (carrier lost), the system should be re-
+    booted, to enable the BBS (or other application) to start up again. This
+    monitor is not affected by Init/Uninit etc.
+
+
+    AH = 15H	Write character to screen using BIOS support routines
+		Input:	AL = character to display
+
+    The character in AL is sent to the screen using  BIOS-level Input/Output 
+    routines. This differs from function 19 in that DOS I/O CAN	NOT be used,
+    as this function might be called from driver level.
+
+
+    AH = 16H	Insert or Delete a function from the timer tick chain
+		Input:	AL    = 1 to add a function or 0 to delete one
+			ES:DX = address of function
+		Output:	AX    = FFFF if unsuccessful
+
+    This function is used to allow a  central authority  to manage the timer
+    interrupts, so that as code is loaded and unloaded, the integrity of the
+    "chain" is not compromised.  Rather than using the traditional method of
+    saving the old contents of the timer vector, storing the address of your
+    routine there,  and executing a far call to the "old" routine when yours
+    is done, instead you call this function. It manages a list of such entry
+    points and calls them on a timer tick (interrupt) using a FAR call.  All
+    the usual cautions about making DOS calls apply (that is, DON'T!).
+
+    This makes it possible for a program to get in and out of the tick chain
+    without having to know whether another program has also done so since it
+    first insinuated itself.   At least 4 entries should be available in the
+    driver's table (including one to be used by Watchdog if implemented that
+    way).
+
+Fundamentals of FOSSIL implementation and use                         Page 9
+Communications functions
+
+
+    AH = 17H	Reboot system
+		Input:	AL = 0 for "cold boot" or 1 for "warm boot"
+
+    Perform the old 3-finger salute.  Used in extreme emergency by code that
+    can't seem to find a "clean" way out of the trouble it has gotten itself
+    into.  Hopefully it won't happen while you're computing something in the
+    other half of a DoubleDOS system. If your machine can make a distinction
+    between a "cold" (power-up, self-test and boot) and a "warm" (just boot)
+    bootstrap,  your FOSSIL should support the flag in AL. Otherwise just do
+    whatever bootstrap is possible.
+
+
+    AH = 18H	Read block (transfer from FOSSIL to user buffer)
+		Input:	CX = maximum number of characters to transfer
+			DX = port number
+ 			ES = segment of user buffer
+			DI = offset into DS of user buffer
+		Output:	AX = number of characters actually transferred
+ 
+    A "no-wait" block read of 0 to 0xffff characters from the FOSSIL inbound
+    ring buffer to the calling routine's buffer. DS:SI are left untouched by
+    the call; the count of bytes actually transferred will be in AX.
+ 
+ 
+    AH = 19H	Write block (transfer from user buffer to FOSSIL)
+		Input:	CX = maximum number of characters to transfer
+			DX = port number
+ 			ES = segment of user buffer
+			DI = offset into DS of user buffer
+		Output:	AX = number of characters actually transferred
+ 
+    A  "no-wait"  block  move of 0 to 0xffff  characters  from  the  calling 
+    program's buffer into the FOSSIL outbound ring buffer. The actual number
+    of characters moved into the ring buffer will be returned in AX.
+
+
+    AH = 1AH	Break Begin or End
+		Input:	AL = 1 to start a 'break' or 0 to end one.
+			DX = port number
+ 
+    Send a break signal to the modem.  If AL=1, the driver will commence the
+    transmission of a 'break'. If AL=0 the driver will end the 'break'. This
+    is useful for communications with devices that can only go into 'command
+    mode' when a BREAK is received. Note: the application is responsible for
+    the timing of the BREAK.  Also,  if the FOSSIL has been restrained by an
+    XOFF received from the modem, the flag will be cleared.   An Init or Un-
+    Init will stop an in-progress BREAK.
+
+Fundamentals of FOSSIL implementation and use                        Page 10
+Communications functions
+
+
+    AH = 1BH	Return information about the driver
+		Input:	CX = size of user info buffer in bytes
+			DX = port number (if data about port desired)
+ 			ES = segment of user info buffer
+			DI = offset into DS of user info buffer
+		Output:	AX = number of bytes actually transferred
+ 
+    Transfer information about the driver and its current status to the user
+    for use in determining,  at the application level, limits of the driver.
+    Designed to assist  "generic" applications  to adjust to "foreign" gear.
+
+    The data structure currently returned by the driver is as follows (sorry
+    but you'll have to live with assembly syntax):
+
+	info	equ	$		; define begin of structure 
+	strsiz	dw	info_size	; size of the structure in bytes 
+	majver	db	curr_fossil	; FOSSIL spec driver conforms to
+	minver	db	curr_rev	; rev level of this specific driver
+	ident	dd	id_string	; "FAR" pointer to ASCII ID string
+	ibufr	dw	ibsize		; size of the input buffer (bytes)
+	ifree	dw	?		; number of bytes left in buffer
+	obufr	dw	obsize		; size of the output buffer (bytes)
+	ofree	dw	?		; number of bytes left in the buffer
+	swidth	db	screen_width	; width of screen on this adapter
+	sheight	db	screen_height	; height of screen    "     "
+	baud	db	?		; ACTUAL baud rate, computer to modem
+	info_size equ $-info
+
+    The ident string should be  null-terminated,  and NOT contain a newline.
+    The baud rate byte contains the bits that  Function 00H would use to set
+    the port to that speed.
+
+    Additional information will always be passed after these,  so that,  for
+    example, offset "sheight" will never change with FOSSIL revs.
+
+
+
+Fundamentals of FOSSIL implementation and use                        Page 11
+"Layered Application" services
+
+
+
+    The functions below are not necessarily FOSSIL related. However, because
+    dispatchers  that support them are hooked on Interrupt 14H,  it behooves
+    the FOSSIL developer to support them as well to avoid fragmenting memory
+    with several dispatchers.
+ 
+ 
+ 
+    AH = 7EH	Install an "external application" function
+		Input:	AL = code assigned to external application
+			DX = offset of application entry point
+ 			DS = segment of application entry point
+		Output:	AX = 1954H
+			BL = code assigned to application (same as input AL)
+			BH = 1 if successfully installed, 0 if not.
+ 
+    This call is used by external application code  (special screen drivers,
+    modem code, database code, etc) to link into the INT 14H service for use
+    by multiple applications. The "error return" (BH=0 with AX=1954H) should
+    mean that  another application layer has  already been installed at that
+    particular code. Codes 80H through BFH should be supported.
+ 
+    External application  codes 80-83 are  reserved by FOSSIL developers for
+    re-organizing FOSSIL services by type (comm, screen, keyboard, system).
+
+    Installed application code will be entered, via a FAR call, from the INT
+    14H dispatcher whenever it is entered with AH=(application code).
+  
+    If the value returned in AX from this function is not 1954H, the service
+    code that is trying to be installed should bring up its own INT 14H code
+    that can service INT 14H functions 7E-BFH (80-BF are "applications").
+
+
+    AH = 7FH	Remove an "external application" function
+		Input:	AL = code assigned to external application
+			DX = offset of application entry point
+ 			DS = segment of application entry point
+		Output:	AX = 1954H
+			BL = code assigned to application (same as input AL)
+			BH = 1 if successfully removed, 0 if not.
+ 
+    Removes an application's entry into the table.  Usually so it can remove
+    itself from memory. Error return means DS:DX did not match or that there
+    is no entry at the slot described by AL.
+
+    An application that wants to remove itself from memory can issue the  7F
+    function to remove itself from the table, then, if it is successful, get
+    out of memory. If it had to install itself with an INT 14H dispatcher it
+    may back itself out, provided no other applications  have been installed
+    on top of it (using its dispatcher).
+  
+
+Fundamentals of FOSSIL implementation and use                        Page 12
+
+
+
+
+E.  Validation Suite.
+
+    Well, there is one, but it's involved.  Run FIDO_GEN V11w on your FOSSIL
+    for about a week with  reasonable caller activity  in the message areas,
+    file uploads and downloads,  and FidoNet(tm) mail.  Run SEAdog for a few
+    days,  sending and receiving a reasonable  number of messages.  Then run
+    Opus for about the same amount of time.   Using Ron Bemis' OUTER package
+    is also a useful test of the timer tick and reboot code. Some reasonable
+    combination of the  above steps should ensure that your FOSSIL will work
+    with most everything coded for one.
+
+
+
+F.  Distribution.
+
+    The good folks who  distribute Opus will be more than happy to take note
+    of your new FOSSIL driver and to add it to their distribution.  And,  of
+    course, you can upload it to any system you want, but your work will get
+    more publicity in the Opus community than anywhere else.
+
+
+
+G.  Technical Discussion.
+
+    A FOSSIL echomail conference exists,  for the purpose of exchanging info
+    and implementation details for FOSSIL drivers.It is coordinated by Vince
+    Perriello at IFNA node 141/491.  Contact him for details on how to join.
+    Keep in mind though,  that this conference is intended  SPECIFICALLY for
+    implementors of FOSSIL  software and not as a general Q&A conference for
+    people who think FOSSILs have something to do with paleontology.
