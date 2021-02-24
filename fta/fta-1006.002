@@ -1,0 +1,156 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTA-1006
+Revision:       2
+Title:          Key words to indicate requirement levels
+Author:         Administrator
+Revision Date:  17 January 1998
+Expiry Date:    17 January 2000
+----------------------------------------------------------------------
+Contents:
+                1. MUST
+                2. MUST NOT
+                3. SHOULD
+                4. SHOULD NOT
+                5. MAY
+                6. Guidance in the use of these imperatives
+                7. Security considerations
+----------------------------------------------------------------------
+
+
+Status of this document
+-----------------------
+
+  This document is an FTSC Administrative document (FTA), and
+  specifies a Fidonet Best Current Practice for the Fidonet community.
+  Distribution of this document is unlimited.
+
+
+Abstract
+--------
+
+  In many standards documents several words are used to signify the
+  requirements in the specification. These words are often
+  capitalized. This document defines these words as they should be
+  interpreted in FTSC documents. Authors who follow these guidelines
+  should incorporate this phrase near the beginning of their document:
+
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+    NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+    in this document are to be interpreted as described in FTA-xxxx.
+
+  Note that the force of these words is modified by the requirement
+  level of the document in which they are used.
+
+  The key words in *this* document itself are to be interpreted as
+  described here.
+
+
+1. MUST
+-------
+
+  This word, or the terms "REQUIRED" or "SHALL", mean that the
+  definition is an absolute requirement of the specification.
+
+
+2. MUST NOT
+-----------
+
+  This phrase, or the phrase "SHALL NOT", mean that the definition is
+  an absolute prohibition of the specification.
+
+
+3. SHOULD
+---------
+
+  This word, or the adjective "RECOMMENDED", mean that there may exist
+  valid reasons in particular circumstances to ignore a particular
+  item, but the full implications must be understood and carefully
+  weighed before choosing a different course.
+
+
+4. SHOULD NOT
+-------------
+
+  This phrase, or the phrase "NOT RECOMMENDED" mean that there may
+  exist valid reasons in particular circumstances when the particular
+  behavior is acceptable or even useful, but the full implications
+  should be understood and the case carefully weighed before
+  implementing any behavior described with this label.
+
+
+5. MAY
+------
+
+  This word, or the adjective "OPTIONAL", mean that an item is truly
+  optional. One vendor may choose to include the item because a
+  particular marketplace requires it or because the vendor feels that
+  it enhances the product while another vendor may omit the same item.
+  An implementation which does not include a particular option MUST be
+  prepared to interoperate with another implementation which does
+  include the option, though perhaps with reduced functionality. In
+  the same vein an implementation which does include a particular
+  option MUST be prepared to interoperate with another implementation
+  which does not include the option (except, of course, for the
+  feature the option provides.)
+
+
+6. Guidance in the use of these imperatives
+-------------------------------------------
+
+  Imperatives of the type defined in this document must be used with
+  care and sparingly. In particular, they MUST only be used where it
+  is actually required for interoperation or to limit behavior which
+  has potential for causing harm. For example, they must not be used
+  to try to impose a particular method on implementors where the
+  method is not required for interoperability.
+
+
+7. Security considerations
+--------------------------
+
+  These terms are frequently used to specify behavior with security
+  implications. The effects on security of not implementing a MUST or
+  SHOULD, or doing something the specification says MUST NOT or SHOULD
+  NOT be done may be very subtle. Document authors should take the
+  time to elaborate the security implications of not following
+  recommendations or requirements as most implementors will not have
+  had the benefit of the experience and discussion that produced the
+  specification.
+
+
+A. References
+-------------
+
+  [RFC2119] "Key words for use in RFCs to Indicate Requirement
+  Levels". Scott Bradner. March 1997.
+
+
+B. Acknowledgements
+-------------------
+
+  This document is heavily based on the original text of RFC2119 by
+  Scott Bradner. Please read that document for further
+  acknowledgements.
+
+
+C. Author contact data
+----------------------
+
+  Odinn Sorensen
+  Fidonet: 2:236/77
+  E-mail:  odinn@goldware.dk
+  WWW:     http://www.goldware.dk
+
+
+D. History
+----------
+
+  Rev.1, 19971118: First release as draft.
+  Rev.2, 19980117: First release as official FTA. Clarified whether
+                   the document applies to itself (which it does).
+
+
+**********************************************************************
