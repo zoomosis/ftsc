@@ -1,0 +1,1624 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FSP-1011
+Revision:       2
+Title:          BinkP - a protocol for transferring FidoNet mail over
+                reliable connections
+Authors:        Dima Maloff
+                Nick Soveiko
+                Max Masyutin
+Revision Date:  8 October 1999
+Expiry Date:    8 October 2001
+----------------------------------------------------------------------
+Contents:
+
+                1. Background
+                   1.1 Objectives
+                   1.2 Motivation for a new protocol
+                2. Definitions
+                3. Protocol Overview
+                4. Frame format
+                   4.1. Notation
+                   4.2. Examples
+                5. Protocol commands and their arguments
+                   5.1 Classification
+                   5.2 File Name Issues
+                   5.3 8-bit characters in command argument symbol
+                       string
+                   5.4 Binkp commands
+                   5.5 Example of frame exchange in a simple BinkP
+                       session
+                6. Protocol states
+                   6.1 Session setup stage
+                       6.1.1 Originating side
+                       6.1.2 nswering side
+                   6.2 File transfer stage
+                   6.3 Session termination
+                7. Recommended protocol extensions
+                   7.1 Non reliable mode
+                   7.2 Multiple batch mode
+                   7.3 Multiple passwords mode
+                   7.4 Keyed Hashing Challenge-Response Authentication
+                       Mechanism
+                       7.4.1 Overview
+                       7.4.2 Sequence of Steps
+                       7.4.3 Generating and Transmitting Challenge
+                             Data
+                       7.4.4 Producing and Transmitting a Digest
+                       7.4.5 Indicating CRAM capabilities
+                       7.4.6 Example of frame exchange during CRAM
+                             Authentication
+                       7.4.7 Notes on Hash Function Algorithms
+                8. Licence
+                9. Glossary
+               10. References
+               11. Acknowledgements
+
+
+Abstract
+--------
+
+  This specification defines binkp - a protocol to handle a session
+  between two Fidonet Technology systems over a reliable connection.
+  Assumption that the connection is reliable makes possible to
+  eliminate error-checking and unnecessary synchronization steps,
+  achieving both ease of implementation and major performance
+  improvement over connections with large unpredictable delays (e.g.
+  Internet).
+
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Standards Proposal (FSP).
+
+  This document specifies an optional Fidonet standard protocol for
+  the Fidonet community, and requests discussion and suggestions for
+  improvements.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+Available formats
+-----------------
+
+  Binkp Specification is also available in HTML format at
+  http://www.ritlabs.com/binkp/
+
+
+1. Background
+-------------
+
+  1.1 Objectives
+  --------------
+
+  It's been a long time since a new Fidonet protocol has been
+  developed, [EMSI] definitions being published last time in 1991,
+  not speaking about basic standards, [FTS-0001] and [FTS-0006].
+  Fidonet is evolving everyday and new transport layers are being
+  introduced into practice. This led to a situation when in certain
+  Fidonet Regions a visible portion of traffic, especially long
+  distance traffic generating high toll, is being carried by means of
+  protocols that formally are not Fidonet standards. This creates an
+  ambiguity for such systems in indicating their additional
+  capabilities in Fidonet nodelist and in some instances, from being
+  listed in the nodelist at all.
+
+  This document attempts to document the current practice for
+  communication between two Fidonet systems via a reliable channel,
+  provide technical reference for Fidonet software developers and
+  eventually improve Fidonet connectivity.
+
+
+  1.2 Motivation for a new protocol
+  ---------------------------------
+
+  Existing Fidonet Technical Standards and Fidonet Reference Library
+  documents [FTS-0001], [FTS-0006], [EMSI] specify both session
+  handshake procedures and transmission capabilities that imply:
+
+  - non-reliable communication channel between mailers
+  - low round-trip times in the communication channel between
+    mailers.
+
+  This was commonplace a few years ago, when Fidonet systems were not
+  using transport other than direct dial-up on a visible basis. Things
+  have changed today, when other communication media become widely
+  available. This communication media typically provide implementation
+  of Physical, Data Link, Network and Transport layers of the ISO/OSI
+  Reference Model and facilitates relieving Session layer of
+  inappropriate functions, such as error control, flow control, call
+  management and data transparency [Halsall95]. Examples of such
+  communication media are connections provided by TCP/IP protocols and
+  the service provided by HDLC family protocols.
+
+  New communication media can be generally characterized by the
+  reliable transmission service offered by it to the Session layer
+  protocol. Reliable transmission implies that:
+
+
+  - Data link and/or Transport layer protocols are responsible for
+    error control and delivery of frames in correct sequence
+  - Session layer and higher layer protocols are operating on top of
+    connection-oriented mode
+  - Quality of Service provisions (if any) result in unspecified
+    delays between transmitter and receiver
+  - connections are rarely aborted.
+
+  Combination of these factors imposed the following requirements for
+  the new Fidonet protocol:
+
+  - error control can be eliminated throughout the session layer
+    protocol for both handshake and default file transfer method
+  - session setup procedure should minimize number of synchronization
+    points for fast handshake
+  - protocol should be insensitive to delays and robust with respect
+    to timeouts
+  - application flow control should be moved to file level;
+    individual data frames do not need to be error checked nor
+    acknowledged
+  - protocol should be independent from both higher and lower layer
+    protocols
+  - protocol should be reasonably easy to implement and allow future
+    extensions.
+
+
+2. Definitions
+--------------
+
+  The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT" and "MAY"
+  in this document are to be interpreted as specified in [FTA-0006].
+  However, for readability, these words may sometimes not appear in
+  all uppercase letters in this specification. Although it should not
+  impact minimal realization of binkp protocol, it must be noted that
+  Protocol Extensions may override, update or obsolete requirement
+  levels indicated by the above keywords in chapters from 3 to 6
+  inclusive.
+
+  Calling party in this document is referred to as the Originating
+  side and called party is referred to as the Answering side.
+  Originating side here is the party that initiates the connection
+  between two systems.
+
+  Mailer in this document is a software that implements the protocol.
+
+  Words "frame", "packet", and "block" when used in this document
+  refer to Binkp's Frames, unless other was stated.
+
+  Other definitions that are not local to this document can be found
+  in Glossary.
+
+
+3. Protocol Overview
+--------------------
+
+  Binkp is a Fidonet session layer protocol intended for use over
+  data transparent bi-directional channels with reliable
+  transmission. There are no other requirements for the service
+  provided by the underlying protocol suite. Presentation and
+  application layer protocols can be kept as defined by the other
+  Fidonet Technical Standards and are not discussed here.
+
+  Functionality of the minimum protocol realization makes provision
+  for:
+
+  - password protected sessions
+  - 4D/5D addressing for Fidonet and technology compatible networks
+  - exchange of Type 2 [FTS-0001], Type 2.2 [FSC-0045],
+    Type 2+ [FSC-0039] and [FSC-0048], Type 3 [FSC-0081] packets and
+    [FTS-0006] arcmail in both directions, including poll and mail
+    pickup, as well as transfer of any binary or ASCII file
+  - handling WaZOO [FTS-0006] file requests
+  - ensuring integrity of transmitted mail and files
+  - simultaneous bi-directional transmission
+  - maximizing performance over packet switched data networks
+
+  Binkp uses only one synchronization point during session startup,
+  that is password exchange. This feature facilitates fast session
+  startup for high delay links. Sliding window flow control is
+  incorporated on the file level. This ensures that a batch of small
+  files is transmitted with the same efficiency as a one large file.
+
+  Frames section defines binkp's frames.
+
+  Binkp/1.0 commands and their arguments section provides detailed
+  description of all defined protocol commands together with
+  recommendations for their usage. Actual binkp implementation may
+  match it's own diagrams providing the implementation remains fully
+  compatible with current specification.
+
+  Protocol states section gives rigorous state diagrams for the
+  minimum realization of binkp. All mailers MUST support this minimum
+  realization.
+
+
+4. Frame format
+---------------
+
+  Binkp is defined in terms of sending and receiving of specially
+  formatted data blocks, we call them frames.
+
+  Command frames carry protocol commands and may change the protocol
+  state. Data frames are usually appended to files being received by
+  mailers or may be discarded, depending on the protocol state.
+
+  The way of reorganizing of an octet stream or a datagram stream
+  provided by the transport layer into binkp's frames may depend on
+  communication media used. Currently TCP channel is split in
+  following manner:
+
+    7 6543210 76543210
+   +-+-------+--------+--- ................ ---+
+   |T|      SIZE      |          DATA          |
+   +-+-------+--------+--- ................ ---+
+   |<-   2 octets   ->|<- up to 32767 octets ->|
+      (frame header)          (frame data)
+
+
+  If T bit is 0, this is a data frame.
+
+  If T bit is 1, this is a command frame.
+
+  15 bits marked SIZE carry the size of the DATA part of the frame in
+  octets (with the bit marked 0 being the least significant). That is,
+  the full length of a binkp frame is SIZE+2.
+
+  The size of the DATA part may vary between 1 and 32767 octets. A
+  correct realization should never set SIZE to 0. Upon receiving of a
+  packet header with the SIZE field set to 0, the total length of the
+  incoming packet must be treated as 2, this packet must be dropped,
+  and the event should be logged.
+
+  The first octet of a command frame data is the command ID. The ID
+  must be between 0 and 127 inclusive.
+
+  Other octets carry command arguments. Command arguments are an
+  arbitrary symbol string that may be null-terminated. Treating of a
+  null character in the middle of a command depends on realization
+  (with the options being "treat as whitespace" or "treat as end-of-
+  line"). The terminating null character (if any) is either stripped
+  or used by mailers internally as an end-of-line marker.
+
+
+  4.1 Notation
+  ------------
+
+  As stated before, command ID is a small number between 0 and 127.
+  Every defined binkp command defined in this document has a symbolic
+  name in form M_XXX. Symbolic names are defined in Binkp commands
+  section. We will use symbolic names and not command IDs to refer to
+  commands everywhere in this document.
+
+  The following notation is used to describe binkp's command frames:
+
+      M_XXX "Data string"
+
+  Real command number for the command with the symbolic name of M_XXX
+  should be written into the first octet of the DATA area of a binkp
+  frame. "Data string" is a string to be copied into DATA area
+  starting at second octet. SIZE should be set to the total length of
+  "Data string" plus one for the octet to store the command number. T
+  bit should be set to 1.
+
+
+  4.2 Examples
+  ------------
+
+  M_OK "".
+
+    7 6543210 76543210 76543210
+   +-+-------+--------+--------+
+   |1|      0        1|       4|
+   +-+-------+--------+--------+
+    |                |        +----- command ID (no arguments)
+    |                +-------- frame length
+    +- command frame flag
+
+  M_NUL "TEST".
+
+   +-+-------+--------+--------+-------+--------+--------+--------+
+   |1|      0        5|       0|   T        E        S       T    |
+   +-+-------+--------+--------+-------+--------+--------+--------+
+
+
+5. Protocol commands and their arguments
+----------------------------------------
+
+  5.1 Classification
+  ------------------
+
+  Protocol commands may be classified the following way:
+
+  - By argument symbol string type
+     1. Mailer-parsable: M_ADR, M_PWD, M_FILE, M_GOT, M_GET, M_SKIP.
+        Mailer MUST parse and is not recommended to log arguments of
+        these commands as they are. Mailer-parsable commands can be
+        further subdivide by containing a file name in an argument.
+         1.Contain a file name: M_FILE, M_GOT, M_GET, M_SKIP
+            commands contain a file name in their arguments.
+         2.Do not contain a file name: M_ADR, M_PWD
+     2.Human-readable: M_NUL, M_OK, M_EOB, M_ERR, M_BSY. Mailer MAY
+        ignore and/or log arguments of these commands.
+  - By protocol stage
+     1.Session setup stage: M_ADR, M_PWD (must not be sent by
+        Answering side), M_OK (must not be sent by Originating side).
+        These commands MUST never be sent in file transfer stage.
+     2.File transfer stage: M_FILE, M_GOT, M_GET, M_SKIP, M_EOB.
+        These commands MUST never be sent in handshake stage.
+     3.Any stage: M_NUL, M_ERR, M_BSY. These commands MAY be sent
+        any time during a session.
+
+
+  5.2 File Name Issues
+  --------------------
+
+  In Mailer-parsable commands that Contain a file name, a file name
+  MUST NOT include symbols with ASCII value less than 0x20. Space
+  character in a file name MUST be quoted (all other characters MAY
+  be quoted as well) using backslash followed by two-character
+  hexadecimal ASCII code, e.g. space must be represented as \20
+
+  A filename SHOULD not use "non-filename" (define here) characters
+  (look for http-rfc)
+
+  Mailer SHOULD accept files with "non-filename" if underlying
+  filesystem allows that. There may be troubles though with national
+  character encoding, see "8-bit section".
+
+  If a file name is incompatible with a given filesystem, Mailer MUST
+  NOT implicitly save a file under altered name that fits
+  requirements of the file system. Such incompatibility may arise
+  when the filesystem only supports 8.3 filenames, or it doesn't
+  allow national characters, or Mailer is not exactly sure of what
+  charset is used, or API function that creates files simply returned
+  "invalid file name" error code. If such incompatibility occur,
+  mailer SHOULD disconnect with M_ERR message and log a proper
+  message to the local system operator, who, upon reception of such
+  message, may have two choices. First, he may ask remote sysop to
+  rename the file and sent it again. He may also ask to cease of
+  further sending files with such names. Second, he may configure
+  Mailer to receive the file under another (specified) name, or allow
+  Mailer to alter names of receiving files to met the requirements of
+  the filesystem. As you've seen, second way needs no intention to
+  remote system but requires more configurable Mailer.
+
+  Conclusion: the best current practice is that Mailer does not alter
+  a file name without sysop's intention. If it provides such
+  mechanism, it MUST BE optional and it SHOULD BE off by default.
+
+
+  5.3 8-bit characters in command argument symbol string
+  ------------------------------------------------------
+
+  Current specification doesn't define a standard of using national
+  characters by means of neither Unicode characters nor 8-bit
+  charater sets. There are some recommendations on using national
+  characters though. Mailer SHOULD not send 8-bit national characters
+  unless exactly sure that the remote system uses the same charset.
+  This knowledge can be obtained:
+
+  - for a calling side, if a charset of a destination node is known
+  - for answering side
+      - before authorization, if inside a private network that uses
+        the same charset
+      - after authorization, if a charset of a destination node is
+        known
+
+  5.4 Binkp commands
+  ------------------
+
+  Format: symbolic_command_name command_ID
+
+  M_NUL 0
+
+    Command arguments contain human-readable information, such as
+    nodelist info, sysop name, etc. This frame can also be used by
+    some Mailers to exchange protocol options. Mailer MAY ignore
+    and/or log arguments of M_NUL.
+
+
+    e.g. "ZYZ Dima Maloff"
+
+
+    The following format of M_NUL argument is recommended for
+    compatibility purposes:
+      M_NUL "SYS system_name"
+      M_NUL "ZYZ sysop's_name"
+      M_NUL "LOC system_location"
+      M_NUL "NDL system_capabilities"
+      M_NUL "TIME remote_date remote_time"
+      M_NUL "VER mailer_version protocol_version"
+        note: BinkP/1.0 mailers should send "binkp/1.0" string for
+        protocol_version.
+      M_NUL "TRF netmail_bytes arcmail_bytes"
+      M_NUL "OPT protocol options"
+        here protocol options is a space separated list of BinkP
+        options and extensions supported by the mailer.
+
+  M_ADR 1
+
+    List of 4D/5D addresses (space separated).
+
+    e.g. "2:5047/13@fidonet 2:5047/0@fidonet"
+
+  M_PWD 2
+
+    Session password, case sensitive. After successful password
+    identification of the remote, originating side goes to file
+    transfer stage. This command MUST never be sent by Answering
+    side.
+
+    e.g. "pAsSwOrD"
+
+  M_OK 4
+
+    Acknowledgement for a correct password. Upon receiving of this
+    command, originating side goes to file transfer stage. This
+    command MUST never be sent by Originating side. Arguments may be
+    ignored.
+
+    e.g. ""
+
+  M_FILE 3
+
+    Space separated list of parameters for the next file to be
+    transmitted: filename; size in bytes; unixtime; file transmission
+    offset.
+
+    In protocol extensions, negative values for the offset may have
+    special meaning (see non-reliable mode for an example of such
+    usage), basic implementation shell treat negative value as an
+    error.
+
+    Size, time and offset parameters are decimal. Until the next
+    M_FILE command is received, all data frames must carry data from
+    this file in consecutive manner. There is no end of file
+    identifier as the file size is known beforehand. If there are
+    "extra" data frames, Mailer may append this data to the file. By
+    default, transmission of each file should be started from offset
+    0. M_GET command sent by the remote shall force us to start
+    transmission from the specified offset.
+
+    e.g. "config.sys 125 2476327846 0"
+
+    or, answering to M_GET with offset 100:
+
+    "config.sys 125 2476327846 100"
+
+  M_EOB 5
+
+    End-of-Batch. M_EOB command must be transmitted after all the
+    files have been sent.
+
+    Arguments of the command may be ignored.
+
+    e.g. ""
+
+  M_GOT 6
+
+    File acknowledgement, that shall be transmitted upon receiving of
+    the last data frame for current file. Arguments for this command
+    shall be the same as for the M_FILE sent by remote, excluding the
+    last argument, file offset, which is not transmitted back to the
+    system which have sent M_FILE. M_GOT can also be transmitted
+    while receiving a file, in which case transmitting party may
+    interpret it as a destructive skip.
+
+    e.g. "config.sys 125 2476327846"
+
+  M_ERR 7
+
+    This command indicates a fatal error. A party sending M_ERR
+    should abort the session. Argument should contain an error
+    explanation and may be logged. Mailer sends M_ERR in response for
+    an incorrect password. Mailer NUST NOT abort a session without
+    sending a M_ERR or a M_BSY frame (though state machine tables,
+    for simplicity, may not include "transmit M_ERR" instructions).
+
+    e.g. "Incorrect password"
+
+  M_BSY 8
+
+    M_BSY command is transmitted when the system encounters a non-
+    fatal error typically due to temporary lack of resources to
+    proceed with the session. The argument should contain an
+    explanation of the situation and may be logged by remote. M_BSY
+    may be sent at any time during the session (including session
+    setup stage), not only the stages explicitly indicated in the
+    finite state machine. The side, which have sent M_BSY, is in
+    legal position to abort the session. Mailer MUST be able to
+    accept M_BSY at any time. Though state machine tables, for
+    simplicity, may not include handling of M_BSY command, Mailer
+    MUST NOT be confused by reception of M_BSY command.
+
+    e.g. "Too many servers are running already"
+
+  M_GET 9
+
+    A mailer sends an M_GET frame in response to an M_FILE frame from
+    the remote if it does not like the suggested offset in case if a
+    part of that file was received during a previous session.
+    Argumets of M_GET copy those of M_FILE with the offset changed to
+    the desired one.
+
+    Upon receiving of M_GET a mailer checks the first three arguments
+    (filename/size/unixtime), to determine whether the file in the
+    M_GET arguments is the current file being transmitted to the
+    remote or a file that have been transmitted, but still not
+    acknowledged (no M_GOT yet). If later is the case, the mailer
+    aborts the transmission of the current file (it just stops to
+    send data blocks without sending of any additional protocol
+    commands), and starts a new transmission for the requested file
+    from the requested offset by sending of an M_FILE with an
+    argument list copied from that of the received M_GET. Otherwise,
+    the error is reported and the session should be closed by sending
+    of an M_ERR frame.
+
+    Example, M_GET "config.sys 125 2476327846 100".
+
+    Example M_FILE response to the M_GET in the example above: M_FILE
+    "config.sys 125 2476327846 100".
+
+  M_SKIP 10
+
+    Non destructive skip. Parameter is a space separated list of
+    filename, size and unixtime. This command indicates that the
+    remote should send the file during a next session.
+
+    e.g. "config.sys 125 2476327846"
+
+  5.5 Example of frame exchange in a simple binkp session
+  -------------------------------------------------------
+
+  Originating side                  Answering side
+
+  M_NUL "SYS ..."                   M_NUL "SYS ..."
+  M_NUL "ZYZ ..."                   M_NUL "ZYZ ..."
+  M_NUL "LOC ..."                   M_NUL "LOC ..."
+  M_NUL "VER ..."                   M_NUL "VER ..."
+  M_ADR "2:2/2.2@fidonet"           M_ADR "3:3/3.3@fidonet"
+  M_PWD "password"                  (waiting for a password from
+                                     remote)
+
+  (waiting for password             M_OK "" (or M_ERR "Bad password")
+  acknowledgement)
+
+  (got M_OK)                        M_FILE "file2 200 42342434 0"
+
+  M_FILE "file1 100 423424244 0"    data
+
+  data                              data
+
+  data                              data
+
+  M_EOB                             (got file1, acknowledging it)
+
+  (got file2, acknowledging it)     M_GOT "file1 100 423424244"
+
+  M_GOT "file2 200 42342434"        data
+
+                                    M_EOB
+
+
+6. Protocol states
+------------------
+
+  The protocol has two major stages: session setup (different for
+  originating side and answering side) and file transfer (where state
+  machined for both sides are the same). Methods for initiating
+  connection as well as numerical values for particular timeouts are
+  dependent on the underlying layer's protocol suite and are not
+  considered here. Mailer MAY allow configuration of timeouts in
+  reasonably wide range to cover all supported transport protocols.
+
+  The Finite State Machine notation is used throughout this section as
+  defined by [FTS-0001].
+
+  6.1 Session setup stage
+  -----------------------
+
+  Originating side should initiate a binkp session according to Table
+  1. Answering side should be able to act according to Table 2. Any
+  optional extensions of the handshake procedure MUST NOT confuse the
+  other side, which may choose at it's discretion to follow this
+  minimal implementation. Upon successful handshake, both sides follow
+  Table 3 (file transfer stage). That's why terms Answering side and
+  Originating side were chosen for this specification instead of Client
+  and Server - both sides has same roles, and their state machines
+  differ on session setup stage only.
+
+  Session setup stage has the following roles
+
+  - Authentication (REQUIRED). Answering side, upon reception of a
+    password (common secret word) from Originating side, decides
+    whether the password really matches the list of presented
+    addresses, and either acknowledges it by sending M_OK frame or
+    rejects by sending M_ERR frame. This mechanism is called Basic
+    Authentication Scheme and MUST be supported by all Mailers. Basic
+    Authentication Scheme has the following limitations:
+      - If Originating side presented multiple addresses, the
+        password for all of the addresses must be the same (may be
+        solved by Multiple passwords extension).
+      - Cleartext reusable passwords are passed over a network (may
+        be solved by CRAM extension).
+      - Verification is made on Answering side only, thus Originating
+        side has no way to verify Answering side (may be solved by
+        dual CRAM or public-key cryptography, not discussed in this
+        document).
+  - Indicating protocol options (OPTIONAL). Sides may exchange
+    specially formatted M_NUL messages to indicate supported
+    extensions. Sides MAY use another technique to indicate
+    extensions.
+
+
+  6.1.1 Originating side
+  ----------------------
+
+  Originating side sends M_ADR and M_PWD frames, waits for successful
+  authentication acknowledgement from Answerign side (M_OK frame) and
+  goes to file transfer stage. Originating side MUST NOT wait before
+  sending M_ADR frame, i.e. this frame should be send just after
+  setting up a connection on underlying layer. Originating side MUST
+  NOT wait before sending M_PWD except after reception of M_ADR frame.
+  The term wait in this paragraph means do not send anything while
+  expecting data from remote.
+
+
+  Table 1: Session setup, originating side
+  ----------------------------------------
+
+
+  #  Name       Predicate(s)    Action(s)                         Next
+
+  S0 ConnInit                   Attempt to establish connection    S1
+
+  S1 WaitConn   Connection      Send M_NUL frames with system info S2
+                established     (at least one M_NUL "SYS ..."
+                                frame should be sent before M_ADR)
+                                Send M_ADR frame with system
+                                addresses
+                                Set Timer
+                                See if we have password for the
+                                remote
+
+                Connection      Report no connection              exit
+                refused
+
+  S2 SendPasswd Yes, we have a  Send M_PWD "password" frame        S3
+                password        Reset Timer
+
+                No, there's no  Send M_PWD "-" frame               S3
+                password
+
+  S3 WaitAddr   M_ADR frame     See if answering side presented    S4
+                received        the address we've called
+
+                M_BSY frame     Report remote is busy             exit
+                received
+
+                M_ERR frame     Report error                      exit
+                received
+
+                M_NUL frame     Ignore (optionally, log frame      S3
+                received        argument)
+
+                Other known     Report unexpected frame           exit
+                frame received
+
+                Unknown frame   Ignore                             S3
+                received
+
+                Nothing happens Wait                               S3
+
+                Timer Expired   Report timeout                    exit
+
+  S4 AuthRemote Yes,the address See if we've sent a password for   S5
+                was presented   this address
+
+                No, the address Report we called the wrong system exit
+                was not
+                presented
+
+  S5 IfSecure   Yes, we've sent Wait for M_OK frame                S6
+                a password
+
+                No,there was no Report nonsecure session           T0
+                password
+
+  S6 WaitOk     M_OK frame      report secure session              T0
+                received
+
+                M_BSY frame     Report remote is busy (Answering  exit
+                received        size may report busy after
+                                reception of caller's address)
+
+                M_ERR frame     Report error                      exit
+                received
+
+                M_NUL frame     Ignore (optionally, log arguments)
+                received                                           S6
+
+
+                Other known     Report unexpected frame           exit
+                frame received
+
+                Unknown frame   Ignore                             S6
+                received
+
+                Nothing happens Wait                               S6
+
+                Timer Expired   Report timeout                    exit
+
+
+  6.1.2 Answering side
+  --------------------
+
+  Originating side sends M_ADR and waits for M_ADR and M_PWD frames
+  from remote. Upon receptions of these frames, it decides whether the
+  password really matches the list of presented addresses, and either
+  acknowledges it by sending M_OK frame (and goes to file transfer
+  stage) or rejects by sending M_ERR frame (and disconnects). The term
+  wait in this paragraph means do not send anything while expecting
+  data from remote.
+
+
+  Table 2: Session setup, answering side
+  --------------------------------------
+
+
+  #  Name     Predicate(s)            Action(s)                   Next
+
+  R0 WaitConn Incoming connection     Send M_NUL frames with       R1
+              established             system info (at least one
+                                      M_NUL "SYS ..." frame
+                                      should be sent before M_ADR)
+                                      Send M_ADR frame with
+                                      system addresses
+                                      Set Timer
+
+              Nothing happens         Wait                         R0
+
+  R1 WaitAddr M_ADR frame received    See if we have a password    R2
+                                      for any of the remote
+                                      addresses
+
+              M_ERR frame received    Report error                exit
+
+              M_NUL frame received    Log                          R1
+
+              Other known frame       Report unexpected frame     exit
+              received
+
+              Unknown frame received  Ignore                       R1
+
+              Nothing happens         Wait                         R1
+
+              Timer expired           Report timeout              exit
+
+  R2 IsPasswd Yes,we have a password  Set Timer                    R3
+
+              Yes,but we have several Send M_ERR frame            exit
+              different passwords for Report inconsistent passw.
+              different addresses of  settings
+              the remote
+
+              No, there's no password Report nonsecure session     T0
+
+  R3 WaitPwd  M_PWD frame received    See if the password matches  R4
+
+              M_ERR frame received    Report error                exit
+
+              M_NUL frame received    Log                          R4
+
+              Other known frame       Report unexpected frame     exit
+              received
+
+              Unknown frame received  Ignore                       R4
+
+              Nothing happens         Wait                         R3
+
+              Timer Expired           Report timeout              exit
+
+  R4 PwdAck   Yes, the password       Send M_OK frame              T0
+              matches                 Report secure session
+
+              No, password does not   Report password error       exit
+              match
+
+
+  6.2 File transfer stage
+  -----------------------
+
+  File transfer stage is based on two major routines. We call them
+  Receive Routine and Transmit Routine. These routines perform some
+  actions depending on their state variables. State variables are
+  RxState for Receive Routine and TxState for Transmit Routine.
+
+
+  RxState := {RxWaitF|RxAccF|RxReceD|RxWriteD|RxEOB|RxDone}
+  TxState := {TxGNF|TxTryR|TxReadS|TxWLA|TxDone}
+
+
+  Table 3: File Transfer
+  ----------------------
+
+
+  #  Name    Predicate(s)                Action(s)           Next
+
+  T0 InitTrs none                        Set Timer            T1
+                                         Set RxState to
+                                         RxWaitF
+                                         Set TxState to
+                                         TxGNF
+
+  T1 Switch  RxState is RxDone and       Report session      exit
+             TxState is TxDone           complete
+
+             Data Available in Input     call Receive routine T2
+
+             Buffer
+
+             Free space exists in output call Transmit        T3
+             buffer                      routine
+
+             Nothing happens             Wait                 T1
+
+             Timer Expired               Report Timeout      exit
+
+
+  T2 Receive Receive routine returned    Set Timer            T1
+             OK
+
+             Receive routine returned    Close all opened    exit
+             Failure                     files
+
+             Receive routine returned    Call Receive routine T2
+             Continue                    again
+
+
+  T3 Transm  Transmit routine returned   Set Timer           T1
+             OK
+
+             Transmit routine returned   Close all opened    exit
+             Failure                     files
+
+             Transmit routine returned   Call Transmit       T3
+             Continue                    routine again
+
+
+  Tables 4-6 are not actually state machines, but routines called
+  during file transfer stage
+
+
+  We define here a FIFO queue called "TheQueue", which is used to pass
+  incoming M_GET / M_GOT / M_SKIP frames from Receive Routine to
+  Transmit Routine. Receive routine itself does not react to these
+  frames.
+
+  Table 4: Receive Routine
+  ------------------------
+
+
+  RxState Pred(s)     Condition(s)   Actions(s)     Next    Return
+
+  RxWaitF Get a frame Haven't got a  none           RxWaitF  OK
+          from Input  complete frame
+          Buffer      yet
+
+                      Got Data frame ignore         RxWaitF  OK
+
+                      Got M_ERR      Report Error   RxDone   Fail.
+
+                      Got M_GET /    Add frame to   RxWaitF  OK
+                      M_GOT / M_SKIP The Queue
+
+                      Got M_NUL      Log            RxWaitF  OK
+
+                      Got M_EOB      Report End of  RxEOB    OK
+                                     Batch
+
+                      Got M_FILE     none           RxAccF   Cont.
+
+                      Got other      Report         RxDone   Fail.
+                      known frame    unexpected
+                                     frame
+
+                      Got unknown    ignore         RxWaitF  OK
+                      frame
+
+  RxAccF  Decide how  Accept from    Report         RxReceD  OK
+          to accept   beginning      receiving file
+          Incoming
+          File        Accept from    Send M_GET     RxReceD  OK
+                      offset (we do  Report
+                      already have a receiving
+                      part of file)  file,
+                                     requested
+                                     offest
+
+                      Accept later   Send M_SKIP    RxWaitF  OK
+                      (or failed to  Report we will
+                      create file)   accept file
+                                     later, not in
+                                     current
+                                     session
+
+                      Refuse (delete Send M_GOT     RxWaitF  OK
+                      on remote)     Report we do
+                                     not accept file
+
+  RxReceD Get a frame Didn't got a   none           RxReceD  OK
+          from Input  complete frame
+          Buffer      yet
+
+                      Got Data frame none           RxWriteD Cont.
+
+
+                      Got M_ERR      Report Error   RxDone   Fail.
+
+                      Got M_GET /    Add frame to   RxReceD  OK
+                      M_GOT / M_SKIP The Queue
+
+                      Got M_NUL      Log            RxReceD  OK
+
+                      Got M_FILE     Report         RxAccF   Cont.
+                                     partially
+                                     received file
+
+                      Got other      Report         RxDone   Fail.
+                      known frame    unexpected
+                                     frame
+
+                      Got unknown    ignore         RxReceD  OK
+                      frame
+
+
+  RxWriteD Write data Write Failed   Report error   RxDone   Fail.
+           to file
+                      File Pos >     Report write   RxDone   Fail.
+                      Reported       beyond EOF
+
+                      File Pos =     Close File     RxWaitF  OK
+                      Reported       Send M_GOT
+                                     Report File
+                                     Received
+
+                      File Pos <     none           RxReceD  OK
+                      Reported
+
+  RxEOB   Get a frame Didn't get a   none           RxEOB    OK
+          from Input  complete frame
+          Buffer      yet or TxState
+                      is not TxDone
+
+                      Got M_ERR      Report Error   RxDone   Fail.
+
+                      Got M_GET /    Add frame to   RxEOB    OK
+                      M_GOT / M_SKIP The Queue
+
+                      Got M_NUL      Log            RxEOB    OK
+
+                      Got other      Report         RxDone   Fail.
+                      known frame or unexpected
+                      data frame     frame
+
+                      Got unknown    ignore         RxEOB    OK
+                      frame
+
+  RxDone  none        none           none           RxDone   OK
+
+
+  We define the list called "PendingFiles". After we put the last
+  byte of file into output buffer, we cannot yet consider the file as
+  being successfully transmitted, thus we have to add the file to
+  this list and then look for corresponding incoming M_GET / M_GOT /
+  M_SKIP frames to remove the file from the list and decide whether
+  the file was indeed received by remote or remote will accept this
+  file later, or something else. After we have sent M_EOB frame, we
+  must wait until PendingFiles list gets empty before disconnecting.
+
+  If the connection accidentally breaks, all the files left in
+  PendingFiles are considered unsent and will be re-transmitted in
+  the next session. If the connection breaks when the remote did
+  actually receive the file (but the corresponded confirmation frame
+  (M_GOT) didn't came back to us) and we are resending this file
+  again in the next session, remote may get two copies of the same
+  file (file dupe). BinkP allows to reduce or totally suppress such
+  dupes (at a cost of performance, of course), see Non-reliable mode
+  and No Dupes protocol extension.
+
+
+  Table 5: Transmit Routine
+  -------------------------
+
+
+  TxStatePredicate(s)  Condition(s)   Actions(s)      Next   Return
+
+  TxGNF   Open next     File opened OK Send M_FILE     TxTryR  Cont.
+          file from                    Report sending
+          outgoing                     file
+          queue
+                        Failed to open Report failure  TxDone  Fail.
+                        file
+
+                        No more files  Send M_EOB      TxWLA   Cont.
+                                       Report end of
+                                       batch
+
+  TxTryR  Check         TheQueue is    none            TxReadS Cont.
+          TheQueue      empty
+
+                        TheQueue is                            Cont.
+                                         call ProcessTheQueue
+                        not empty
+
+
+  TxReadS Read data     Read failed    Report Error    TxDone  Fail.
+          block from    Read OK,       Send data block TxGNF   OK
+          file          Reached EOF    frame
+                                       Close current
+                                       file
+                                       Add current
+                                       file to
+                                       PendingFiles
+
+                        Read OK, not   Send data block TxTryR  OK
+                        reached EOF    frame
+
+  TxWLA   Check         TheQueue is    none            TxDone  OK
+          TheQueue      empty and
+                        RxState >=
+                        RxEOB
+
+                        TheQueue is    none            TxWLA   OK
+                        empty and
+                        RxState <
+                        RxEOB
+
+                        TheQueue is      call ProcessTheQueue  Cont.
+                        not empty
+
+  TxDone  none          none           none            TxDone  OK
+
+
+
+  Table 6: ProcessTheQueue routine
+  --------------------------------
+
+
+  Predicate(s)     Condition(s)           Actions(s)
+
+  M_GET file that  Requested pos is       Close and finalize file
+  is currenly      FileSize               Report Remote refused file
+  transmitting                            being transmitted
+                                          Set TxState to TxGNF
+
+                   Requested pos is       Set file pointer to
+                   greater then CurPos    requested pos
+                                          Report Remote requested
+                                          offset
+
+                   Requested pos is less  Ignore frame
+                   (or equal) then CurPos
+
+  M_GET file that  none                   Ignore frame
+  is not currenly
+  transmitting
+
+  M_GOT file that  none                   Close and finalize file
+  is currenly                             Report Remote refused file
+  transmitting                            being transmitted
+                                          Set TxState to TxGNF
+
+  M_GOT file that  File is in             Finalize file
+  is not currenly  TheListOfSendFiles     Report file has been sent
+  transmitting                            Remove file from
+                                          TheListOfSendFiles
+
+                   File is not in         Ignore frame
+                   TheListOfSendFiles
+
+  M_SKIP file that none                   Close file (do not finalize,
+  is currenly                             we will send it later, not
+  transmitting                            in current session)
+                                          Report remote will accept
+                                          this file later
+                                          Set TxState to TxGNF
+
+  M_SKIP file that none                   Report remote will accept
+  is not currenly                         this file later
+  transmitting                            Remove file from
+                                          TheListOfSendFiles, if
+                                          exists there
+
+
+  6.3 Session termination
+  -----------------------
+
+  A session may be terminated in the following cases:
+
+  - If transmitted or received M_ERR. In this case, the session
+    should be deemed aborted due to a fatal error.
+  - If transmitted or received M_BSY. In this case, the session
+    should be deemed aborted due to non-fatal error typically because
+    of temporary lack of resources to proceed with the session.
+  - If all of the following applies:
+      - all the files have been sent
+      - we have received M_EOB from the remote side (there are no
+        more files for us),
+      - we have received acknowledgements for all the files sent,
+      - we have received all the files re-requested by M_GET,
+    In this case, the session should be deemed successfully
+    completed.
+
+  A session termination itself is not a protocol stage. Mailer may
+  terminate a session at any time by simple issuing disconnect
+  (shutdown) command to underlying transport layer, providing one of
+  three above conditions are met. Mailer MUST take all proper steps
+  to provide a graceful shutdown of transport layer, as transport
+  layer is responsible to all the data transmitted by one side are
+  received by another before disconnection, providing the shutdown of
+  transport layer protocol was successful.
+
+
+7. Recommended protocol extensions
+----------------------------------
+
+  This section documents already implemented and proposed extensions
+  for the BinkP/1.0. These extensions are purely optional and are
+  included here for the sake of compatibility with future
+  implementations.
+
+  Sides indicate supported protocol extensions by sending of M_NUL
+  frame with "OPT " string, where is Mailer SHOULD NOT use any
+  extension unless exactly sure that the extension is supported by
+  remote. Mailer SHOULD use M_NUL "OPT ..." to indicate supported
+  options.
+
+
+  7.1 Non-reliable mode
+  ---------------------
+
+  Non-reliable mode solves the problem with frequently aborted
+  connections when the sides can not successfully complete file
+  transfer before connection is broken. In this case, if the
+  transmitting side starts retransmission from offset 0, performance
+  degrades as by the time it receives M_GET from the remote, network
+  buffers are already full and by the time they are freed for
+  retransmission from requested offset, the connection might go down
+  again.
+
+  In order to circumference this problem, a mailer can request the
+  remote to enter non-reliable mode by sending a M_NUL "OPT NR" frame
+  at any time during the session. After the remote acknowledges it by
+  sending an M_NUL "OPT NR" frame indicating that the option is
+  supported, both sides can assume that they are in non-reliable mode.
+
+  When session is in non-reliable mode, the transmitting side may send
+  -1 for the offset value in M_FILE command. If it does so, it should
+  wait for the M_GET frame from the receiving side that explicitly
+  specifies file offset and start transmitting file data from this
+  offset. If the receiving side has indicated that it supports non-
+  reliable mode by sending M_NUL "OPT NR" frame, it must recognize -1
+  as the file offset in M_FILE command as an explicit request for the
+  file offset and transmit an appropriate M_GET frame as soon as
+  possible.
+
+  It should be understood that this option degrades performance over
+  regular quality connections and should be used only if absolutely
+  necessary.
+
+
+  7.2 Multiple batch mode
+  -----------------------
+
+  The session is in MB mode if both sides set "MB" flag in any of
+  M_NUL "OPT" packets exchanged before sending of M_OK/M_PWD packets.
+
+  In MB mode both sides restart session from RxDone into InitTransfer
+  state if there were any command packets sent or received by any
+  side between starting at InitTransfer and exchanging of M_EOB by the
+  sides (RxDone state). Otherwise, the session terminates as usual.
+
+  Multiple batches mode is intended to handle WaZOO [FTS-0006] file
+  requests. If there were any WaZOO request files transferred in a
+  batch sides MAY process them and send resulting files in the next
+  batch. Mailers MAY also generate list of files to send in additional
+  batches by other techinques -- including rescanning of their spools
+  or processing of other magic files transferred before in the same
+  session.
+
+  7.3 Multiple passwords mode
+  ---------------------------
+
+  Multiple password mode allows to specify different passwords for the
+  different addresses of the remote.
+
+  Originating side identifies it's multipassword capabilities by
+  sending M_NUL "OPT MPWD" during session setup stage before sending
+  any M_ADR commands and waits for response from the answering side.
+
+  If answering side responds with the M_NUL "OPT MPWD", then it
+  supports multiply passwords too. Answering side also always
+  responds with it's own address list: M_ADR "adr1 adr2 adr3 ...". If
+  M_NUL "OPT MPWD" was not received prior to the first M_ADR command,
+  originating side should assume that the remote does not support
+  multiple password mode and send a single password (if any) for one
+  of the addresses of the remote.
+
+  If the MPWD option was indicated by the answering side, originating
+  side now may send M_PWD "pwd1 pwd2 pwd3 ..." with the number of
+  entries in passwordlist equivalent to the number of addresses
+  presented by the answering side. If there is no password for a
+  particular address, it must send '-' character as a placeholder.
+
+  If the passwords presented are consistent, answering side must
+  acknowledge successful authentication by sending M_OK command.
+
+
+  7.4 Keyed Hashing Challenge-Response Authentication Mechanism
+  -------------------------------------------------------------
+
+  7.4.1 Overview
+  --------------
+
+  Challenge-Response Authentication Mechanism (CRAM) allows to avoid
+  passing cleartext, reusable passwords across the network. Since it
+  utilizes Keyed-Hashing digests [Keyed], it does not require that the
+  password is stored in the clear on the Mailer's media, allowing
+  storing the intermediate results which are known as "contexts".
+
+  Providing BinkP-mailer is capable of [Keyed] digest calculation and
+  conversion of a byte array to a hexadecimal string and back,
+  implementation of CRAM is easily achieved by slightly modifying the
+  state machine.
+
+
+  7.4.2 Sequence of Steps
+  -----------------------
+
+  CRAM adds an additional synchronization step to BinkP protocol. The
+  description of this step follows:
+
+
+  1. Answering side sends a unique set of data (challenge data) to the
+     Originating side, encoded to a hexadecimal string.
+  2. Originating side uses challenge data, decoded from received
+     hexadecimal string, and a password to produce a digest by
+     applying the keyed Hashing algorithm from [Keyed] where the key
+     is the password and the digested text is the challenge data.
+  3. When the answering side receives this response, it verifies the
+     digest provided. If the digest is correct, the answering side
+     should consider the Originating side authenticated and responds
+     appropriately.
+
+  Similar technique is used in [IMAP-AUTH].
+
+  7.4.3 Generating and Transmitting Challenge Data
+  ------------------------------------------------
+
+  Size and contents of challenge data are implementation-dependent,
+  but it SHOULD be no smaller than 8 bytes and no bigger than 64
+  bytes. Answering side SHOULD never generate the same challenge
+  data.
+
+  Instead of generating a long challenge data, answering side MAY use
+  a hash function to shorten it. In calculation of a challenge data
+  answering side MAY also use connection/line number, caller's IP
+  address, current time, etc.
+
+  Answering side transmits challenge data in the very first M_NUL
+  message, the following way:
+
+  M_NUL "OPT [othropt] CRAM-lsthf-cde [othropt]"
+
+  lsthf is a list of aliases of supported hash functions, delimited by
+  slash characters. The list begins with alias of most preferred and
+  ends with alias of least preferred hash function.
+
+  Currently defined aleases are: MD5 for [MD5] and SHA1 for [SHA-1].
+
+  cde is challenge data encoded to hexadecimal string, Lower-case
+  ASCII characters MUST be used for encoding, but Mailer SHOULD also
+  accept upper-case characters. The length of the string MUST be
+  even, and the leading zeros MUST NOT be trimmed.
+
+  7.4.4 Producing and Transmitting a Digest
+  -----------------------------------------
+
+  Originating side responds with:
+
+  M_PWD "CRAM-chosenhf-khde [othropt]"
+
+  where chosenhf is the alias of the chosen hash function and khde is
+  a keyed hashed digest, encoded to a hexadecimal string.
+
+  According to [IMAP-AUTH], keyed hashed digest is produced by
+  calculating
+
+  HASH((secret XOR opad), HASH((secret XOR ipad), challengedata))
+
+  where HASH is chosen hash function, ipad and opad are 36 hex and 5C
+  hex (as defined in [Keyed]) and secret is a password null-padded to
+  a length of 64 bytes. If the password is longer than 64 bytes, the
+  hash-function digest of the password is used as an input (16-byte
+  for [MD5] and 20-byte for [SHA-1]) to the keyed hashed calculation.
+
+
+  7.4.5 Indicating CRAM capabilities
+  ----------------------------------
+
+  Answering side MUST send
+
+  M_NUL "OPT [othropt] CRAM-lsthf-cde [othropt]"
+
+  as a very first M_NUL message if it supports CRAM. It MAY send other
+  non-M_NUL messages before though. Current specification doesn't
+  define any such non-M_NUL message, they are reserved for protocol
+  extension.
+
+  Originating side MUST be ready to receive non-M_NUL before M_NUL in
+  a CRAM session. BinkP state machine MUST ignore any received
+  message of unknown type in order to be compatible with future
+  extensions.
+
+  If an originating side receives a first M_NUL message that is M_ADR
+  or not
+
+  M_NUL "OPT [othropt] CRAM-lsthf-cde [othropt]"
+
+  it MUST decide that the answering side doesn't support CRAM and MAY
+  either disconnect or use old password exchange. If the sides have no
+  any compatible hash function, originator may also either disconnect
+  or use old password exchange. If an originating side decides to
+  disconnect, it SHOULD send M_ERR frame with a proper explanation
+  before disconnecting.
+
+  When parsing M_NUL "OPT ..." string (came from answering side),
+  originating side first splits it by using space delimiter to get a
+  list of options, and then if an option begins with "CRAM-lsthf-",
+  takes the remaining substring as a hexadecimal-encoded challenge
+  data.
+
+
+  7.4.6 Example of frame exchange during CRAM Authentication
+  ----------------------------------------------------------
+
+  (Password here is tanstaaftanstaaf)
+
+  Originating :
+    send M_NUL messages
+    and M_ADR
+    wait for first M_NUL message
+
+  Answering   :
+    send M_NUL "OPT ND CRAM-SHA1/MD5-f0315b074d728d483d6887d0182fc328"
+    and other messages
+    wait for M_PWD
+
+  Originating :
+    M_PWD "CRAM-MD5-56be002162a4a15ba7a9064f0c93fd00"
+
+  Answering   :
+    M_OK and continue session
+
+
+  7.4.7 Notes on Hash Function Algorithms
+  ---------------------------------------
+
+  [MD5] and [SHA-1] are the most widely used cryptographic hash
+  functions. [MD5] has been shown to be vulnerable to collision
+  search attacks [Dobb]. This attack and other currently known
+  weaknesses of [MD5] do not compromise the use of [MD5] within CRAM
+  as specified in this document (see [Dobb]); however, [SHA-1]
+  appears to be a cryptographically stronger function. To this date,
+  [MD5] can be considered for use in CRAM for applications where the
+  superior performance of [MD5] is critical. In any case,
+  implementers and users need to be aware of possible cryptanalytic
+  developments regarding any of these cryptographic hash functions,
+  and the eventual need to replace the underlying hash function.
+
+
+8. Licence
+----------
+
+  You can implement BinkP protocol in your software as long as you
+  agree to the following conditions:
+
+   1. The protocol shall be referenced to as BinkP and not in any
+      other way. You shall include the author(s) of the protocol in
+      your copyright statement for the software.
+   2. BinkP shall always be backwards compatible with it's previous
+      versions. BinkP allows development of the new capabilities
+      without compromizing interoperability with previous versions.
+      Therefore, it is important that future developments of the
+      protocol are not pursued in different directions by different
+      people. If you have any suggestions regarding future
+      developments of the protocol, make a reasonable effort to
+      contact the author (s), so that the development efforts can
+      coordinated in a way advantageous for everybody.
+   3. If your implementation is not compatible with past, present or
+      future BinkP specifications, you shall reference to it as a
+      "BinkP variation" or "BinkP derived".
+
+  Remember that you may use, implement or utilize BinkP, it's
+  description or any other associated texts or documentations at your
+  own risk, without any warranty, without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE
+
+  BinkP author: Dima Maloff.
+
+9. Glossary
+-----------
+
+  Many entries in this glossary are provided courtesy of Butterfly
+  Glossary of Internet and Data Communication terms and RFC-1983.
+
+  connection-oriented
+      Data communication method in which communication proceeds
+      through three well-defined phases: connection establishment,
+      data transfer, connection release. TCP is a connection-oriented
+      protocol.
+  data link layer
+      The OSI layer that is responsible for data transfer across a
+      single physical connection, or series of bridged connections,
+      between two Network entities.
+  flow control
+      A technique for ensuring that a transmitting entity does not
+      overwhelm a receiving entity.
+  HDLC
+      (High level Data Link Control). Popular ISO standard bit-
+      oriented, data link layer protocol derived from SDLC. HDLC
+      specifies an encapsulated method of data on synchronous serial
+      data links.
+  IP
+      (Internet Protocol). The Internet Protocol, defined in STD 5,
+      RFC 791, is the network layer for the TCP/IP Protocol Suite.
+      It is a connectionless, best-effort packet switching protocol.
+  network layer
+      Layer 3 of the OSI reference model. Layer 3 is the layer at
+      which routing, addressing and connection management take place.
+  OSI (Open Systems Interconnection) Reference Model
+      A seven-layer structure designed to describe computer network
+      architectures and the way that data passes through them. This
+      model was developed by the ISO (International Organization for
+      Standardization) in 1978 to clearly define the interfaces in
+      multivendor networks, and to provide users of those networks
+      with conceptual guidelines in the construction of such networks.
+  port
+      A port is a transport layer demultiplexing value. Each
+      application has a unique port identifier associated with it.
+  physical layer
+      The OSI layer that provides the means to activate and use
+      physical connections for bit transmission. In plain terms, the
+      Physical Layer provides the procedures for transferring a single
+      bit across a Physical Media.
+  Quality of Service
+      (Also QoS). A measure of performance for a transmission system
+      that reflects its transmission quality and availability of
+      service.
+  reliable transmission
+      a type of transport service that:
+        - recovers from errors by retransmitting errored frames
+        - delivers frames in correct sequence (also known as stream-
+          oriented)
+        - usually is used in connection-oriented mode
+  session layer
+      Layer 5 of the OSI reference model. Coordinates session activity
+      between aplications, including application-layer error control,
+      dialog control, and remote procedure calls.
+  sliding window flow control
+      Method of flow control in which a receiver gives transmitter
+      permission to transmit data until a window is full. When the
+      window is full, the transmitter must stop transmitting until the
+      receiver advertises a larger window.
+  socket
+      Software structure operating as a communications and point
+      within a network device.
+  TCP
+      Transmission Control Protocol. An Internet Standard transport
+      layer reliable protocol defined in STD 7, RFC 793. It is
+      connection-oriented and stream-oriented.
+  TCP/IP protocol suite
+      Transmission Control Protocol over Internet Protocol. This is a
+      common shorthand which refers to the suite of transport and
+      application protocols which runs over IP.
+  transport layer
+      Layer 4 of the OSI reference model. The transport layer is
+      responsible for reliable network communication between end
+      nodes. It implemnts flow and error control and often uses
+      virtual circuits to ensure reliable data delivery.
+  unixtime
+      number of seconds elapsed since 00:00:00 UTC, Jan. 1, 1970.
+
+
+10. References
+
+  [binkd]
+      Binkd User Guide.
+  [BinkpRus]
+      Original BinkP/1.0 description by Dima Maloff,
+      http://www.corbina.net/~maloff/binkd/binkp.html (in Russian).
+  [FTS-0001]
+      A Basic FidoNet(r) Technical Standard, Revision 15. Randy Bush,
+      Pacific Systems Group, August 30, 1990.
+  [FTS-0006]
+      YOOHOO and YOOHOO/2U2.
+  [FSC-0039]
+      M.Howard, A type-2 packet extension proposal,
+      FSC-0039 Version 4, 29-Sep-1990
+  [FSC-0045]
+      T.Henderson, Proposed new packet header, Version 1, 17-Apr-1990
+  [FSC-0048]
+      J.Vroonhof, Proposed type-2 packet extension, Version 2,
+      21-Oct-1990
+  [FSC-0081]
+      M.Staldal, A type-3 packet proposal, Version 1, 01-Mar-1995
+  [EMSI]
+      FSC-0056 EMSI/IEMSI protocol definition.
+  [FTA-1006]
+      FTA-1006, Key words to indicate requirement levels, Fidonet
+      Technical Standards Committee administrativa.
+  [Halsall95]
+      Data Communications, Computer Networks and Open Systems, F.
+      Halsall, 4th ed., Addison-Wesley, 1995, ISBN 0-201-42293-X.
+  [Dobb]
+      H. Dobbertin, "The Status of MD5 After a Recent Attack", RSA
+      Labs' CryptoBytes, Vol. 2 No. 2, Summer 1996.
+  [MD5]
+      Rivest, R., "The MD5 Message-Digest Algorithm", RFC 1321, April
+      1992.
+  [SHA-1]
+      NIST, FIPS PUB 180-1: Secure Hash Standard, April 1995.
+  [Keyed]
+      Krawczyk, Bellare, Canetti, "HMAC: Keyed-Hashing for Message
+      Authentication", RFC 2104, February 1997.
+  [IMAP-AUTH]
+      Klensin, "IMAP/POP AUTHorize Extension for Simple
+      Challenge/Response", RFC 2195, September, 1997
+
+
+11. Acknowledgements
+--------------------
+
+  This document is partially based on extracts from RFCs and FTSC
+  publications too numerous to be acknowledged individually.
+
+  The authors would like to thank Joaquim Homrighausen, Kim 'B' Heino,
+  Rune Johansen and many others for fruitful discussions and
+  suggestions regarding protocol design and specifications.
+
+A. Author contact data
+----------------------
+
+  Dima Maloff
+  Fidonet: 2:5020/128
+  E-mail: maloff@corbina.net
+  WWW: http://www.corbina.net/~maloff/
+
+  Max Masiutin
+  Fidonet: 2:469/84
+  E-mail: max@ritlabs.com
+  WWW: http://www.ritlabs.com/rit/
+
+  Nick Soveiko
+  Fidonet: 2:5030/23.101
+  E-mail: nsoveiko@doe.carleton.ca
+  WWW: http://www.doe.carleton.ca/~nsoveiko/
+  
+
+B. History
+----------
+
+  Rev.1, 19990611: First release
+  Rev.2, 19991008: Added new topic: "Definitions";
+                   clarified the following topics: "Frame Format",
+                   "Protocol Commands and Their Arguments",
+                   "Keyed Hashing Challenge-Response
+                   Authentication Mechanism";
+                   added "unixtime" item to Glossary topic;
+                   corrected links in References topic.
+
