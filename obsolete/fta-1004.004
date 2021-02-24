@@ -1,0 +1,181 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTA-1004
+Revision:       4
+Title:          FTSC File List
+Author:         Administrator
+Revision Date:  5 July 1999
+Expiry Date:    5 July 2001
+----------------------------------------------------------------------
+Contents:
+                1. Administrative Documents
+                2. Fidonet Technical Standards
+                3. Fidonet Standards Proposals
+                4. Fidonet Reference Library
+----------------------------------------------------------------------
+
+
+1. FTSC Administration
+----------------------
+
+  FTA-1000  Charter
+  FTA-1001  Operations
+  FTA-1002  Document Submission and Publication Standard
+  FTA-1003  Membership List
+  FTA-1004  File List
+  FTA-1005  Product ID List
+  FTA-1006  Keywords to indicate requirement levels
+  FTA-1007  Intellectual Property Rights
+
+
+2. Fidonet Technical Standards
+------------------------------
+
+  FTS-0001.016  Basic Fidonet Technical Standard
+  FTS-0004.001  Echomail specification
+  FTS-0005.003  ** Obsoleted by FTS-5000 **
+  FTS-0006.002  YOOHOO and YOOHOO/2U2
+  FTS-0007.003  SEAlink protocol extension
+  FTS-0008.003  Bark file-request protocol extension
+  FTS-0009.001  Message identification and reply linkage
+  FTS-5000.001  The Distribution Nodelist
+  FTS-5001.001  Nodelist Flags and Userflags
+
+
+3.  Fidonet Standards Proposals
+-------------------------------
+
+  FSP-1001.002  Timezone information in FTN messages
+  FSP-1002.002  Reply indication in FTN subject lines
+  FSP-1003.001  ** Obsoleted by FRL-1001 **
+  FSP-1004.001  ** Obsoleted by FRL-1002 **
+  FSP-1005.006  Zone 2 nodelist flags
+  FSP-1006.001  Kludge for specifying addition e-mail reply addresses
+  FSP-1007.001  Multiple recipient address specification to gateway
+  FSP-1008.002  New control lines for forwarded messages
+  FSP-1009.001  Year 2000 issues in FTN software
+  FSP-1010.001  Via kludge specification
+  FSP-1011.001  Binkp - a protocol for transferring FidoNet mail over
+                reliable connections
+  FSP-1012.002  Integration of IP nodes into the nodelist
+
+
+
+4. Fidonet Reference Library
+----------------------------
+
+  FSC-0001      ** Obsoleted by FTS-0001 **
+  FSC-0002      ** Obsoleted by FTS-0005 **
+  FSC-0003.001  FidoNet Route Files Explained
+  FSC-0004.001  Zones and Zonegates explained primitively
+  FSC-0005.001  Opus 1.01 Netmail passwording scheme
+  FSC-0006      ** Obsoleted by FTS-0006 **
+  FSC-0007.002  RFC-822-style msg header proposal
+  FSC-0008      ** Obsoleted by FSC-0015 **
+  FSC-0009.001  Nodelist Flag Draft Document
+  FSC-0010.001  Dutchie 2.80 SEAlink File Resynch
+  FSC-0011.001  Experiences/corrections to FSC-0001
+  FSC-0012      ** Obsoleted by FTS-0004 **
+  FSC-0013      ** Obsoleted by FTS-0008 **
+  FSC-0014.001  Binary-style msg proposal
+  FSC-0015.001  FOSSIL 5.0 Documentation
+  FSC-0016.001  FidoNet Mail Session Startup
+  FSC-0017.001  Archive Philosophy and Document Naming
+  FSC-0018      ** Obsoleted by FTSCLIST **
+  FSC-0019      ** Obsoleted by FTS-0007 **
+  FSC-0020.001  Alternate Nodelist Flag Proposal
+  FSC-0021.001  VFOSSIL, OS/2 Video FOSSIL Appendage
+  FSC-0022      ** Obsoleted by FSC-0090 **
+  FSC-0023.001  Bundle naming convention proposal
+  FSC-0024.001  Binary bundle proposal
+  FSC-0025.001  AVATAR Video Spec
+  FSC-0026      ** Obsoleted by FTSCLIST **
+  FSC-0027      ** Obsoleted by FTS-0005 **
+  FSC-0028.001  Proposed file-forwarding standard
+  FSC-0029      ** Not used **
+  FSC-0030.001  Proposal for message identification
+  FSC-0031.001  Proposed message id/linkage standard
+  FSC-0032.001  Proposed message quoting standard
+  FSC-0033.001  Proposal for message identification
+  FSC-0034.002  Gateways to and from FidoNet(r)
+  FSC-0035.001  Transparent gateways to/from FidoNet
+  FSC-0036.001  Group Mail specification
+  FSC-0037.001  AVATAR 0+ Video Spec
+  FSC-0038.001  Proposed domain gating protocol
+  FSC-0039.004  A type-2 packet extension proposal
+  FSC-0040.001  Proposed modem handling extension
+  FSC-0041      ** Obsoleted by FTS-0009 **
+  FSC-0042.001  A modified gateway agreement
+  FSC-0043.002  Some hints on recognizing control lines in Fidonet ...
+  FSC-0044.002  Improved duplicate detection
+  FSC-0045.001  Proposed new packet header
+  FSC-0046.005  Product ID for FidoNet message handlers
+  FSC-0047.001  The ^ASPLIT kludge line
+  FSC-0048.002  Proposed type-2 packet extension
+  FSC-0049.001  Passing domain information during FTS-0006 sessions
+  FSC-0050.001  Character set identifier for FidoNet msg editors
+  FSC-0051.003  System-independent way of transferring special cha ...
+  FSC-0052.001  A proposal for making the PATH zone aware
+  FSC-0053.002  Specifications for the ^aFLAGS field
+  FSC-0054.004  The CHARSET proposal
+  FSC-0055.001  Security passwords in nodelist updates
+  FSC-0056.001  EMSI/IEMSI protocol definition
+  FSC-0057.003  Echo Area Managers - Specifications for Requests
+  FSC-0058.002  A New Way Of Addressing In FidoNet
+  FSC-0059.001  Newsgroup Interchange within FidoNet
+  FSC-0060.001  Calculation and Usage of CRC's
+  FSC-0061.001  Proposed Guidelines for the FileBone
+  FSC-0062.003  Nodelist Flag Indicating Online Times
+  FSC-0063.001  Proposal For FidoNet Messages
+  FSC-0064.007  InterDomain Message ID, Gating, Linking and Addressing
+  FSC-0065.001  Type 3 ASCII: A Proposal
+  FSC-0066.002  Type 3 Binary: A Proposal
+  FSC-0067.001  A Proposal For Sensible New Kludge Lines
+  FSC-0068.001  A Proposed Replacement For FTS-0004
+  FSC-0069.001  A FidoNet (FTN) Domain Name Service
+  FSC-0070.002  Improving FidoNet/UseNet Gating and Dupe Checking
+  FSC-0071.001  Distributed FREQ (DFREQ) Specifications
+  FSC-0072.001  The HYDRA File Transfer Protocol
+  FSC-0073.001  Encrypted message identification for Fidonet
+  FSC-0074.001  Proposed echomail specification to replace FTS-0004
+  FSC-0075.001  ISDN capability flags in the Nodelist
+  FSC-0076.001  A Proposal for NetMail AreaTags
+  FSC-0077.001  Type-10 Packet Format
+  FSC-0078.001  Gateway between Fidonet compatible networks
+  FSC-0079.002  RTF Mail: message formatting in Type-2 message packet
+  FSC-0080.002  Describing FidoNet with a layered model
+  FSC-0081.001  A type-3 packet proposal
+  FSC-0082.001  Proposed new packet type
+  FSC-0083.001  Proposed standard for message IDS on FTN systems
+  FSC-0084.001  EDX1: Electronic Data Exchange standard level 1
+  FSC-0085.001  Proposal for "NOZIP" and "ERX" nodelist flags
+  FSC-0086.001  SRIF: Description of new Standard Requestion ...
+  FSC-0087.001  File forwarding in FidoNet technology networks
+  FSC-0088.001  Compatibility & Link Qualifier Extens ... EMSI ...
+  FSC-0089.001  The INTL: netmail addressing control line
+  FSC-0090.001  FTSC Product Codes and Application Form
+  FSC-0091.001  ISDN nodelist flags (supersedes FSC-0075)
+  FSC-0092.001  New control lines for forwarded messages
+  FSC-0093.002  Reduced seen-by lines
+  FRL-1001.001  Standard Fidonet Addressing
+  FRL-1001.001  Zone 2 nodelist flags
+
+
+A. History
+----------
+
+  Rev.1, 19971009: First non-draft release. Author Adrian Walker.
+  Rev.2, 19971219: Cleanup draft. Reformatted document slightly.
+                   Changed FRL back to FSC for the old historic
+                   proposals.
+  Rev.3, 19971229: Added FSP's up to 1009. Added revision numbers.
+  Rev.4, 19990705: Added FTA-1006 and FTA-1007;
+                   Added FSP-1010 to FSP-1012;
+                   Added FTS-5000 to FTS-5001;
+                   Added FRL-1001 to FRL-1002;
+                   Updated obsolete status accordingly.
+
+
+**********************************************************************
