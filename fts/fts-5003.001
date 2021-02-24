@@ -1,0 +1,313 @@
+
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTS-5003
+Revision:       1
+Title:          Character set definition in Fidonet messages
+Author(s):      Peter Krefting (born Karlsson)
+                Stas Degteff
+                FTSC Administrator
+Date:           7 April 2012
+----------------------------------------------------------------------
+Contents:
+                1. Introduction
+                2. Format of the identifier
+                3. Supported levels
+                4. Supported character sets
+                5. Obsolete identifiers
+                6. Notes
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Standard (FTS).
+
+  This document specifies a Fidonet standard for the Fidonet community.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+Abstract
+--------
+
+  This document defines the identifiers that are used to indicate the
+  character sets and character encodings used within messages that are
+  distributed in Fidonet.
+
+  There have been many attempts on defining a common standard on what
+  character encodings are used in Fidonet distributed messages. The
+  only one that has gained widespread use is the "CHRS" specification
+  described in FSC-0054. This document tries to describe the current
+  use, as well as standardising the parts of it that were ambiguously
+  defined.
+
+1. Introduction
+---------------
+
+  As Fidonet is an international network, one has to consider that
+  not all people use English to write messages. Many languages have
+  alphabets that are either bigger than the standard English alphabet,
+  or completely different. To keep track of which character set and
+  character encoding is used for a particular message, this document
+  describes a way to identify this to message reading software.
+
+1.1 Definition of terms.
+
+  A character set is the collection of characters that is used to
+  display text. Examples of a character set are the ASCII set, the
+  LATIN 1 set and the universal character set or Unicode character
+  set.
+
+  An encoding scheme is the algorithm to transform characters from
+  a specific character set into a number or set of numbers that can be
+  stored and manipulated. An example is UTF-8, an encoding scheme
+  for the universal character set.
+
+  The distinction between character set and character encoding scheme
+  is only meaningful for character sets that need more than one byte
+  for representation. 7 and 8 bit character sets are normally
+  represented by a scalar value up to 255. For Unicode that uses the
+  universal character set, there is more than one way however to
+  represent a particular character. There is UTF-8, UTF-16 and UTF-32.
+  These are different  encoding schemes for one and the same character
+  set, the universal character set.
+
+
+2. Character set identification line
+------------------------------------
+
+  The character encoding of a message is specified in the "CHRS"
+  control line.
+
+  The CHRS control line is formatted as follows:
+
+  ^ACHRS: <identifier> <level>
+
+  Where <identifier> is a character string of no more than eight (8)
+  ASCII characters identifying the character set or character encoding
+  scheme used, and level is a positive integer value describing what
+  level of CHRS the  message is written in.
+
+  For backwards compatibility, "CHARSET" may be treated as a synonym
+  for "CHRS".
+
+  Some implementations do not add the <level> field and some
+  implementations erroneously present "UTF-8 2" instead of "UTF-8 4".
+  Well mannered implementations should gracefully handle this situation
+  when reading messages. The recommended way of doing this is to
+  ignore the level parameter and only use the name of the identifier.
+  In future the level parameter may become obsolete.
+
+  Incoming messages without "CHRS" control lines should be considered
+  as being written in pure ASCII, but may be treated as being written
+  in some default character set or character encoding scheme. Such as
+  IBM codepage 437, IBM codepage 866 or UTF-8. It is recommended that
+  message readers offer the user the option of manually selecting a
+  different character set or encoding scheme for these messages on a
+  per-area, per-message or other basis.
+
+
+3. Supported levels
+-------------------
+
+  These levels are the ones that are implemented in current software:
+
+  Level 0
+  -------
+
+  This level is for messages containing pure seven bit ASCII only.
+  Outgoing messages in pure ASCII need not be identified by a "CHRS"
+  control line, but if they are, they should be indicated as
+  "ASCII 1" (not "ASCII 0").
+
+  Level 1
+  -------
+
+  First level of internationalisation, using seven bit character sets.
+  Most of these are based on US ASCII, with minor internationalisation
+  variations.
+
+  Level 2
+  -------
+
+  Second level of internationalisation, using eight bit character
+  sets.
+
+  This level adds support for character sets that use "extended
+  ASCII", i.e codes with the most significant bit set. The character
+  sets in level two are all based on ASCII (the codes 0-127 coincide
+  with ASCII).
+
+
+  Level 3
+  -------
+
+  Level 3 is included just for completeness as it was mentioned in the
+  proposals (FSC-0054 and FSP-1013, now FRL-1020) that this standard is
+  based on.
+
+  It seems level 3 was originally meant for 16 bit character sets but
+  there never was an implementation and there may never be. This may
+  have to do with the NULL byte being reserved in the Fidonet
+  specifications as a termination character.
+
+  Level 3 is "reserved".
+
+
+  Level 4
+  -------
+
+  Level 4 is for multi byte character encodings. The only presently
+  known implementation is UTF-8.
+
+
+  4. Known character set identifiers
+  ----------------------------------
+
+  This is a list of character set and character encoding scheme
+  identifiers that are known to be in use or to have been in use in
+  Fidonet. This list is not exhaustive and is not meant to be a list
+  of characters sets or character encoding identifiers that all must
+  be supported by an implementation. It is perfectly all right for
+  an implementation to only have partial support.
+
+  A common method of implementation is to have a character translation
+  table for each character set or character encoding identifier. The
+  user can add or delete these tables to or from his configuration in
+  order to add or delete support for character set/encoding. The
+  details are left to the implementation.
+
+
+  Identifier  Character set
+  ----------  -------------
+
+  Level 1 character sets (seven-bit)
+
+  Level 1 is no longer "current practise". The level 1 character
+  sets are included here for backward compatibility.
+
+
+  ASCII       ISO 646-1 (US ASCII)
+  DUTCH       ISO 646 Dutch
+  FINNISH     ISO 646-10 (Swedish/Finnish)
+  FRENCH      ISO 646 French
+  CANADIAN    ISO 646 Canadian
+  GERMAN      ISO 646 German
+  ITALIAN     ISO 646 Italian
+  NORWEIG     ISO 646 Norwegian
+  PORTU       ISO 646 Portuguese
+  SPANISH     ISO 646 Spanish
+  SWEDISH     ISO 646-10 (Swedish/Finnish)
+  SWISS       ISO 646 Swiss
+  UK          ISO 646 UK
+  ISO-10      ISO 646-10 (Deprecated alias)
+
+
+  Level 2 character sets (eight-bit, ASCII based)
+
+  CP437       IBM codepage 437 (DOS Latin US)
+  CP850       IBM codepage 850 (DOS Latin 1)
+  CP852       IBM codepage 852 (DOS Latin 2)
+  CP866       IBM codepage 866 (Cyrillic Russian)
+  CP848       IBM codepage 848 (Cyrillic Ukrainian)
+  CP1250      Windows, Eastern Europe
+  CP1251      Windows, Cyrillic
+  CP1252      Windows, Western Europe
+  CP10000     Macintosh Roman character set
+
+  LATIN-1     ISO 8859-1 (Western European)
+  LATIN-2     ISO 8859-2 (Eastern European)
+  LATIN-5     ISO 8859-9 (Turkish)
+  LATIN-9     ISO 8859-15 (Western Europe with EURO sign)
+
+  Level 2 obsolete character set identifiers (see note)
+
+  IBMPC       IBM PC character sets for European
+  +7_FIDO     IBM codepage 866, use CP866 instead
+  MAC         Macintosh character set, use CPxxxxx instead
+
+
+  Level 4
+
+  UTF-8      UTF-8 encoding for the Unicode character set
+
+
+5. Obsolete indentifiers
+------------------------
+
+  These indentifiers must not be used when creating new messages.
+  The following only applies to processing messages that were
+  created using old software.
+
+  Since the "IBMPC" identifier, initially used to indicate IBM
+  codepage 437, eventually evolved into identifying "any IBM
+  codepage", there exists in some implementations an additional
+  control line, "CODEPAGE", identifying the messages codepage:
+
+         "^ACODEPAGE: xxx
+
+  This use is deprecated in favour of the "CPxxx" identifiers
+  defined above. If found in incoming messages, however, it should
+  be used as an override of the "CHRS: IBMPC" identifier.
+
+  The character set "+7_FIDO" is sometimes used as an identifier for
+  CP866. This use is deprecated, and "CP866" is recommended instead.
+  Implementations should treat "+7_FIDO" as a synonym for "CP866".
+
+  The character set "MAC" some time ago was used for Macintosh
+  character set, but now sysops should use CP10000 or another codepage
+  identifier from international standard: CP10029 for Macintosh
+  Central Europe languages, CP10007 for Macintosh Cyrillic and another.
+
+  FSC-54 also defined control lines for style changes, "CHRC". These
+  are not implemented in any software known to the authors, and are
+  deprecated.
+
+  Level 3, as defined by FSC-54, is also considered "not used" since
+  there currently are no known implementations of them. All levels not
+  documented here are considered reserved for future use.
+
+6. Notes
+--------
+
+  The character set identifier applies to all parts of the message,
+  including the header information and the control lines like origin
+  and tear line.
+
+  FSC-54 documents file formats for mapping files that could be used
+  for storing character translation data. These are not documented
+  here because determined by software implementation.
+
+
+  A. Author contact data
+  ----------------------
+
+  Peter Krefting (born Karlsson)  Fidonet: 2:203/0.222
+                                  E-mail: peter@softwolves.pp.se
+  Stas Degteff Fidonet: 2:5080/102
+  FTSC Administrator: 2:2/20, administrator@ftsc.org
+
+  B. Acknowledgements
+  -------------------
+
+  This document is largely based on FSP-1013 by Peter Karlsson, which
+  in turn was based on FSC-0054 by Duncan McNutt.
+
+  Peter Karlsson is now known as Peter Krefting and FSP-1013 has been
+  filed in the FTSC reference library as FRL-1020.
+
+  Significant modifications were submitted by Stas Degteff. Other
+  FTSC members also provided valuable input.
+
+
+  C. Revision History
+  -------------------
+
+
+  Rev.1, 20120407: First release..
+
+
+
