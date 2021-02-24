@@ -1,6 +1,6 @@
 Document: FTS-0008
-Version:  002
-Date:     17-Jun-90
+Version:  003
+Date:     15-Oct-1990
 Updates:  FTS-0001
 
 
@@ -8,7 +8,7 @@ Updates:  FTS-0001
                   An Enhanced FidoNet(r) Technical Standard
                  Extending FTS-0001 to include Bark requests
 
-                               June 17, 1990
+                            October 15, 1990
 
 
 
@@ -22,15 +22,15 @@ Status of this document:
     the copyright notice displayed below.
 
 
+    Copyright 1989-90 by Philip L. Becker.  Portions of this document are
+    copyright 1986-90 by Randy Bush and are incorporated with his consent.
+    All rights reserved.  A right to distribute only without modification and
+    only at no charge is granted.  Under no circumstances is this document to
+    be reproduced or distributed as part of or packaged with any product or
+    other sales transaction for which any fee is charged.  Any and all other
+    reproduction or excerpting requires the explicit written consent of the
+    copyright holders.
 
-    Copyright 1990 by Philip L. Becker.  Portions of this document are
-    copyright 1990 by the International FidoNet Association and are
-    incorporated with their consent.  The right to distribute for 
-    non-commercial use is granted to the FidoNet Technical Standards
-    Committee, provided that no fee is charged.  This may be posted on FidoNet
-    electronic BBSs which charge no fee for accessing this document.   Any and
-    all other reproduction or excerpting requires theexplicit written consent
-    of the copyright holders.
 
 
 
