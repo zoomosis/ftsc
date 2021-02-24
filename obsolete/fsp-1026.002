@@ -1,0 +1,228 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:  FSP-1026
+Revision:     2
+Title:        Translation of a Fidonet Address into an Internet
+              Domain Name
+Author:       Alex Shakhaylo
+Issue Date:   31 Jan 2004
+Review Date:  31 Jan 2005
+-+--------------------------------------------------------------------
+
+
+Status of this document
+-+---------------------
+
+  This document is a Fidonet Standards Proposal (FSP).
+
+  This document specifies an optional Fidonet standard protocol for
+  the Fidonet community, and requests discussion and suggestions for
+  improvements.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+Introduction
+-+----------
+
+  This document describes translation of a Fidonet address into
+  an internet domain name technique for utilization by IP-capable
+  Fidonet mailers.
+  This is a draft for comments and suggestions.
+
+
+Translation of a Fidonet address into an internet domain name.
+-+-----------------------------------------------------------
+
+  Fidonet addressing uses the following format:
+
+  ZZ:NN/FF.PP@DO
+
+  where the fields refer to...
+
+  ZZ - Zone Number:  The zone the node is part of.
+                     Min: 1 Max: 32767
+                     If 'ZZ:' is missing then assume 1 as the zone.
+
+  NN - Net Number:   The network the node is a member of.
+                     Min: 1 Max: 32767
+                     Must be present.
+
+  FF - Node Number:  The actual node number.
+                     Min: -1 Max: 32767
+                     Must be present.
+
+  PP - Point Number: If the system is a point rather than a node then
+                     this is their point number off the node.
+                     Min: 0 Max: 32767
+                     If '.PP' is missing then assume 0 (ie not a
+                     point) as the point number.
+
+  DO - Domain:       The name of the 'Fidonet Technology Network'.
+                     Maximum length of 8 characters. The domain
+                     should not include periods, thus 'fidonet.org'
+                     is invalid (should be 'fidonet').
+                     If '@DO' is missing then 'fidonet' can be 
+                     assumed.
+
+  The following are all valid examples:
+      1:234/5.6@fidonet  (a '5D' address)   => 1:234/5.6@fidonet
+      2:345/6.7          (a '4D' address)   => 2:345/6.7@fidonet
+
+
+  Fidonet address should be translated into FQDN (Fully Qualified
+  Domain Name) as:
+
+  [pPP.]fFF.nNN.zZZ.DD.RD
+
+  where the fields refer to...
+
+  PP        - Point Number: As Fidonet address (FA)
+                            If '.pPP' is missing 0 is assumed.
+
+  FF        - Node Number:  As FA
+                            Must be present.
+
+  NN        - Net Number:   As FA
+                            Must be present.
+
+  ZZ        - Zone Number:  As FA
+                            Must be present.
+
+  DD        - Domain:       As FA
+                            Must be present.
+
+  RD        - Root Domain:  Root internet domain.
+                            Must be present
+
+  The following are all valid examples (assuming 'org' is a root
+  internet domain):
+
+  p6.f5.n234.z1.fidonet.org  => 1:234/5.6@fidonet
+  p78.f6.n34.z2.fidonet.org  => 2:34/6.78@fidonet
+  f3.n610.z4.fidonet.org     => 4:610/3.0@fidonet
+
+  The following are all valid examples (assuming 'net' is a root
+  internet domain):
+
+  p6.f5.n234.z1.fidonet.net  => 1:234/5.6@fidonet
+  p78.f6.n34.z2.fidonet.net  => 2:34/6.78@fidonet
+  f3.n610.z4.fidonet.net     => 4:610/3.0@fidonet
+
+  The following are all valid examples (assuming 'foo.bar' is a root
+  internet domain):
+
+  p6.f5.n234.z1.fidonet.foo.bar  => 1:234/5.6@fidonet
+  p78.f6.n34.z2.fidonet.foo.bar  => 2:34/6.78@fidonet
+  f3.n610.z4.fidonet.foo.bar     => 4:610/3.0@fidonet
+
+  and if 'other.domain' is a root domain for 'othernet':
+
+  f2.n95.z955.othernet.other.domain => 955:95/2.0@othernet
+
+
+Flag indicating root internet domain for translation
+of a Fidonet address into an internet domain name.
+-+--------------------------------------------------
+
+  To indicate which root internet domain should be used for
+  translation of a Fidonet address into internet domain name
+  there is a need to implement a set of the nodelist flags.
+  The flags have a scope influence, which means that flag in
+  a zone entry defines default root domain for a zone, flag
+  in a region entry defines default root domain for a region,
+  flag in a host entry defines default root domain for a network,
+  flag in any other entry defines default root domain for an
+  individual node.
+
+  A format of the flags is:
+
+  DOM:RD
+  DO4:RD
+  DO3:RD
+  DO2:RD
+  DO1:RD
+
+  where the fields refer to...
+
+  DOM,
+  DO4,
+  DO3,
+  DO2,
+  DO1 - flag names
+  RD  - root internet domain
+
+  DOM - assumes 5D addressing scheme ([pPP.]fFF.nNN.zZZ.fidonet.RD)
+  DO4 - assumes 4D addressing scheme ([pPP.]fFF.nNN.zZZ.RD)
+  DO3 - assumes 3D addressing scheme (fFF.nNN.zZZ.RD)
+  DO2 - assumes 2D addressing scheme (fFF.nNN.RD)
+  DO1 - assumes 1D addressing scheme (fFF.RD)
+
+  The following are all valid examples:
+
+  Zone,1,...,DOM:org,...
+
+  which means 'org' domain is default for zone 1 and FQDNs
+  of the nodes of Fidonet zone 1 are expected to have a look:
+
+  [pPP.]fFF.nNN.z1.fidonet.org
+
+  Zone,2,...,DO4:fidonet.org,...
+
+  which means 'org' domain is default for zone 2 and FQDNs
+  of the nodes of Fidonet zone 2 are expected to have a look:
+
+  [pPP.]fFF.nNN.z2.fidonet.org
+
+  Region,50,...,DOM:net,...
+
+  which means 'net' domain is default for region 50 of
+  zone 2 and FQDNs of nodes in Fidonet region 50 of zone 2
+  are expected to have a look:
+
+  [pPP.]fFF.n50NN.z2.fidonet.net
+
+  Host,5020,...,DO4:moscow.ru,...
+
+  which means 'moscow.ru' is a root domain for the
+  network 5020 of zone 2 and FQDNs of the nodes of the
+  Fidonet network 5020 of zone 2 are expected to have
+  a look:
+
+  [pPP.]fFF.n5020.z2.moscow.ru
+
+  ,1234,...,DO2:let.me.alone,...
+
+  which means 'let.me.alone' is a root domain for a node
+  1234 of network 5020 of zone 2 and FQDN of a node 1234
+  of network 5020 of zone 2 of Fidonet is expected to have
+  a look:
+
+  f1234.nNN.let.me.alone
+
+  ,1234,...,DO1:let.me.alone
+
+  which means 'let.me.alone' is a root domain for a node
+  1234 of network 5020 of zone 2 and FQDN of a node 1234
+  of network 5020 of zone 2 of Fidonet is expected to have
+  a look:
+
+  f1234.let.me.alone
+
+A. Author contact data
+-+--------------------
+
+  Alex Shakhaylo
+  Fidonet: 2:461/700@fidonet
+  E-mail:  alex_s@kcci.kharkov.ua
+
+B. History
+-+--------
+
+  Rev.1, 07 Aug 2003: First release as FSP.
+  Rev.2, 31 Jan 2004: Some little addition and corrections.
+
+**********************************************************************
