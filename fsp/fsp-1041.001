@@ -1,0 +1,64 @@
+*********************************************************************
+FTSC                            FIDONET TECHNICAL STANDARDS COMMITTEE
+*********************************************************************
+
+Publication:    FSP-1041.001
+Revision:       1
+Title:          The BEER nodelist flag
+Author(s):      FTSC Members, Administrator and Honoured Guests
+Issue Date:     01 April 2018
+=====================================================================
+
+
+Status:
+
+This document is a Fidonet Standards Proposal (FSP) - it specifies
+the best current practices for the Fidonet community, and requests
+discussion and suggestions for improvements. It is released to the
+public domain, and may be used, copied or modified for any purpose
+whatever.
+
+
+Contents:
+0. Introduction.
+1. The problem.
+2. The solution.
+
+
+0. Introduction.
+
+The Fidonet consists of individual systems operated by different
+people. To maintain proper connectivity, these systems should set
+stationary trusted links between them to ensure smooth echomail
+distribution.
+
+
+1. The Problem
+
+The problem is that sysops have to agree to set these stationary
+links first, and this may require time-stretched discussion.
+
+
+2. The solution.
+
+The solution is the joint drinking beer during these discussions.
+Many years of experience show us how greatly joint drinking beer
+increases the mutual understanding, so this method definitely is
+the common practice.
+
+This is why the BEER nodelist flag is introduced. The most typical
+syntax has no parameters, like ",CM,BEER,IBN,INA:...", which just
+tells others that SysOp drinks beer. Some more complex applications
+may require refinements and clarifications in the flag parameters,
+like "BEER:dark_lager" or "BEER:mild_ale". Even the most preferred
+snacks and other addons may be published, like "BEER:with_crisps".
+
+
+References.
+
+FTS-5000, "The distribution nodelist".
+FTS-5001, "Nodelist flags and userflags".
+
+
+*********************************************************************
+
