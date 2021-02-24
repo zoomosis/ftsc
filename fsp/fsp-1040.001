@@ -1,0 +1,465 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FSP-1040
+Revision:       1
+Title:          SRIF file request interface
+Authors:        Markus Reschke, FTSC members
+Date:           2018-03-11
+----------------------------------------------------------------------
+
+Contents
+--------
+                1. Definitions
+                2. SRIF
+                   2.1 Introduction
+                   2.2 Description
+                   2.3 SRIF Format 
+                   2.4 Required Keywords
+                   2.5 Optional Keywords
+                A. References
+                B. History
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+   This document is a Fidonet Standard Proposal (FSP) - it specifies
+   the current technical requirements and recommendations for FTN
+   software developers, coordinators and sysops of the Fidonet network
+   and other networks using FTN technology.
+
+   This document is released to the public domain, and may be used,
+   copied or modified for any purpose whatever.
+
+
+1. Definitions
+--------------
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+   NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+   in this document are to be interpreted as described in [FTA-1006].
+
+   Filepath:
+     The complete filepath of a file, i.e. path and file name.
+
+   Text file:
+     A file containing text characters. Since all keywords are based
+     on the ASCII character encoding the format is assumed to be 
+     compatible with most other character encodings.
+
+
+2. SRIF
+-------
+
+2.1 Introduction
+----------------
+
+SRIF (Standard Request Information File) was developed to be a
+standard interface to run external file request processors by mailers.
+A standard interface provides more operational flexibility for sysops.
+For example, a system can run different mailers for Internet and POTS
+lines while using the same file request processor.
+
+Originally SRIF was defined in FSC-0086. But that document is
+protected by copyright and can't be simply amended by the FTSC. Also
+it lacks some technical details, and new keywords were introduced
+meanwhile. This new document intends to fix the shortcomings.
+
+
+2.2 Description
+---------------
+
+The SRIF is a simple text file created by the mailer after receiving
+an file request, and contains information for the file request
+processor. It includes the filepath of the file request (.REQ file)
+and the filepath of a response file besides other information. The
+file request processor reads the SRIF, processes the file request,
+and writes a list of files found to the response file. After the file
+request processor has finished the mailer reads the response file
+and sends the files listed.
+
+The SRIF process in more detail:
+
+When the mailer receives a .REQ file request from a calling system it
+performs following tasks:
+- creates a unique response file
+- creates a unique SRIF
+- writes all required data to the SRIF, also optional data
+- executes the file request processor with the SRIF's filepath as
+  command line parameter,
+  and waits until the file request processor has finished
+- processes the response file and sends the files found
+- deletes the SRIF and the response file
+
+The file request processor performs following tasks when executed:
+- gets the SRIF's filepath from the command line
+- reads its own configuration
+- reads the SRIF
+- reads and processes the file request file,
+  and writes files found to the response file
+- may create user feedback, e.g. a netmail packet, and add that to
+  the response file too
+  hint: feedback has to be a unique file also
+
+The files created need to be unique to support a multi line or
+multitasking system. It's up to the software developer to implement
+a method ensuring unique files. Some operating systems offer library
+functions for that purpose. If you use one of those, select a safe
+function which minimizes the risk of race conditions.
+
+
+2.3 SRIF Format
+---------------
+
+As already mentioned, the SRIF is a simple text file containing
+information for the file request processor. Each line consists of a
+keyword-value pair. The line termination isn't specified, so it could
+be CR (Carriage Return, ASCII 0x0D), LF (Line Feed, ASCII 0x0A) or
+CR-LF. The file request processor should support all three variations.
+Empty lines should be avoided by the mailer, but tolerated by the file
+request processor. The syntax for each line is:
+
+  <keyword><space><value or string>
+
+Space is ASCII 0x20. A string can include spaces, for example 
+'sysop name'.
+
+Keywords are divided into two groups, i.e. required and optional
+keywords. Required keywords must be given by the mailer, and optional
+keywords may be given. Each keyword must not be used more than one
+time, unless stated otherwise in the keyword's description. Keywords
+must not contain any whitespace characters.
+
+The order of the keywords in the SRIF isn't defined. Therefore the
+file request processor must be able to accept any order. It should
+also ignore unknown and unsupported keywords.
+
+
+2.4 Required Keywords
+---------------------
+
+The SRIF must include the following keywords:
+
+
+Sysop
+
+  Name of the calling sysop.
+
+  Syntax: Sysop <sysop name>
+  Example: Sysop Jane Doe  
+
+
+AKA
+
+  FTS address of calling system. This keyword can be repeated multiple
+  times to list all AKAs given by the remote system (one per keyword).
+
+  Syntax: AKA <zone:net/node[.point][@domain]>
+  Examples: AKA 2:240/1661@fidonet
+            AKA 2:240/1661
+            AKA 10:100/1000.1@othernet
+
+
+Baud
+
+  Data transfer rate of connection in bps. For IP based connections
+  the transfer rate is usually stated as 115200.
+
+  Syntax: Baud <line rate>
+  Example: Baud 14400
+
+
+Time
+
+  Time limit for file request. This can be also used to indicate the
+  time left until some scheduled task would block file request
+  processing.  If there aren't any time constraints the time limit is
+  stated as -1.
+
+  Syntax: Time <minutes>
+  Example: Time -1
+
+
+RequestList
+
+  Filepath of the list containing the requested files. This is the
+  .REQ file sent by the calling system. The mailer should make sure
+  that the filepath is unique to prevent any problems in a multi
+  line environment.
+
+  Syntax: RequestList <filepath>
+  Examples: RequestList C:\Inbound\011801d0.req
+            RequestList /fido/inbound/011801d0.req
+
+  The syntax of the list should follow FTS-0006. A brief refresher:
+  Each line lists one filename or search pattern, and can include an
+  optional password. Lines end with a CR (Carriage Return, ASCII
+  0x0D). 
+
+  Line syntax: <filename or pattern>[<space>!<password>]
+
+  There is no specification of search pattern and wildcard characters,
+  which must be supported. Most file request processors support simple
+  wildcard characters like '*' for search pattern, e.g. <name>.*. Some
+  also process more sophisticated search expressions.
+
+  For interoperability reasons the file request processor should also
+  accept lines ending with LF (Line Feed, ASCII 0x0A) or CR-LF.
+
+
+ResponseList
+
+  Filepath of the list containing the files to be sent as response to
+  the file request. The mailer should make sure that the filepath is
+  unique to prevent any problems in a multi line environment.
+
+  Syntax: ResponseList <filepath>
+  Examples: ResponseList C:\Outbound\011801d0.rsp
+            ResponseList /fido/outbound/011801d0.rsp
+
+  The response list states all the files to be sent using following
+  syntax:
+
+  Line syntax: <mode><filepath>
+
+  Each line lists exactly one filepath preceded by a mode identifier.
+  The line end is not specified, and could be CR Carriage Return,
+  ASCII 0x0D), LF (Line Feed, ASCII 0x0A) or CR-LF. Therefore the
+  file request processor should use the OS specific line termination.
+  For interoperability reasons the mailer should support all line end
+  variations.
+
+  The mode identifier is a single character defining how a file has to
+  be processed by the mailer:
+
+  =   send file, and erase it after successful transmission
+  +   send file
+  -   send file, and erase it afterwards in any case
+
+  Typically, files are marked with '+', since they shouldn't be 
+  deleted in the system's file base. If the file request processor
+  creates a netmail packet or simple text message for feedback
+  additionally, those files could be marked with a "=" to have them
+  deleted automatically after transmission.
+
+
+RemoteStatus
+
+  The remote status indicates if the session with the calling system
+  is protected or unprotected, i.e. secured by a session password.
+
+  Syntax: RemoteStatus <PROTECTED|UNPROTECTED>
+  Example: RemoteStatus UNPROTECTED
+
+
+SystemStatus
+
+  The system status states if the calling system is listed or not
+  listed in any nodelist.
+
+  Syntax: SystemStatus <LISTED|UNLISTED>
+  Example: SystemStatus LISTED
+
+
+2.5 Optional Keywords
+---------------------
+
+The following keywords are optional and provide additional information:
+
+
+Mailer Session
+--------------
+
+CallerID
+
+  Caller ID of the calling system. For IP based connections the IP
+  address is stated. There is no syntax specified for the ID itself.
+
+  Syntax: CallerID <ID>
+  Examples: CallerID +496033921015
+            CallerID 123.45.67.89
+            CallerID 2001:DB8:F1D0::2:240:9999
+
+
+OurAKA
+
+  FTS address of the called system. If the mailer performs AKA
+  matching it's the AKA which was called by the remote system.
+
+  Syntax: OurAKA <zone:net/node[.point][@domain]>
+  Example: OurAKA 2:240/1661@fidonet
+
+
+SessionType
+
+  The session protocol used in the current session with the calling
+  system. Protocols are EMSI, FTSC0001, WAZOO, JANUS, HYDRA or the
+  special case OTHER, if none of the protocols listed before is used.
+
+  Syntax: SessionType <protocol>
+  Example: SessionType EMSI
+
+
+SessionProtocoll
+
+  The transfer protocol used in the current session with the calling
+  system, e.g. ZAP, ZMO or XMA.
+
+  This keyword includes a spelling error and is defined this way in 
+  FSC-0086 unfortunately. We recommend that the file request processor
+  should support the bad and the correct spelling, i.e.
+  SessionProtocol.
+
+  Syntax: SessionProtocoll <protocol>
+  Example: SessionProtocoll ZAP
+
+
+Password
+
+  Password of the current session with the calling system in case of
+  a protected session.
+
+  Syntax: Password <password>
+  Example: Password secret
+
+
+Line Settings
+-------------
+
+DTE
+
+  Current DTE rate between PC and modem in bps.
+
+  Syntax: DTE <rate>
+  Example: DTE 57600
+
+
+PORT
+
+  COM port in case FOSSIL is used. The valid port range is 1-8.
+
+  Syntax: PORT <port number>
+  Example: PORT 2
+
+
+Remote System
+-------------
+
+These optional keywords state details of the remote system when that
+information is provided by the session protocol. 
+
+
+Site
+
+  Site information of calling system.
+
+  Syntax: Site <info>
+  Example: Site My little BBS
+
+
+Location
+
+  Location and/or ZIP code of calling system.
+
+  Syntax: Location <town and/or ZIP>
+  Example: Location Butzbach
+
+
+Phone
+
+  Phone number of the calling system. An unpublished number is
+  indicated by the character string "-Unpublished-". The format of
+  the phone number is:
+
+   <country code>-<city code>-<number>
+
+  The country code is the country calling code without any leading
+  zeros or '+'. The city code shouldn't have any leading zeros either.
+
+  Syntax: Phone <phone number>
+  Examples: Phone 49-6033-921015
+            Phone -Unpublished-
+
+
+Mailer
+
+  Mailer of the calling system.
+
+  Syntax: Mailer <id>
+  Example: Mailer Foozle
+
+
+MailerCode
+
+  Product code of the calling system's mailer. The code is in
+  hexadecimal format (lower or upper case) and can be an 8 bit (old
+  code format) or a 16 bit (new code format) value.
+
+  Syntax: MailerCode <id>
+  Example: MailerCode 66
+
+
+SerialNumber
+
+  Serial number of calling system's mailer. The common format is:
+
+    <name><space><version>/<serial number>
+
+  Syntax: SerialNumber <id>
+  Example: SerialNumber MyMailer 1.23/123456
+
+
+Version
+
+  Version of calling system's mailer.
+
+  Syntax: Version <id>
+  Example: Version 2
+
+
+Revision
+
+  Revision of calling system's mailer.
+
+  Syntax: Revision <id>
+  Example: Revision 34
+
+
+TRANX
+
+  Tranx, i.e. local time of calling system. The time is encoded as
+  Unix time stamp (32 bit, seconds since 1970-01-01 00:00:00 UTC) and
+  formatted as hexadecimal string with 8 digits. The hexadecimal
+  digits can be in lower or upper case.
+
+  Syntax: TRANX <time stamp>
+  Example: TRANX 5a326682
+
+  The 32 bit time stamp will overflow in 2038. We haven't seen any
+  implemented solutions for that yet, so we recommend to support
+  also a 64 bit time stamp (string with 16 hex digits) while allowing
+  leading zeros to be omitted.
+
+
+A. References
+-------------
+
+    [FTA-1006]
+           Keywords to indicate requirement levels, Fidonet Technical
+           Standards Committee administrative. FTA-1006.
+
+    [FSC-0086]
+           Standard Request Information File (SRIF)
+           Gordian Schuermann & Mirko Mucko  
+
+    [FTS-0006]
+           YOOHOO and YOOHOO/2U2
+           Vince Perriello
+
+
+B. History
+----------
+    Rev. 1, 2018-03-11: First release.
+
