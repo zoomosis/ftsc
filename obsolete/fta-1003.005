@@ -1,0 +1,159 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTA-1003
+Revision:       5
+Title:          FTSC Membership List
+Author:         Administrator
+Revision Date:  18 January 1999
+Expiry Date:    18 January 2001
+----------------------------------------------------------------------
+Contents:
+                1. FTSC Administrator
+                2. FTSC Standing Members
+                3. Standing Working Groups
+                4. Special Assignment Working Groups
+----------------------------------------------------------------------
+
+
+1. FTSC Administrator
+---------------------
+
+  Colin Turner, 2:443/13, appointed until 31 Dec 2002.
+
+
+2. FTSC Standing Members
+------------------------
+
+  Name                    Node        What       Appointed until
+  --------------------------------------------------------------
+  Lothar Behet            2:2446/301                 01 Oct 2000
+  Ron Bemis               1:124/1113                 01 Oct 1999
+  Mike Bilow              1:323/107   FP-OS/2        01 Oct 2000
+  Tobias Burchhardt       2:2448/400  FastEcho       01 Oct 2000
+  Todd Cochrane           1:345/2                    01 Oct 2000
+  Goran Eriksson          2:201/505                  01 Oct 1999
+  Bjorn Felten            2:203/208                  01 Oct 1999
+  Zorch Frezberg          1:205/1701                 01 Oct 1999
+  David Hallford          1:208/103                  01 Oct 2000
+  Joaquim Homrighausen    2:201/330   Frodo          01 Oct 2000
+  Peter Karlsson          2:206/221   Announcer      01 Oct 1999
+  Andreas Klein           2:2480/47   Imail          01 Oct 2000
+  Michael McCabe          1:297/11    FNS            01 Oct 1999
+  Gary Price              1:3607/26   TriBBS         01 Oct 1999
+  Sean Rima               2:252/300                  01 Oct 2000
+  Carlos Fernandez Sanz   2:341/70    CFRoute        01 Oct 2000
+  Benjamin Schollnick     1:2613/477  QuickBBS       01 Oct 2000
+  Odinn Sorensen          2:236/77    GoldED         01 Oct 2000
+  Jason Steck             1:285/424   Jmail          01 Oct 1999
+  Colin Turner            2:443/13                   01 Oct 1999
+  Thomas Waldmann         2:2474/400  BT-XE          01 Oct 2000
+  Mats Wallin             2:201/329   FDAPX          01 Oct 2000
+
+
+3. Standing Working Groups
+--------------------------
+
+  Working Group A - Data Transmitted
+  ----------------------------------
+  Leader: Mats Wallin
+  
+  Tobias Burchhardt
+  Goran Eriksson
+  Joaquim Homrighausen  
+  Andreas Klein
+  Benjamin Schollnick
+  Odinn Sorensen
+  Colin Turner
+  Thomas Waldmann
+  Mats Wallin
+
+  Working Group B - Connection and Protocols
+  ------------------------------------------
+  Leader: Thomas Waldmann
+  
+  Lothar Behet
+  Tobias Burchhardt
+  Todd Cochrane
+  Carlos Fernandez Sanz  
+  Zorch Frezberg
+  Joaquim Homrighausen
+  Sean Rima
+  Thomas Waldmann
+
+
+  Working Group C - Echomail and Routing
+  --------------------------------------
+  Leader: Andreas Klein
+  
+  Lothar Behet
+  Ron Bemis  
+  Tobias Burchhardt  
+  Goran Eriksson  
+  Peter Karlsson
+  Andreas Klein
+  Joaquim Homrighausen
+  Michael McCabe
+  Sean Rima
+  Benjamin Schollnick
+  Odinn Sorensen  
+  Francois Thunus  
+  Mats Wallin  
+
+  Working Group D - Nodelist
+  --------------------------
+  Leader: Michael McCabe
+  
+  Lothar Behet
+  Todd Cochrane
+  David Halford
+  Joaquim Homrighausen
+  Michael McCabe
+  Colin Turner
+  Richard Bash
+  Zorch Frezberg
+  Thomas Waldmann
+  tom schlangen
+
+  Working Group E - Gateways
+  --------------------------
+  Leader: <To Be Appointed>
+  
+  Lothar Behet
+  Sean Rima
+  Todd Cochrane
+  Odinn Sorensen
+
+
+4. Special Assignment Working Groups
+------------------------------------
+
+  To be formed as determined by the FTSC Standing Members and
+  Administrator
+
+  Working Group Y - Year 2000
+  ---------------------------
+  Leader: Colin Turner
+  
+  Todd Cochrane
+  Colin Turner
+  Benjamin Schollnick
+  Odinn Sorensen
+
+
+A. History
+----------
+
+  Rev.1, 19971005: First non-draft release.
+  Rev.2, 19971204: Reformatted document slightly. Working group Y2K
+                   added. Working group members added.
+  Rev.3, 19971229: Year 2000 working group renamed from Y2K to Y.
+                   Leaders added for groups C and Y.
+  Rev.4, 19980117: Group E added. Leaders added for groups A, B, D and
+                   E. Updated member list for group C.
+  Rec.5, 19990109: Lists updated to reflect election results and
+                   resignations.
+
+
+**********************************************************************
