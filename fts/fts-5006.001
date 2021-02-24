@@ -1,0 +1,411 @@
+ 
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTS-5006
+Revision:       1
+Title:          TIC file format.
+Authors:        Michiel van der Vlist, FTSC members.
+Date:           2016-11-07
+----------------------------------------------------------------------
+
+Contents
+--------
+                1. Definitions
+                2. TIC file system.
+                   2.1 Introduction
+                   2.2 The TIC file format 
+                   2.3 TIC Keywords
+                3. CRC-32 Algorithm
+                A. References
+                B. History
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+   This document is a Fidonet Technical Standard (FTS) - it specifies
+   the current technical requirements and recommendations for FTN
+   software developers, coordinators and sysops of the Fidonet network
+   and other networks using FTN technology.
+
+   This document is released to the public domain, and may be used,
+   copied or modified for any purpose whatever.
+
+
+1. Definitions
+--------------
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+   NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+   in this document are to be interpreted as described in [FTA-1006].
+
+
+2. The TIC file system
+----------------------
+
+2.1 Introduction
+----------------
+
+   The TIC file system is a way to distribute files via Fidonet
+   technology. It is also called the file echo system in analogy
+   with the echomail system used for messages.
+
+   To distribute a file, it is always accompanied by a control
+   file, called the TIC file. TIC files are created and processed
+   by file processors. When a system that is configured for file
+   processing receives a TIC file it calls the file processor.
+   The file processor acts on the keywords in the TIC file and it
+   may move the file to be distributed to dedicated directories
+   and/or send it on to other nodes.
+
+   The details of this process are beyond the scope of this document
+   which is limited to the format of the TIC file.
+
+
+2.2 TIC file format
+-------------------
+
+   A TIC file is a text file with a name in 8.3 DOS format with the
+   extension .TIC. The name of the TIC file should be unique enough
+   to ensure that systems receiving TIC files never have two TIC
+   files with the same name in their inbound. How this is done is
+   left to the implementation.
+
+   The line separator is a CR,LF pair. It is recommended that
+   applications reading TIC files can read TIC files that only use
+   a LF or CR as line separator. Application must only write files
+   with a CR,LF pair.
+
+   Each line in a TIC file consists of a keyword followed by one or
+   more parameters.
+
+   Parameters can be a string of text, an FTN address in 4D or 5D
+   format or a (hexadecimal) number.
+
+   Keywords are case insensitive.
+
+   Keywords are not position dependant with the exception of the
+   the Path, Desc and Ldesc keywords. If there is more than one,
+   they must be grouped and ordered.
+
+   New implementations should be tolerant of unknown keywords. If a
+   line with an unknown keyword is found in an incoming TIC file, the
+   preferred  way of dealing with it is to pass the line "as is" to
+   outgoing TIC files and optionally log the encounter.
+   Existing software may or may not act in this preferred way. 
+
+
+2.3 TIC Keywords
+----------------
+
+   Area
+
+     The tag of the area in which the file is to be distributed.
+
+     Example: Area REGION28
+
+     This is a required keyword.
+
+
+   Areadesc
+
+     A short description of the area. This may be used when auto-
+     creating a new area.
+
+     Example: Region28 nodelist segment.
+
+     This is an optional keyword. 
+
+
+   Origin
+
+     This keyword specifies the FTN address of the system that has
+     hatched the file.
+
+     Example:    Origin 2:28/0
+
+     This is a required keyword.
+
+
+   From
+
+     This keyword specifies the FTN address of the system that has
+     sent the file to be distributed and the accompanying TIC file.
+
+     Example:   From 2:280/5555
+
+     This is a required keyword
+
+
+   To
+
+     This keyword specifies the FTN address of the system where to
+     send the file to be distributed and the accompanying TIC file.
+     Some File processors (Allfix) only insert a line with this
+     keyword when the file and the associated TIC file are to be
+     file routed through a third sysem instead of being processed
+     by a file processor on that system. Others always insert it.
+     Note that the To keyword may cause problems when the TIC file
+     is proecessed by software that does not recognise it and
+     passes the line "as is" to other systems.
+
+     Example:  To 292/854
+
+     This is an optional keyword.
+
+
+   File
+
+     The name of the file to be distributed. The name must be in
+     8x3 DOS format. If an Lfile keyword is also specified, the
+     8x3 file name may be automatically derived from the long
+     file name by the file processor hatching the file. The algorithm
+     is left to the implementation.
+
+     Example:  File REGION28.208
+
+     This is a required keyword.
+
+
+   Lfile
+
+     The name of the file in long file format.
+
+     Note that few file processors will recognise this Keyword.
+     Your milage may vary when attempting to distribute files
+     with long file names.
+
+     Example: Lfile Longfilename.extension
+
+     This is an optional keyword.
+
+
+   Fullname
+
+     This is an alias for Lfile. It is recommended that applications
+     always use Lfile when writing TIC files but recognise Fullname
+     as an alias when reading TIC files.
+
+
+   Size
+
+     The size of the file in bytes.
+
+     Example: Size 5000
+
+     This is an optional keyword.
+
+
+   Date
+
+    The date and time the file was created in Unix form.
+
+    Example: Date 1415567298
+
+    This is an optional keyword.
+
+
+   Desc
+
+     A one line description of the file to be distributed.
+
+     Example: Desc Region 28 nodelist segment for day 208
+
+     This is an optional keyword
+
+
+   Ldesc
+
+     This Keyword may occur more than once. If there is more than one
+     they should be grouped together. Together they form a long
+     description of the file to be distributed.
+
+     Example: Ldesc This is a utility that everyone must have.
+              Ldesc It beats all and everything you ever had.  
+
+     This is an optional keyword.
+
+
+   Created
+
+     This keyword identifies the software that created this TIC file.
+     There is no rigid format for this Keyword.
+
+     Example: Created by Mtick 1.4 beta 20070731, (c) 1995-2007,
+             Michiel van der Vlist, PA0MMMV (2:280/5555)
+
+     (Split over two lines in this document, one line in reality)
+
+     This is an optional keyword.
+
+
+   Magic
+
+     This specifies the magic word that file request processors may
+     use as an alias for the file to be requested.
+
+     Example: Magic REGION28
+
+     This is an optional keyword.
+
+
+   Replaces
+
+     This specifies that the file replaces one or more files that
+     were sent previously. It is up to the receiving system if it
+     honours this keyword. 
+     The wildcard characters '?' and '*' may be used with the usual
+     meaning as in MS-DOS.
+     Some tic processors do not support wild cards and use of
+     wild cards with this keyword may cause unexpected results.
+
+
+    Example: Replaces REGION28.???
+
+
+     This is an optional keyword.
+
+
+   Crc
+
+     This keyword specifies the CRC-32 of the file to be distributed.
+     The CRC an eight digit hex number, preferably written in upper
+     case, but application should be able to handle CRC's written in
+     lower case.
+
+     Example: Crc B0A29EE6
+
+     This is a required keyword.
+
+
+   Path
+
+     This specifies the node number and the date and time of a
+     system that has processed the file.
+     The time parameter is expressed as a unix style timestamp,
+     optionally followed by the date and time in human readable
+     form. Unix timestamp is UTC. Human readable format may be
+     local time (including UTC offset) or UTC.
+
+     File processors may add additional information. For example a
+     signature identifying the software generating the path line.
+
+     Example:  Path 2:2/20 1415567298 Sun Nov 9 21:08:18 2014 UTC
+
+     Each system should add its own line to the TIC file. Path
+     lines should be grouped and in order of processing.
+
+     This is a required keyword.
+
+
+   Seenby
+
+     This lists the systems that have "seen" the file. It is
+     similar to the seen-by in echomail messages, with the
+     difference that it is one line per node number and the
+     node numbers are 4D or 5D. The seenby information may be
+     used for dupe prevention.
+
+     Seenby lines should be grouped and may be sorted by node
+     number. Application must be able to deal with unsorted
+     seenby lines.
+
+
+     Example:  Seenby 2:2/20
+               Seenby 2:280/5003
+               Seenby 2:280/5555
+               Seenby 2:280/5555.1
+               Seenby 2:292/854
+
+     This is a required keyword.
+
+
+   Pw
+
+     This specifies the password agreed upon between the sysops of
+     the link. There are no restrictions on the length and the
+     allowed characters of the password, it is a matter of what the
+     sending and receiving sysops agree. Most file processors however
+     will only accept a maximum of eight characters and treat them as
+     case insensitive.
+
+     Example:  Pw PASSWORD
+
+     Although it is not recommended to distribute files between
+     systems without agreeing on a password, this keyword is optional.
+     Technically it is possible to accept files without a password.
+    
+
+
+3. CRC-32 Algorithm
+-------------------
+
+    This paragraph was copied from FTS-1030.001 par 2.4
+    The author is Tobias Ernst.
+
+
+    The checksum algorithm that is used is CRC-32 following ITU-T's
+    specifications. For further information refer to the literature
+    list given below. The following pseudocode shows how to
+    calculate such a checksum for a file of N bytes indexed from 0 to
+    N-1 and stored in BUFFER. The XOR, AND and NOT logical
+    operations are to be executed bit-wise. In C, for instance, XOR
+    equals ^, AND equals &, and NOT equals ~.
+
+    // CRC, I, J, K are unsigned integers of at least 32 bits.
+    UNSIGNED LONG CRC, I, J, K
+
+    // Preconditioning
+    CRC = FFFFFFFF
+
+    // Loop through all bytes in the file
+    FOR J = 0 TO N-1
+      K = (CRC XOR BYTE#J) & 000000FF  // (*)
+      FOR I = 8 DOWNTO 1
+         IF K AND 1 <> 0
+           THEN K = (K SHR 1) XOR EDB88320
+         ELSE
+           K = K SHR 1
+         ENDIF
+      END FOR                          // (**)
+      CRC = ((CRC SHR 8) AND 00FFFFFF) XOR K
+    END FOR
+
+    // Postconditioning: Flip all bits
+    CRC = NOT CRC;
+
+    Note that as in the line marked as (*), K can initially only get
+    values in the range from 0 to 255. Therefore it is a good idea
+    to replace the inner loop over I with a lookup table routine,
+    i.E. generate a lookup table for the outcomes of K after the loop
+    with initial values of K from 0 to 255, and then replace lines
+    (*) up to and including (**) with something like
+
+    K = LOOKUPTABLE [ (CRC XOR BYTE#J) XOR 000000FF ]
+
+ Author: Tobias Ernst
+
+
+
+A. References
+-------------
+
+    [FTA-1006]
+           Key words to indicate requirement levels, Fidonet Technical
+           Standards Committee administrative. FTA-1006.
+
+    [FTS-1030]
+           Binkp optional protocol extension CRC Checksum.      
+     
+
+    [ITU-T V.42]
+           International Telecommunications Union, Error-correcting
+           Procedures for DCEs Using Asynchronous-to-Synchronous
+           Conversion, ITU-T Recommendation V.42, 1994, Rev. 1.
+ 
+
+B. History
+----------
+    Rev.1, 2016-11-07: First release.
