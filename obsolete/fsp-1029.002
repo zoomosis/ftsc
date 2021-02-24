@@ -1,0 +1,243 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+Publication:    FSP-1029
+Revision:       2
+Title:          Serial number allocation in Message IDs.
+Author(s):      Michiel van der Vlist
+
+Date:           31 March 2010
+----------------------------------------------------------------------
+Contents:       0. Status of this document.
+                1. Introduction.
+                2. The problem.
+                3. The solution.
+                4. The standard.
+                   4.1 The serial number file.
+                   4.2 Name and path of the serial number file.
+                   4.3 Issuing numbers using the serial number file.
+                   4.4 Upon successful open and lock.
+                   4.5 Upon failure to open the serial number file.
+                   4.6 Upon failure to obtain a lock.
+                   4.7 When the serial number file is corrupted.
+                   4.8 A note on "increasing by at least one".
+                5. References.
+                6. Contact Info.
+----------------------------------------------------------------------
+
+0. Status of this document
+--------------------------
+
+  This document is a Fidonet Standards Proposal (FSP).
+
+  This document proposes a Fidonet standard for the Fidonet
+  community.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+1. Introduction
+---------------
+
+  FTS-0009 mandates that serial numbers used in FTN Message IDs be
+  unique on a given system within a period of three years. FTS-0009
+  does not mandate any particular way to achieve this goal. It does
+  not even offer suggestions, It leaves it entirely to the
+  implementation.
+
+  This has led to software developers using a variety of methods,
+  using the system clock is the most popular, but random number
+  generators and checksums over the message header and/or body are
+  also used.
+
+
+2. The Problem
+--------------
+
+  The problem is that none of the above mentioned methods is really
+  satisfactory as it can not guarantee that no duplicate message IDs
+  will be issued. Issuing duplicate message ID's is undesirable as
+  echomail processors and netmail trackers may discard or quarantine
+  messages as dupes.
+  
+  Using the system clock was good enough when computers were slow and
+  single tasking. With computers getting faster, only issuing a new
+  serial number every second however is too coarse. Fast systems can
+  create tens if not hundreds of messages a second. Using a finer
+  scale, i.e. hundreds of a second or even thousands only shifts the
+  problem to the future. Some day we shall see systems that can
+  spew out more than one message in a millisecond.
+
+  Multitasking systems have worsened the problem. Not only can one
+  application give out the same number twice, Another application
+  running in another task may give out that same number as well!
+
+  Using random number generators and/or checksums is simply wrong.
+  There is just no guarantee no duplicates will occur. It is roulette,
+  Some day the same number will come up again.
+
+
+3. The Solution
+---------------
+
+  The obvious solution is to use some sort of "sequencer" that
+  is shared by all applications running on a given system that
+  issue message ID's. The idea is simple, it is the same as
+  drawing a "ticket" from the ticket dispenser in the Post Office.
+  No two tickets in the machine have the same number and only
+  one customer can draw a ticket at the time. If the machine is busy
+  dispensing a ticket to a customer, the next customer has to wait.
+  This way it is ensured that no two customers get the same number.
+
+  There are many ways to implement the equivalent of such a system
+  for FTN serial numbers, but it will only work properly if all
+  applications use the same method. Hence the need for a standard.
+
+
+4. The standard
+---------------
+
+  4.1 The serial number file.
+
+        The serial number file is a plain text file who's first
+        line is exactly eight characters long. It holds an eight
+        digit hexadicimal number, representing a 32 bit unsigned
+        integer. Leading zeros may not be omitted.
+        It is recommended that applications write this number in
+        lower case. When reading it must be treated as case
+        insensitive.
+
+        The eight character line may optionally be terminated by a
+        line terminator. The file may contain additional lines
+        containing additional information, thus making it possible
+        to use this file for supplementary future standards. Appli-
+        cations issuing serial numbers according to this proposed
+        standard shall only consider the first eight bytes of the
+        serial number file.
+
+
+  4.2 Name, extension and path of the serial number file.
+
+        The default name of the serial number file shall be MSGIDNR.NXT.
+        It is recommended that the name be configurable.
+
+        The path pointing to the file MUST be configurable. For ease
+        of configuration it is strongly recommended that the
+        implementation supports reading the path from the environment
+        variable SERNRPATH.
+
+  4.3 Issuing serial numbers using the serial number file.
+
+        An application needing to issue a serial number for a message
+        ID shall attempt to open the serial number file and lock the
+        file. Or alternatively, if the OS permits partial locking, lock
+        part of it with a minimum of the first 8 bytes.
+
+
+  4.4 Upon successful open and lock.
+
+        On a successful lock it shall read the 32 bit hexadecimal
+        number from the file and use that as the next serial number
+        to be issued.
+
+        After having issued this number it shall increase the serial
+        number by at least one and use that for the next serial
+        number. When the programme is done issuing serial numbers,
+        it shall write the last issued serial number increased by at
+        least one to the serial number file, release the lock and 
+        close the file.
+
+        Alternatively if more than one serial number is to be issued
+        in one run, the programme may write the next to issue serial
+        number to the file, unlock and close it; and open, lock and
+        read it again between issuing serial numbers so that other
+        applications can obtain a serial number in the meantime.
+
+
+  4.5 Upon failure to open the serial number file.
+
+        Upon failure to open the file because it does not exist, the
+        application shall attempt to create it. What method is used
+        to "seed" the serial number generator is up to the implemen-
+        tation. The system clock might be a good suggestion, but this
+        document shall not attempt to mandate any particular method.
+
+
+  4.6 Upon failure to obtain a lock.
+
+        Failure to obtain a lock normally means another application
+        has locked the file. The logical course of action would be to
+        wait for the lock to clear and retry. Limiting the time to a
+        maximum before aborting and/or supplying a user abort option
+        are at the discretion of the implementation.
+
+        Another reason for failure to obtain a lock can be that the
+        application is running on a single tasking system that does
+        not support file sharing and locking. (F.e. plain DOS, SHARE
+        not loaded.) If the application is aware of being run in a
+        single tasking environment, either by autodetect or by
+        a configuration switch, it can of course skip the locking
+        and just read and update the sequence number file.
+
+  4.7 When the serial number file is corrupted.
+
+        When the serial number file contains characters other than
+        0-9, A-Z or a-z in the first eight positions, this is an error
+        condition. One possible course of action would be to re-
+        initialize the serial number generator. Another would be to
+        abort or prompt the sysop for intervention.
+        All methods have pros and cons, so this proposal does not
+        impose any specific course of action to resolve this error and
+        leaves it to the implementation.
+
+
+  4.8 A note on "increasing by at least one".
+
+        Simply starting at zero and increasing the serial number by
+        one for each number issued would be perfectly valid and
+        satisfy FTS-0009. That is, provided  all applications running
+        on a given system were to use this method, use the same serial
+        number file and the serial number file is never lost.
+
+        In practise these ideal condition may not be met so using a
+        more sophisticated method of increasing the serial number than
+        just increasing it by one may be preferred. Using the system
+        clock to prime the number generator in case the serial number
+        file is absent and to use the larger value of the system clock
+        and the last number incremented by one for the next number may
+        give reasonable insurance against the loss of the serial
+        number file.
+
+
+5. References
+-------------
+
+  [FTS-0009] A standard for unique message identifiers and reply chain
+             linkage.
+             Jim Nutt, 17 Dec 1991.
+
+  [FSC-0083] A proposed standard for message IDs on FTN systems.
+             Jonathan de Boyne Pollard. 17 June 1995.
+
+
+6. Contact Data
+---------------
+
+  Michiel van der Vlist
+  Fidonet:  2:280/5555
+  E-mail:   pa0mmv at vrza dot org
+  E-mail:   administrator at ftsc dot org 
+
+
+History
+-------
+
+   Rev.1, 20040206: Initial Release.
+                    Principal author Michiel van der Vlist.
+
+   Rev.2, 20100331  Par. 4.1: 1st paragraph changed for more clearity.
+                    Made some small textual changes.
+                    Added section about corrupted sequence number file
+**********************************************************************
+
