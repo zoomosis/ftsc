@@ -1,0 +1,382 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTS-5001
+Revision:       1
+Title:          NODELIST FLAGS AND USERFLAGS
+Author(s):      Colin Turner, Andreas Klein, Michael McCabe,
+                David Hallford, Odinn Sorensen
+
+Revision Date:  27 June 1999
+Expiry Date:    27 June 2001 
+----------------------------------------------------------------------
+Contents:
+                1. Authorized Flags
+                2. Userflags
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Standard (FTS).
+
+  This document specifies a Fidonet standard for the Fidonet
+  community.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+Abstract
+--------
+
+  Current practice for Fidonet Technology Networks (FTN) is to
+  maintain a nodelist used to store the details of the nodes in
+  the network, and the network structure. Flags are used in this
+  nodelist to aid automatic and manual control of various tasks.
+
+
+1. Authorized flags
+-------------------
+
+ Flags authorized for use in the Fidonet nodelist:
+
+  A: OPERATING CONDITION FLAGS:
+
+          Flag      Meaning
+
+          CM        Node accepts mail 24 hours a day
+          MO        Node does not accept human callers
+          LO        Node accepts calls Only from Listed
+                    FidoNet addresses
+
+  B. MODEM FLAGS:
+     The following flags define modem protocols supported:
+
+          Flag      Meaning
+
+          V21       CCITT V.21     300 bps   full duplex
+          V22       CCITT V.22     1200 bps  full duplex
+          V29       CCITT V.29     9600 bps  half duplex
+          V32       CCITT V.32     9600 bps  full duplex
+          V32b      ITU-T V.32 bis 14400 bps full duplex
+          V32T      V.32 Terbo
+          V33       CCITT V.33
+          V34       CCITT V.34
+          HST       USR Courier HST
+          H14       USR Courier HST 14.4
+          H16       USR Courier HST 16.8
+          H96       Hayes V9600
+          MAX       Microcom AX/96xx series
+          PEP       Packet Ensemble Protocol
+          CSP       Compucom Speedmodem
+          ZYX       Zyxel series
+          VFC       V.Fast Class
+          Z19       Zyxel 19,200 modem protocol
+          V90C      ITU-T V.90 modem Client 
+          V90S      ITU-T V.90 Server. 
+          X2C       US Robotics x2 client. 
+          X2S       US Robotics x2 server. 
+
+
+
+     The following flags define type of error correction available. A
+     separate error correction flag should not be used when the error
+     correction type can be determined by the modem flag. For instance
+     a modem flag of HST implies MNP.
+
+          Flag      Meaning
+
+          MNP       Microcom Networking Protocol error correction
+                    of type MNP1 to MNP4
+          V42       LAP-M error correction w/fallback to MNP
+
+  C: COMPRESSION FLAGS:
+
+     The following flags define the type(s) of compression of mail
+     packets supported.
+
+          Flag      Meaning
+
+          MN        No compression supported
+
+     The following flags define the type(s) of data compression
+     available.
+
+          V42b      ITU-T V42bis
+
+
+  D: FILE/UPDATE REQUEST FLAGS:
+
+     The following flags indicate the types of file/update requests
+     supported.
+
+
+  |--------------------------------------------------|
+  |      |         Bark        |        WaZOO        |
+  |      |---------------------|---------------------|
+  |      |   File   |  Update  |   File   |  Update  |
+  | Flag | Requests | Requests | Requests | Requests |
+  |------|----------|----------|----------|----------|
+  | XA   |    Yes   |    Yes   |    Yes   |    Yes   |
+  | XB   |    Yes   |    Yes   |    Yes   |    No    |
+  | XC   |    Yes   |    No    |    Yes   |    Yes   |
+  | XP   |    Yes   |    Yes   |    No    |    No    |
+  | XR   |    Yes   |    No    |    Yes   |    No    |
+  | XW   |    No    |    No    |    Yes   |    No    |
+  | XX   |    No    |    No    |    Yes   |    Yes   |
+  |--------------------------------------------------|
+
+  E: GATEWAY FLAG:
+
+     The following flag defines gateways to other domains (networks).
+
+          Flag      Meaning
+
+          Gx..x     Gateway to domain 'x..x', where 'x..x` is a string
+                    of alphanumeric characters. Valid values for
+                    'x..x' are assigned by the FidoNet International
+                    Coordinator.  Current valid values of 'x..x' may
+                    be found in the notes at the end of the FidoNet
+                    nodelist.
+
+  F: MAIL PERIOD FLAGS:
+     The following flags define the dedicated mail periods supported.
+     They have the form "#nn" or !nn where nn is the UTC hour the mail
+     period begins,  # indicates Bell 212A compatibility,  and !
+     indicates incompatibility with Bell 212A.
+
+          Flag      Meaning
+
+
+           #01       Zone 5 mail hour (01:00 - 02:00 UTC)
+           #02       Zone 2 mail hour (02:30 - 03:30 UTC)
+           #08       Zone 4 mail hour (08:00 - 09:00 UTC)
+           #09       Zone 1 mail hour (09:00 - 10:00 UTC)
+           #18       Zone 3 mail hour (18:00 - 19:00 UTC)
+           #20       Zone 6 mail hour (20:00 - 21:00 UTC)
+
+                    NOTE:  When applicable,  the mail period flags may
+                    be strung together with no intervening commas, eg. 
+                    "#02#09".  Only mail hours other than that
+                    standard within a node's zone should be given.
+                    Since observance of mail hour within one's zone is
+                    mandatory,  it should not be indicated.
+
+  G: ISDN CAPABILTY FLAGS:
+
+   Nodelist  Specification of minimal support required for this flag;
+   flag      any additional support to be arranged via agreement 
+           between users
+
+   V110L     ITU-T V.110 19k2 async ('low').
+   V110H     ITU-T V.110 38k4 async ('high').
+   V120L     ITU-T V.120 56k async, layer 2 framesize 259, window 7,
+             modulo 8.
+   V120H     ITU-T V.120 64k async, layer 2 framesize 259, window 7,
+             modulo 8.
+   X75       ITU-T X.75 SLP (single link procedure) with 64kbit/s B
+             channel; layer 2 max.framesize 2048, window 2, non-ext.
+             mode (modulo 8); layer 3 transparent (no packet layer).
+   ISDN      Other configurations. Use only if none of the above
+             fits.
+             
+   NOTE: No flag implies another. Each capability MUST be specifically
+       listed.
+   If no modem connects are supported, the nodelist speed field should
+   be 300.
+
+   Conversion from old to new ISDN capability flags:
+     ISDNA -> V110L
+     ISDNB -> V110H
+     ISDNC -> X75
+
+  H: INTERNET CAPABILITY FLAGS: 
+
+    FLAG   MEANING
+
+    IBN - denotes a system that does BINKP  
+    IFC - denotes a system that is capable of RAW or IFCICO 
+    ITN - denote a system that does TELNET 
+    IVM - denotes a system that is capable of VMODEM 
+    IFT - denotes a system that allows FTP             
+    ITX - denotes a system that uses TransX encoding for email
+          tunneling
+    IUC - denotes a system that uses UUEncode for email tunneling      
+    IMI - denotes a system which uses MIME encoding for email
+          tunneling
+    ISE - denotes a system which supports SEAT receipts for anonymous
+          mail
+    IP  - denotes a system that can receive TCP/IP connects using a
+          protocol that is not covered by any other flag. 
+    IEM - is a deprecated flag, and new implementations must not
+          write it in nodelist entries. This was used as a single
+          placeholder for the InterNet address of the system if it
+          supported several transport methods. Instead of placing
+          the system address in the deprecated form specified below
+          in each flag, the address would be placed once only in this
+          flag. Implementations may need to parse this information
+          from nodelists created with older programs.
+
+  Conversion from old Internet capabilty flags to the new flags:
+
+    BND -> IBN
+    TEL -> ITN
+    TELNET -> ITN
+    VMD -> IVM
+    TCP -> IP
+
+  The Internet Address should be placed in the BBS name field.
+   
+  Previous usage has placed the InterNet address as part of the
+  I-flag (for example ITX:r10_tx@thevision.net); in this format the
+  flag, colon, and address combined cannot exceed 32 characters.
+  However, this practice is deprecated, and new implementations must
+  not place address data in the flag section of the nodelist entry,
+  implementations may however be required to read this data from the
+  flag section.
+
+  Telnet default port is 23. If the port is not 23 then the port
+  number must be placed after the ITN flag (eg ITN:60177) if the
+  Telnet address is part of the ITN flag (eg ITN:farsi.dynip.com) then
+  the port number should be last (eg ITN:farsi.dynip.com:60177) always
+  remember that the flag cannot exceed 32 characters total.
+  
+  The default ports for other protocols are shown below, and changes
+  from the default port must be flagged in a similar way.
+   
+  Protocol      Flag    Default Port
+  
+  FTP           IFT     21
+  BINKP         IBN     24554
+  RAW/IFCICO    IFC     60179
+  VMODEM        IVM     3141
+
+  Actual IP addresses can also be placed in the phone number field
+  using  the country code of 000.
+
+  I: SYSTEM ONLINE USERFLAGS
+
+   The flag Tyz is used by non-CM nodes online not only during ZMH,
+   y is a letter indicating the start and z a letter indicating the
+   end of the online period as defined below (times in UTC):
+
+        A  0:00,  a  0:30,   B  1:00,  b  1:30,   C  2:00,  c  2:30,
+        D  3:00,  d  3:30,   E  4:00,  e  4:30,   F  5:00,  f  5:30,
+        G  6:00,  g  6:30,   H  7:00,  h  7:30,   I  8:00,  i  8:30,
+        J  9:00,  j  9:30,   K 10:00,  k 10:30,   L 11:00,  l 11:30,
+        M 12:00,  m 12:30,   N 13:00,  n 13:30,   O 14:00,  o 14:30,
+        P 15:00,  p 15:30,   Q 16:00,  q 16:30,   R 17:00,  r 17:30,
+        S 18:00,  s 18:30,   T 19:00,  t 19:30,   U 20:00,  u 20:30,
+        V 21:00,  v 21:30,   W 22:00,  w 22:30,   X 23:00,  x 23:30.
+
+   For example TuB shows an online period from 20:30 until 1:00 UTC.
+
+   Daylight saving time
+
+   If a node changes online times with respect to UTC when daylight
+   saving time becomes effective (which would be the case with most
+   part time nodes), then this is to be taken into account when
+   assigning this flag. An online times flag assigned to a node should
+   not be altered for the specific purpose of adjusting due to
+   daylight saving time, since large difference files (NODEDIFF's)
+   would result if every node was allowed to do this, e.g. my node
+   used to be online from 2300 to 0800 in local time, which in winter
+   is UTC, but in the summer it becomes BST (British Summer Time).
+   This is one hour ahead of UTC, and the corresponding availability
+   times of my node during the summer period were 2200 to 0700 UTC.
+   Therefore my online times flag would have indicated availability
+   between the hours of 2300 and 0700 UTC, the daily time period
+   encompassing both times, so the flag would be TXH.
+
+2. Userflags
+------------
+
+  Registry of Userflags
+
+  A. FORMAT OF USER FLAGS
+
+     U,x..x
+               A user-specified string, which may contain any
+               alphanumeric character except blanks.  This string may
+               contain one to thirty-two characters of information
+               that may be used to add user-defined data to a specific
+               nodelist entry.  The character "U" must not be
+               repeated, eg, ",U,XXX,YYY,ZZZ" not ",U,XXX,U,YYY,UZZZ".
+               The 32 character limitation is per userflag, not for
+               the total of all userflags.
+
+               New implementations must place a comma after the
+               initial "U" before the user flags. Some
+               implementations will not place a separating comma
+               betweent the "U" and the first user flag, but this
+               practice is deprecated. Implementations should be
+               prepared to read flags in this format, and must strip
+               the "U" from the flag before analysis in this case.
+
+               Entries following the "U" flag must be of a technical
+               or administrative nature.  While experimentation of new
+               software functions using this flag is encouraged,
+               advertisement is strictly prohibited.
+
+               For applications other than those shown, or if you
+               have questions concerning the use of this field, please
+               contact your Regional or Zone Coordinator.
+
+
+  B: MAIL ORIENTED USER FLAGS:
+
+     ZEC       Zone EchoMail Coordinator. Not more than one entry
+               in the zone  segment may carry this flag and that entry
+               must be the current Zone EchoMail Coordinator.
+
+     REC       Regional EchoMail Coordinator. Not more than one
+               entry in any region may carry this flag and that entry
+               must be the current Regional EchoMail Coordinator.
+
+     NEC       Network EchoMail coordinator. Not more than one entry
+               in any net may carry this flag and that entry must be
+               the current Network EchoMail Coordinator of that Net.
+
+
+     SDS       Software Distribution System
+
+     SMH       Secure Mail Hub
+
+     NC        Network Coordinator. This flag is ONLY to be used by
+               the Network Coordinator of a net which has split the
+               duties of NC and Host and the NC does NOT occupy the
+               Net/0 position in the nodelist.
+
+
+A. Contact Data
+---------------
+  
+  David Hallford  
+  Fidonet: 1:208/103
+
+  Andreas Klein
+  Fidonet: 2:2480/47
+  E-mail:  akx@gmx.net
+  
+  Michael McCabe
+  Fidonet: 1:297/11
+  
+  Odinn Sorensen
+  Fidonet: N/A
+  E-mail:  odinn@goldware.dk
+  WWW:     http://www.goldware.dk
+
+  Colin Turner
+  Fidonet: 2:443/13
+  E-mail:  ct@piglets.com
+  WWW:     http://www.piglets.com
+
+
+B. History
+----------
+
+   Rev.1, 19990627: Initial Release. Principal Author David Hallford
+
+
