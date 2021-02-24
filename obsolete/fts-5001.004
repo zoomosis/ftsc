@@ -1,0 +1,818 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:  FTS-5001
+Revision:     4
+Title:        Nodelist flags and userflags
+Author(s):    FTSC Members, Administrator and Honoured Guests
+
+Issue Date:   10 March 2013
+
+======================================================================
+
+Status of this document
+-----------------------
+
+  This document is a Fidonet Technical Standard (FTS) - it specifies
+  the current technical requirements and recommendations for FTN
+  software developers, coordinators and sysops of the Fidonet network
+  and other networks using FTN technology.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+
+Abstract
+--------
+
+  Nodelist flags extend the basic nodelist format described in
+  FTS-5000, allowing a node to provide detailed information of its
+  operation and capabilities.
+
+
+Contents
+--------
+
+  1.  Introduction
+  2.  Supersessions
+  3.  Purpose
+  4.  Syntax
+  5.  Normal flags
+        5.1  Operating Condition Flags
+        5.2  Modem Connection Protocol Flags
+        5.3  Session Level Error-correction and Compression Flags
+        5.4  File/Update Request Flags
+        5.5  Gateway Flag
+        5.6  Mail Period Flags
+        5.7  System Online Flags
+        5.8  ISDN Capability Flags
+        5.9  Internet Capabilities
+        5.10 Robot flags
+        5.11 Flag Redundancies
+  6.  User Flags
+        6.1  Format Of User Flags
+        6.2  Mail Oriented User Flags
+
+  A.  References
+  B.  History
+
+======================================================================
+
+
+1. Introduction
+---------------
+
+  The Fidonet Distribution Nodelist (FTS-5000) is a comma-delimited
+  database, i.e. each node's entry is made up of fields, each of which
+  has a specific purpose.
+
+  While this is a fine system for holding information that all nodes
+  must have (e.g. node number, sysop name, etc.) it is not well suited
+  for data that varies wildly from system to system.  To accommodate
+  such data, the flag fields are defined as self-describing and
+  non-position dependent fields.
+
+  This document is a registry of all commonly used flags in Fidonet,
+  and companion to FTS-5000 in describing the Distribution Nodelist.
+
+
+2. Supersessions
+----------------
+
+  This document supersedes and replaces FTS-0005, FSC-0009, FSC-0040,
+  FSC-0062, FSC-0075 and FSC-0091.
+
+
+3. Purpose
+----------
+
+  As with FTS-5000, this document is intended for both developers and
+  nodelist maintainers to avoid duplication and conflicts.  Normal
+  sysops would also do well to have at least cursory knowledge of the
+  nodelist's capabilities so they may provide their Coordinators with
+  all the pertinent detail of their systems.
+
+  This document should be considered a guide, and not the final word
+  on what are and aren't valid flags.  There will obviously be an
+  unavoidable lag between the introduction of new flags and their
+  inclusion in this document, as well as experimental flags that will
+  come and go with no official documentation at all.
+
+
+4. Syntax
+---------
+
+  Most flags are simple tokens that each occupy a single field and by
+  their presence or absence in the nodelist, indicate the presence or
+  absence of a certain feature in the node.
+
+  A more recent style is to subdivide the flag field, usually with a
+  colon (3Ah) to allow for variable data under a common flag.  These
+  are essentially named fields, consisting of the flag itself and its
+  payload as one or more subfields.
+
+  Unless otherwise stated, flags are not position or order dependent,
+  with the exception that User Flags must follow Normal Flags.
+
+
+5. Normal flags
+---------------
+
+5.1. Operating Condition Flags
+------------------------------
+
+  Flag  Meaning
+
+    CM  Node accepts mail 24 hours a day using all listed methods
+   ICM  Node accepts mail 24 hours a day using all listed TCP/IP
+        methods, but not all of the other listed methods (such as
+        PSTN/ISDN) and therefore cannot be CM.  See FRL-1017.
+    MO  Node does not accept human callers
+    LO  Node accepts calls Only from Listed FidoNet addresses
+    MN  Compressed mail packets will not be processed automatically
+
+
+5.2. Modem Connection Protocol Flags
+------------------------------------
+
+  The following flags define modem connection protocols supported.
+  Please also read section 5.11 on flag redundancies.
+
+
+    ITU-T (formerly CCITT) Protocols:
+
+      Flag   Meaning
+
+      V22   ITU-T V.22           1.200 bps  full duplex
+      V29   ITU-T V.29           9.600 bps  half duplex
+      V32   ITU-T V.32           9.600 bps  full duplex
+      V32b  ITU-T V.32bis       14.400 bps  full duplex
+      V34   ITU-T V.34          33.600 bps  full duplex *
+      V90C  ITU-T V.90 Client   56.000 bps  asymmetric
+      V90S  ITU-T V.90 Server   56.000 bps  asymmetric
+
+
+    Industry standard protocols:
+
+      Flag  Meaning
+
+      V32T  V.32 Terbo          21.600 bps  full duplex *
+      VFC   V.Fast Class        28.800 bps  full duplex
+
+
+    Proprietary Protocols:
+
+      Flag  Meaning
+
+      HST   USR Courier HST          9.600 bps  asymmetric
+      H14   USR Courier HST         14.400 bps  asymmetric
+      H16   USR Courier HST         16.800 bps  asymmetric
+      X2C   US Robotics x2 client   56.000 bps  asymmetric
+      X2S   US Robotics x2 server   56.000 bps  asymmetric
+      ZYX   Zyxel                   16.800 bps
+      Z19   Zyxel                   19,200 bps
+      H96   Hayes V9600              9.600 bps
+      PEP   Packet Ensemble Protocol
+      CSP   Compucom Speedmodem
+
+
+    * NOTE: maximum possible speed; actual maximum will vary
+      depending on implementation.
+
+
+5.3. Session Level Error-correction and Compression Flags
+---------------------------------------------------------
+
+  The following flags define type of error correction and/or data
+  compression available. A separate error correction flag should not
+  be used when the error correction type can be determined by the
+  modem flag. See section I for details.
+
+      Flag  Meaning
+
+      MNP   Microcom Networking Protocol error correction
+            of type MNP1 to MNP4
+      V42   ITU-T V.42: LAP-M error correction with fallback
+            to MNP 1-4
+      V42b  ITU-T V.42bis: LAP-M error correction and
+            compression with fallback to MNP 1-5
+
+
+5.4. File/Update Request Flags
+------------------------------
+
+  The following table shows the flags indicating various types of
+  file/update requests supported:
+
+    +--------------------------------------------------+
+    |      |         Bark        |        WaZOO        |
+    |      |---------------------|---------------------|
+    |      |   File   |  Update  |   File   |  Update  |
+    | Flag | Requests | Requests | Requests | Requests |
+    |------|----------|----------|----------|----------|
+    | XA   |    Yes   |    Yes   |    Yes   |    Yes   |
+    | XB   |    Yes   |    Yes   |    Yes   |    No    |
+    | XC   |    Yes   |    No    |    Yes   |    Yes   |
+    | XP   |    Yes   |    Yes   |    No    |    No    |
+    | XR   |    Yes   |    No    |    Yes   |    No    |
+    | XW   |    No    |    No    |    Yes   |    No    |
+    | XX   |    No    |    No    |    Yes   |    Yes   |
+    | none |    No    |    No    |    No    |    No    |
+    +--------------------------------------------------+
+
+
+  The following software is qualified to use the appropriate file
+  request flag according to information provided by developers:
+
+    +-----------------------------------+
+    | Flag      Software Package        |
+    |-----------------------------------|
+    |  XA  Frontdoor   1.99b and lower  |
+    |      Frontdoor   2.01  and higher |
+    |      Dutchie     2.90c            |
+    |      Binkleyterm 2.1   and higher |
+    |      D'Bridge    1.2   and lower  |
+    |      Melmail                      |
+    |      TIMS                         |
+    |      ifcico                       |
+    |      mbcico      0.60.0 and higher|
+    |                  (via modem)      |
+    |-----------------------------------|
+    |  XB  Binkleyterm 2.0              |
+    |      Dutchie     2.90b            |
+    |-----------------------------------|
+    |  XC  Opus        1.1              |
+    |-----------------------------------|
+    |  XP  Seadog                       |
+    |-----------------------------------|
+    |  XR  Opus        1.03             |
+    |      Platinum Xpress              |
+    |-----------------------------------|
+    |  XW  Fido        12N   and higher |
+    |      Tabby                        |
+    |      TrapDoor  No update processor|
+    |      binkd w/SRIF FREQ processor  |
+    |-----------------------------------|
+    |  XX  Argus       2.00  and higher |
+    |      D'Bridge    1.30  and higher |
+    |      Frontdoor   1.99c/2.00       |
+    |      InterMail   2.01             |
+    |      McMail      1.00             |
+    |      T-Mail                       |
+    |      TrapDoor - Update Processor  |
+    |      mbcico      0.60.0 and higher|
+    |                  (via IP)         |
+    |-----------------------------------|
+    |  None       QMM                   |
+    +-----------------------------------+
+
+
+5.5. Gateway Flag
+-----------------
+
+  The following flag defines gateways to other domains (networks).
+
+    Flag   Meaning
+
+    Gx..x  Gateway to domain 'x..x', where 'x..x` is a string
+           of alphanumeric characters. Valid values for
+           'x..x' are assigned by the FidoNet International
+           Coordinator or the Zone Coordinators Council. They
+           will also adequately distribute a list of valid
+           values.
+
+
+5.6. Mail Period Flags
+----------------------
+
+  The Mail Period Flags indicate compliance with another zone's ZMH.
+  Since ZMH is mandatory within one's own zone, it is not indicated.
+
+  These flags have the form "#nn" or !nn where nn is the UTC hour the
+  mail period begins, # indicates Bell 212A compatibility, and !
+  indicates incompatibility with Bell 212A.  For example:
+
+    Flag   Meaning
+
+    #02    Zone 2 mail hour (02:30 - 03:30 UTC)
+    #08    Zone 4 mail hour (08:00 - 09:00 UTC)
+    #09    Zone 1 mail hour (09:00 - 10:00 UTC)
+    #17    Zone 3 mail hour (17:00 - 18:00 UTC)
+
+  The above listing of the ZMH for each individual zone is only given
+  for your convenience. It was correct at the time of this writing,
+  but could be changed at any time by following the procedures
+  established in Fidonet policy. The FTSC has no role in determining
+  the Mail Hour of any Zone. You'll find an up-to-date list in the
+  comments at the end of the Fidonet Nodelist.
+
+  NOTE:  When applicable, the mail period flags may be strung together
+  with no intervening commas, e.g. "#02#09".
+
+
+5.7. System Online Flags
+------------------------
+
+  The flag Tyz is used by non-CM nodes online not only during ZMH, y
+  is a letter indicating the start and z a letter indicating the end
+  of the online period as defined below (times in UTC):
+
+    A  0:00,  a  0:30,   B  1:00,  b  1:30,   C  2:00,  c  2:30,
+    D  3:00,  d  3:30,   E  4:00,  e  4:30,   F  5:00,  f  5:30,
+    G  6:00,  g  6:30,   H  7:00,  h  7:30,   I  8:00,  i  8:30,
+    J  9:00,  j  9:30,   K 10:00,  k 10:30,   L 11:00,  l 11:30,
+    M 12:00,  m 12:30,   N 13:00,  n 13:30,   O 14:00,  o 14:30,
+    P 15:00,  p 15:30,   Q 16:00,  q 16:30,   R 17:00,  r 17:30,
+    S 18:00,  s 18:30,   T 19:00,  t 19:30,   U 20:00,  u 20:30,
+    V 21:00,  v 21:30,   W 22:00,  w 22:30,   X 23:00,  x 23:30.
+
+  For example TuB shows an online period from 20:30 until 1:00 UTC.
+
+
+  Daylight saving time
+  --------------------
+
+  If a node changes online times with respect to UTC when daylight
+  saving time becomes effective (which would be the case with most
+  part time nodes), then this is to be taken into account when
+  assigning this flag. An online times flag assigned to a node should
+  not be altered for the specific purpose of adjusting due to daylight
+  saving time, since large difference files (NODEDIFF's) would result
+  if every node was allowed to do this, e.g. a node used to be online
+  from 2300 to 0800 in local time, which in winter is UTC, but in the
+  summer it becomes BST (British Summer Time). This is one hour ahead
+  of UTC, and the corresponding availability times of a node during
+  the summer period were 2200 to 0700 UTC. Therefore its online times
+  flag would have indicated availability between the hours of 2300 and
+  0700 UTC, the daily time period encompassing both times, so the flag
+  would be TXH.
+
+
+5.8. ISDN Capability Flags
+--------------------------
+
+  Nodelist   Specification of minimal support required for this flag;
+      flag   any additional support to be arranged via agreement
+             between users
+
+   V110L     ITU-T V.110 19k2 async ('low').
+             NOTE: some implementations are limited to 9600bps.
+   V110H     ITU-T V.110 38k4 async ('high').
+   V120L     ITU-T V.120 56k async, layer 2 framesize 259, window 7,
+             modulo 8.
+   V120H     ITU-T V.120 64k async, layer 2 framesize 259, window 7,
+             modulo 8.
+   X75       ITU-T X.75 SLP (single link procedure) with 64kbit/s B
+             channel; layer 2 max. framesize 2048, window 2, non-ext.
+             mode (modulo 8); layer 3 transparent (no packet layer).
+   ISDN      Other configurations. Use only if none of the above
+             fits.
+
+   NOTE: No flag implies another. Each capability MUST be specifically
+   listed.
+
+
+5.9. Internet Capabilities
+--------------------------
+
+Basic Syntax
+------------
+
+  Internet capability flags use the format:
+
+    <flag>[:<internet address>][:<port>]
+
+  Where <internet address> is:
+    * a fully qualified domain name (FQDN), or
+    * an IPv6 address encased in square brackets, or
+    * an IPv4 address in dotted-quad format, or
+    * an email address,
+
+  depending on the protocol, and <port> is the service port number.
+
+  <internet address> may be omitted if the address is available in
+  another field (see below).  <port> should be omitted if it is the
+  default port for that particular service, and is not permitted for
+  email addresses.
+
+  The mailer software is expected to be able to determine whether
+  <internet address> is an IPv4 quad, an IPv6 encased address, a
+  host name or email address by itself.
+
+
+Advanced usage
+--------------
+
+  Several methods of listing Internet capability flags are widely
+  used and subject to change at any time.  Internet capable software
+  should provide a suitable manual override mechanism to compensate
+  for the volatility of the nodelist format, and be able to deal with
+  prolonged connection failures (e.g. by automatically putting waiting
+  mail on hold, and notifying the local sysop).
+
+
+  Shorthand flags
+  ---------------
+
+  For brevity, a node that lists multiple Internet capability flags
+  that require the same address may list the address only once, and
+  specify only port numbers per flag if required.
+
+  Ideally, a node should use the flags specifically intended for this
+  purpose, but that is not always the case.  Be prepared to look for
+  addresses under any flag of the same type.
+
+  Multihomed systems
+  ------------------
+
+  Multihomed systems or systems that are otherwise reacheable by more
+  than one address, may - instead of adding another A or AAAA record
+  to the DNS zone of the host name - repeat the flag(s) carrying the
+  address with another address.
+
+  Example:  INA:host1.example1.tld,INA:host2.example2.tld,IBN
+
+  This method is not to be used to signal that a system is IPV4 and
+  IPv6 capable. Additional IPv6 capability should be advertised by
+  adding an AAAA record to an already listed host name.
+
+
+  Alternate fields
+  ----------------
+
+  If the address is not attached to any of the Internet capability
+  flags, it may be present in another field (see FTS-5000).
+
+  Because of this, systems using Internet capability flags should
+  avoid entering data in such fields that may be mistaken for Internet
+  related information.  For example, a node with an email flag should
+  not use a system name that could be confused with an email address.
+
+
+  DNS Distributed Nodelist
+  ------------------------
+
+  "Precompiled" IP connection information may also be obtained from
+  one of the local or publicly available DNS Distributed Nodelist
+  (DDN) services. This is documented in FTS-5004.
+
+
+Indirect Delivery
+-----------------
+
+  Not all Internet tunneling methods require the originating node and
+  the destination node to make a direct, realtime connection.  Relays
+  through the FTP or email servers of an ISP may serve as an example.
+
+  To avoid unusual delays, nodes using such 3rd party relays should
+  check regularly for new mail -- daily for non-CM nodes, and hourly
+  for CM nodes is recommended.
+
+  Where multiple protocols are available, the originating node should
+  select the most direct method, and avoid protocols that may be using
+  relays.
+
+
+Standard Flags
+--------------
+
+        Default
+  Flag     port  Description
+  --------------------------
+
+   INA   (none)  This flag sets the default Internet address used
+                 for any non-email based flag that does not specify
+                 its own. This flag does not carry a port number.
+   IP    (none)  Mostly used during the introduction of IP capable
+                 systems to the nodelist, is similar to the INA flag
+                 but may or may not specify an Internet address.
+                 Both usages are deprecated in favour of INA.
+
+   IBN    24554  Binkp (FTS-1026 - FTS-1029)
+   IFC    60179  RAW ifcico (FTS-1024)
+   IFT       21  FTP (RFC-0959); Note there is currently no widely
+                 accepted authentication scheme for FTP transfers by
+                 Fidonet mailers.
+   ITN       23  Telnet connection using FTS-1 or any other protocol
+                 designed for classic POTS and modem. 
+   IVM     3141  Vmodem connection using FTS-1 or any other protocol
+                 designed for classic POTS and modem. 
+
+
+Email Flags
+-----------
+
+  To use the flag for any Email method providing for return receipts
+  (currently ITX and ISE) a node *must* have them enabled and send
+  such receipts within 24 hours of receiving a file.
+
+  Flag    Description
+  --------------------------
+
+   IEM    Indicates an unspecified mail tunnelling method (old
+          usage, similar to IP), or sets the default email
+          address for other flags (similar to INA)
+
+   ITX    TransX encoding for email tunnelling with receipts
+          enabled.
+   IUC    uuencoding of mail bundles
+   IMI    MIME encoding of mail bundles
+   ISE    SEAT protocol for Email tunnelling with receipts.
+          enabled; should always be accompanied by IUC and/or IMI.
+
+   The e-mail flags do not carry a port number.
+
+Reliability
+-----------
+
+  It should be noted that only some of these Internet based methods
+  (currently IBN, IFC, ITN, IVM, ITX and ISE) can give the sender a
+  proof of receipt of a file by the addressee, like FTS-0001 does.
+
+  Other methods have no guarantee of reliability, so they shouldn't be
+  used to transmit critical data.
+
+  Also, nodelist segment maintainers should take into account the
+  presence of at least one of these reliable protocols when deciding
+  on application for Fidonet membership by nodes without a dial-up
+  connection.
+
+
+5.10. Robot flags
+-----------------
+
+  PING
+  ----
+
+    Specified as exactly "PING" with no arguments.  Nodes flying this
+    flag will adhere to the following functionality:
+
+    1) PING-function:
+
+    If a message destined to "PING" arrives at its final destination
+    and this final destination flies the "PING"-flag, then the
+    receiving node will bounce the message back to the original sender
+    clearly quoting all the original via-lines.
+
+    If a message destined to "PING" arrives at its final destination
+    but this final destination does _not_ fly the "PING"-flag then the
+    message may be deleted from the inbound-queue without further
+    follow-up.
+
+    2) TRACE-function:
+
+    If a message destined to "PING" arrives at a node which flies the
+    PING-flag but is merely passing-through to another destination
+    then the in-transit node will notify the sender of this occurrence
+    and will forward the original mail unaltered towards its final
+    destination.
+
+    WARNING: the sender's name (in either direction) must *NEVER* be
+    "PING".
+
+
+5.11. Flag Redundancies
+-----------------------
+
+   Only the smallest possible set of flags should be used in each
+   entry.
+
+   Since different people might have different perception of modem
+   flag redundancies, the FTSC decided to provide a standard table.
+
+   The relation "implies" means either that the first protocol
+   requires all the others as a fallback or that to all practical
+   purposes all modems which have been manufactured until today (and
+   conceivably even future ones) implemented the other protocols
+   anyway.
+
+   For example, the protocol V.32bis implies V.32 because it's
+   required as a fallback; on the other hand, V.32Terbo implies
+   V.32bis because practically all modems with V.32Terbo also had
+   V.32bis to connect to existing modems, even though it wasn't
+   required in the protocol specifications.
+
+   V32   implies  V22
+   V32B  implies  V22 V32
+   V34   implies  V22 V32 V32B
+   V90C  implies  V22 V32 V32B V34
+   V90S  implies  V22 V32 V32B V34
+
+   V42   implies  MNP
+   V42B  implies  V42 MNP
+
+   V32T  implies  V22 V32 V32B
+   VFC   implies  V22 V32 V32B
+
+   HST   implies  MNP
+   H14   implies  HST MNP
+   H16   implies  HST H14 MNP V42 V42B
+
+   X2C   implies  V22 V32 V32B V34
+   X2S   implies  V22 V32 V32B V34
+
+   ZYX   implies  V22 V32 V32B V42 V42B MNP
+   Z19   implies  V22 V32 V32B V42 V42B MNP ZYX
+
+   Please note also that:
+   . the V90C and V90S flags are mutually exclusive.
+   . the X2C and X2S flags are are mutually exclusive.
+   . no modem has at the same time the US Robotics proprietary
+     protocols and the ZyXEL ones; so, use of any flag in the group
+     HST, H14, H16, X2S and X2C is incompatible with any of the ZYX
+     and Z19 flags, and vice versa.
+   . all X? flags are mutually exclusive.
+   . the CM flag is incompatible with any of the #??, !?? or T??
+     flags.
+   . the CM implies ICM; ICM should not be used unless CM is
+     impossible.
+
+
+6. User flags
+-------------
+
+  It is impossible to document all user flags in use.  The FTSC makes
+  no attempt at it.  This document lists those flags which got at
+  least some kind of official sanction or were deemed of technical
+  interest by FTSC.
+
+
+6.1 Format Of User Flags
+------------------------
+
+  U,x..x
+
+  A user-specified string, which may contain any alphanumeric
+  character except blanks. This string may contain one to thirty-two
+  characters of information that may be used to add user-defined data
+  to a specific nodelist entry. The character "U" must not be
+  repeated, eg, ",U,XXX,YYY,ZZZ" not ",U,XXX,U,YYY,UZZZ". The 32
+  character limitation is per userflag, not for the total of all
+  userflags.
+
+  New implementations must place a comma after the initial "U" before
+  the user flags. Some implementations will not place a separating
+  comma between the "U" and the first user flag, but this practice is
+  deprecated. Implementations should be prepared to read flags in this
+  format, and must strip the "U" from the flag before analysis in this
+  case.
+
+  Entries following the "U" flag must be of a technical or
+  administrative nature. While experimentation of new software
+  functions using this flag is encouraged, advertisement is strictly
+  prohibited.
+
+  For applications other than those shown, or if you have questions
+  concerning the use of this field, please contact your Regional or
+  Zone Coordinator.
+
+  Developers should note that the distinction between "normal" flags
+  and user flags is a non-technical, purely political one. It often
+  happened that a user flag was "promoted" to regular status, and the
+  reverse could conceivably happen. It is recommended that, while
+  parsing nodelist entries, no distinction at all be done between the
+  two categories of flags.
+
+
+6.2. Mail Oriented User Flags
+-----------------------------
+
+  Flag   Meaning
+
+  ZEC    Zone EchoMail Coordinator.  Not more than one entry in the
+         zone segment may carry this flag and that entry must be the
+         current Zone EchoMail Coordinator.
+
+  REC    Regional EchoMail Coordinator.  Not more than one entry in
+         any region may carry this flag and that entry must be the
+         current Regional EchoMail Coordinator.
+
+  NEC    Network EchoMail coordinator.  Not more than one entry in any
+         net may carry this flag and that entry must be the current
+         Network EchoMail Coordinator of that Net.
+
+  NC     Network Coordinator.  This flag is ONLY to be used by the
+         Network Coordinator of a net which has split the duties of NC
+         and Host and the NC does NOT occupy the Net/0 position in the
+         nodelist.
+
+  SDS    Software Distribution System
+
+  SMH    Secure Mail Hub
+
+  RPK    Regional Pointlist Keeper.  This user-flag identifies the
+         person who compiles the region-pointlist (only 1 entry per
+         region allowed)
+
+  NPK    Net Pointlist Keeper.  This user-flag identifies the person
+         who compiles the net-pointlist (only 1 entry per net allowed)
+
+
+  ENC    This node accepts inbound encrypted mail and will route it
+         like other mail
+
+  CDP    This node will accept points auto-created by the CD-point
+         software.
+
+
+A. References
+-------------
+
+  [FTS-0005] "The distribution nodelist", Ben Baker, Rick Moore.
+  February 1989.
+
+  [FSC-0009] "Nodelist Flag Changes Draft Document", Ray Gwinn, 
+  David Dodell.  November 1987.
+
+  [FSC-0040] "Extended Modem Handling", Michael Shiels.
+  February 1990.
+
+  [FSC-0062] "A Proposed Nodelist flag indicating Online Times of a
+  Node", David J. Thomas.  April 1996.
+
+  [FSC-0075] "ISDN capability flags in the Nodelist", Jan Ceuleers.
+  October 1993
+
+  [FSC-0091] "ISDN nodelist flags", Arjen Lentz.  October 1995.
+
+  [FRL-1036] "IPv6 numbers in the nodelist". March 2010
+
+  [Policy] "FidoNet Policy Document" v4.07 - June 9, 1989.
+
+
+B. History
+----------
+
+   Rev.1, 19990627: Initial Release.
+                    Principal Author David Hallford
+
+   Rev.2, 20000422: new draft by Gino Lucrezi; major changes:
+                    - reorganization of flags classification
+                    - rewrite for clarification of internet connection
+                    flags
+                    - note on difference between "regular" and "user"
+                    flags
+                    - description of flag redundancies
+                    new draft by Gino Lucrezi with input from others
+                    - removed Andreas Klein from authors
+                    - ENC flag
+                    - distinction of direct and indirect IP
+                    connectivity
+                    - requirement for return receipts with ITX and ISE
+                    - additional requirement for IP-nodes with CM flag
+                    - clarification on some flag redundancies
+                    new draft by Gino Lucrezi with input from others
+                    - corrected Z3MH and added note on changing of
+                    ZMHs
+
+   Rev.2, 20040904: re-re-draft by FTSC.
+                    - Changed header style
+                    - Added Introduction and Purpose sections
+                    - Added Syntax section
+                    - Rewrite of Internet connectivity section
+                    - Removed IP flag conversions
+                    - Merged IP flags and default ports tables
+                    - Added ifcico to compatibility table
+                    - Fixed Txy flag status (user flag -> normal flag)
+                    - Removed ISDN conversions and redundant 300 bps
+                      limit (specified in FTS-5000)
+                    - Removed 32 character flag limitation
+                    - Removed obsolete flag: V21
+                    - Removed obsolete flag: V33
+                    - Removed obsolete flag: MAX
+                    - Removed obsolete flag: K12
+                    - Updated V?? flags
+                    - Added ICM flag
+                    - Added PING flag
+                    - Added flag redundancy table
+
+   Rev.3 20130104   - There is no version 3. The above version
+                      20040904 should have been labelled version 3,
+                      but due to a clerical error it was also labelled
+                      version 2. So there are two version 2's. Rather
+                      than attempting to correct the error, which
+                      would probably not have succeeded as it is next
+                      to impossible to recall a file that was hatched
+                      many years ago, it was decided  to leave things
+                      as they are, skip version 3 and carry on with
+                      version 4.
+
+   Rev.4, 20130310  - Updated the paragraph on DDN in section 5.9 to
+                      reflect that the DDN project is now documented
+                      in separate document FTS-5004.
+                    - Upgraded the description of the MN flag
+                    - Removed reference to port numbers for e-mail
+                      flags.
+                    - Added IPv6 where literal IP numbers are
+                      referenced.
+                    - Removed reference to Z5 and Z6. (#nn flags)
+                    - Added "binkd w/SRIF FREQ processor" to list
+                      of programmes qualifying for XW freq flag.
+                    - Dropped NSMH, RSMH, ZSMH and ISMB. Obsolete.
+                    - Clarified meaning of ITN and IVM flag.
+                    - Various small changes in wording and correcting
+                      spelling errors.
+                    - Added repeating of flags in case of systems
+                      having multiple adresses. 
+**********************************************************************
