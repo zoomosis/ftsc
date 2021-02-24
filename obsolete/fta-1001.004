@@ -1,0 +1,398 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTA-1001
+Revision:       4
+Title:          FTSC Operations
+Author:         Administrator
+Revision Date:  18 January 1999
+Expiry Date:    18 January 2001
+---------------------------------------------------------------------
+Contents:
+                1. Definitions
+                2. Documentation
+                3. Structure
+                4. Access
+                5. Approvals
+----------------------------------------------------------------------
+
+
+1. Definitions
+--------------
+
+  Plurality: More votes than any other candidate, but less than a
+             majority.
+
+  Majority:  More than fifty percent of all votes cast.
+
+
+2. Documentation
+----------------
+
+   Every Fidonet Technical Standards (FTS) document shall be reviewed
+   at least once every two years and revised as needed.
+
+   Every Fidonet Standards Proposal (FSP) document shall be assessed
+   for conversion to a FTS document within two years of its
+   submission, and thereafter will either become an FTS document, or
+   be assigned to the FRL library.
+
+   Fidonet Reference Library (FRL) documents are former Fidonet
+   Standards Proposals which were not granted FTS standing.  They are
+   maintained in the library permanently for reference and historical
+   purposes.
+
+   FTSC Administrative (FTA) documents guide the operation of the
+   FTSC. FTA-1000 is amendable by the FTSC only after extensive
+   discussion in the FTSC_PUBLIC echo, and the formation of a broad
+   public concensus on changes to the overall mandate. FTA-1001 and
+   FTA-1007 are amendable by the FTSC after public input and concensus
+   in the FTSC_PUBLIC echo, on needed operational changes. FTA-1002
+   through FTA-1006 are data listings and may be revised by the FTSC
+   Administrator with the agreement of the Standing Members, without
+   the need for public input.
+
+   Intellectual property rights for Standards Proposals and Technical
+   Standards are covered by FTA-1007. Please read this document before
+   submitting any proposal.
+
+
+3. Structure
+------------
+
+  3.1 FTSC Administrator
+  ----------------------
+
+  The FTSC administrator is appointed for a four year renewable term.
+
+  To be eligible for appointment, an individual must be a Fidonet
+  node, be actively involved in Fidonet, though not necessarily in a
+  programming context, and should have proven organizational skills. A
+  candidate need not be a member of the FTSC. It is recommended that a
+  successful candidate not carry any *C or *EC responsibilities during
+  the term of office.
+
+  A candidate for FTSC Administrator may be nominated by any Standing
+  Member.
+
+  The FTSC Administrator is appointed on the basis of a vote by all
+  Standing Members who are defined by the then-current edition of
+  FTA-1003 (FTSC Membership List). A successful candidate must receive
+  approval by at least a plurality of votes.
+
+  Publication of the nominations and the voting procedure shall take
+  place openly in the FTSC_PUBLIC echo, and voting shall close three
+  weeks after publication of the vote. Votes shall be by netmail
+  ballot to an independent enumerator.
+
+  Responsibilities:
+
+  1. Ensuring FTSC Mandate is adhered to.
+  2. Facilitating communications links between members.
+  3. Maintaining document distribution links.
+  4. Coordinating all membership nominations and voting.
+  5. Developing Working Groups as required.
+  6. Ensuring that the FTSC seeks, accepts and responds to public
+     input.
+  7. Assigning FSP numbers to new Standards Proposals.
+
+
+  3.2 FTSC Standing Members
+  -------------------------
+
+  FTSC members are appointed for a two year renewable term.  [50 % of
+  appointments on initial formation of the FTSC shall be for a 3 year
+  renewable term, to ensure continuity of the Committee on expiry of
+  the terms.]
+
+  To be selected as a FTSC member, an individual must be a Fidonet
+  node, and should be actively involved in Fidonet. Examples include
+  having put out a Fidonet-related product or having updated a product
+  in the preceding two years, or having experience as a Coordinator,
+  Echomail Coordinator or mail or file Hub.
+
+  Standing members may be nominated Fidonet-wide by all of the
+  following methods:
+
+  1. Any RC or REC.
+  2. A nominating committee established for the purpose by the FTSC.
+  3. A nominating committee established for the purpose by the ZCC.
+
+  A nominating committee may not consist of any current member or
+  officer of the FTSC.
+
+  Standing members are appointed on the basis of a vote by all RCs and
+  RECs who are nodelisted as holding those positions at the time the
+  nominations are published. A successful candidate must receive
+  approval by a majority of votes.
+
+  Publication of the nomination and the voting procedure, and posting
+  of RC and REC votes, shall take place openly in the FTSC_PUBLIC
+  echo, and voting shall close three weeks after publication of the
+  vote.
+
+
+  3.3 Working Group Leader
+  ------------------------
+
+  A Working Group Leader is selected by the FTSC Administrator and
+  must be a Standing Member of the FTSC.
+
+  The following information will be provided to the leader at the time
+  of selection:
+
+  1. Technical focus of the Leader's group.
+  2. Its operating time-frame.
+  3. Authority to invite FTSC members or outside advisors to
+     participate.
+  4. The setting up of any necessary admin or file echoes.
+
+
+  3.4 Working Groups
+  ------------------
+
+  Working groups are formed to provide focus.
+
+  Standing Working Groups are permanent entities which are responsible
+  for monitoring the accuracy of existing Technical Standards and
+  effecting change to those Standards to reflect current practice. The
+  following 4 groups are active as of the date of this document:
+
+    3.4.1 Working Group A - Data Transmitted
+    ----------------------------------------
+
+    Responsibilities (FTS-0001 and 0009):
+
+    1. Netmail
+    2. Transport format
+    3. Stored format
+    4. Message control lines
+
+    3.4.2 Working Group B - Connection and Protocols
+    ------------------------------------------------
+
+    Responsibilities (FTS-0006, 0007, 0008):
+
+    1. Handshaking
+    2. File Transfer Protocols
+    3. Mailer interaction
+
+    3.4.3 Working Group C - Echomail and Routing
+    --------------------------------------------
+
+    Responsibilities (FTS-0004):
+
+    1. EchoMail
+    2. Kludges
+    3. Message Standards
+    4. Routing of netmail and echomail
+
+    3.4.4 Working Group D - Nodelist
+    --------------------------------
+
+    Responsibilities (FTS-0005):
+
+    1. The distribution nodelist
+    2. Nodediff format
+    3. Compiled nodelists
+
+    3.4.5 Working Group E - Gating and Other Networks
+    -------------------------------------------------
+
+    Responsibilities:
+
+    1. Connection over TCP/IP
+    2. Transferral of messages from InterNet to FidoNet
+
+
+  Additional Special Assignment Working Groups are formed as necessary
+  to investigate the documentation of new Standards proposals.
+
+    3.4.6 Working Group Y - Year 2000 Issues
+    ----------------------------------------
+
+    Responsibilities:
+
+    1. Year 2000 awareness
+    2. Survey of existant software
+    3. Review of other documents
+
+
+  3.5 Removal from Office
+  -----------------------
+
+  If it is established that any member, including any officer, of the
+  FTSC has repeatedly failed to carry out the duties of the position
+  as described above, or has acted in a manner which would bring the
+  FTSC into disrepute, that person may be removed from office and/or
+  from membership in the FTSC. The following procedure shall be used:
+
+    1. A vote to remove from office and/or from FTSC membership shall
+       be held only if it can be established by a majority vote of a
+       committee consisting of the FTSC Administrator and Working
+       Group Leaders, but excluding the member or officer under
+       consideration, that the above criteria have all been met and
+       that removal can be justified.
+
+    2. The committee shall post its recommendation and the text of a
+       proposed voting question for the general membership in the
+       FTSC_PUBLIC echo.
+
+    3. Discussion of the concerns, and publication of the voting
+       procedure shall then take place openly in the FTSC_PUBLIC echo.
+
+    4. The vote shall be held three weeks after publication of the
+       vote, and shall be by netmail ballot to an independent
+       enumerator.
+
+    5. Removal from office and/or from FTSC membership shall be
+       effected by a majority vote of all FTSC members, whether voting
+       or not and including the member in question, in favour of the
+       removal.
+
+
+4. Access
+---------
+
+  The FTSC maintains the following information channels:
+
+  1. FTSC_PUBLIC echomail conference.
+     Access:        Anyone
+     Distribution:  North American Backbone and Zones 2 and 3
+     Moderator:     Bruce Bodger, 1:170/400
+
+  2. FTSC file echo.
+     Access:        Anyone
+     Distribution:  Filebone
+     Liaison:       Colin Turner, 2:2/20
+
+  3. FTSC Internet Web site.
+     Access:        Anyone
+     Distribution:  http://www.piglets.com/ftsc
+     Liaison:       Colin Turner <ct@piglets.com>
+
+  4. FTSC echomail conference.
+     Access:        FTSC Standing Members & Administrator only
+     Distribution:  Private
+     Moderator:     Colin Turner, 2:2/20
+
+  5. FTSC.WG.x working group echomail conferences.
+     Access:        FTSC Working Group Members & Administrator only
+     Distribution:  Private
+     Moderators:    Working Group Leaders
+
+  Input to the FTSC on published standards, and standards proposals
+  concerning those standards is normally by netmail to the Leader of
+  the appropriate Working Group. This input will then be forwarded to
+  that Groups' internal discussion echo for response.
+
+  Input to the FTSC on other standards proposals is normally by
+  netmail to the FTSC Administrator. This input will then be forwarded
+  to the FTSC discussion echo for response.
+
+  All members of the FTSC will also accept such input and will ensure
+  that it is forwarded to the Leader of the appropriate Working Group
+  or to the FTSC echo as appropriate.
+
+  The FTSC encourages the use of any additional channels for
+  submitting Standards Proposals, suggestions and comments.
+
+  The FTSC does not act as an enforcement body for compliance with
+  published Standards, but may provide interpretations or advice on
+  the application of Technical Standards, and the apparent
+  compatibility of any software implementation.
+
+  Developers or Coordinators wishing clarification of the application
+  of part of a specification may request an official clarification or
+  interpretation of the Technical Standard by contacting the FTSC
+  Administrator or the Leader of the appropriate Working Group.
+
+
+5. Approvals
+------------
+
+  5.1 Technical Standards (FTS)
+  -----------------------------
+
+  The FTSC does not invent new standards, but only documents existing
+  implementations. It does not design the data formats or protocols
+  but only attempts to document them.
+
+  Where developers or users show strong interest in a proposed
+  implementation, the FTSC will review such a FSP proposal and may
+  publish it as a specification for software developers to follow.
+
+  A Technical Standard should be sufficiently complete and
+  self-contained that it should be possible to give a competent
+  programmer a copy of the standard and have him/her produce a
+  working, compliant implentation without reference to any other
+  document.
+
+
+  5.2 Product Codes
+  -----------------
+
+  Product Codes shall be assigned, and a list maintained by the FTSC.
+  The list can be found in FTA-1005.
+
+
+  5.3 Standards Proposals (FSP)
+  -----------------------------
+
+  All Standards Proposals submitted to the FTSC shall be formatted as
+  detailed in FTA-1002 (Document Submission and Publication Standard).
+
+  Any Fidonet sysop may submit a Standards Proposal.
+
+  A sysop in a non-Fidonet network may also submit a Standards
+  Proposal to document extensions to Fidonet technology. Where
+  compatible connections with the other network are of importance to
+  Fidonet, the FTSC may assign a working group to review the proposal,
+  in which case non-FTSC or non-Fidonet members will generally be
+  invited to advise the group.
+
+  Provided that a Standards Proposal meets FTA-1002 standards, or a
+  proposal from a non-Fidonet network is to be considered, the FTSC
+  administrator shall:
+
+  1. Assign it an FSP number.
+  2. Add it to the library of Standards Proposals.
+  3. Distribute it via the normal FTSC file echo.
+  4. Make it available via any other FTSC file access source.
+  5. Refer the document to an existing or new committee for
+     recommendation.
+
+  The recommendation in '5' above shall be one of the following:
+
+  1. To accept the FSP as an recognized Technical Standard, in which
+     case the Administrator shall:
+
+     1. Immediately circulate the draft FTS in the FTSC_PUBLIC
+        echomail conference for comment by a specified date.
+     2. Make any resulting revisions.
+     3. Assign it an FTS number.
+     4. Publish and distribute the new FTS.
+
+  2. To accept the FSP as an Technical Standard subject to requested
+     changes by a specified date by the author. If the changes are
+     made, the procedure in '1' shall be followed, otherwise the
+     procedure in '3' shall be followed.
+
+  3. To file the FSP as a reference library (FRL) document.
+
+
+A. History
+----------
+
+  Rev.1, 19971214: First non-draft release. Author Adrian Walker.
+  Rev.2, 19971229: Reformatted slightly. Author changed to
+                   Administrator. Revision number added. Minor
+                   text adjustments. Updated access information.
+  Rev.3, 19980117: Replaced the public domain requirement with a
+                   reference to the newly ratified FTA-1007 document.
+  Rev.4, 19990118: Updated access information. Added working groups
+                   E (Gating) and Y (Year 2000).
+
+
+**********************************************************************
