@@ -1,0 +1,571 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTS-5005
+Revision:       3 
+Title:          Advanced BinkleyTerm Style Outbound flow and control
+                files.
+Authors:        Igor Romanovsky
+                Administrator and FTSC members
+
+Date:           2016-10-31
+----------------------------------------------------------------------
+Contents:       0. Status of this document.
+                1. Introduction.
+                2. Definitions.
+                3. Flow files.
+                4. File Requests
+                5. Control files.
+                A. References.
+                B. Contact Info.
+                C. History
+----------------------------------------------------------------------
+
+0. Status of this document
+--------------------------
+
+
+  This document is a Fidonet Technical Standard (FTS) - it specifies
+  the current technical requirements and recommendations for FTN
+  software developers, coordinators and sysops of the Fidonet network
+  and other networks using FTN technology.
+
+  This document is released to the public domain, and may be used,
+  copied or modified for any purpose whatever.
+
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+  NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL"
+  in this document are to be interpreted as described in FTA-1006.
+
+
+1. Introduction
+---------------
+
+  BinkleyTerm Style Outbound (BSO) flow and control files have been
+  used for a long time but still are not fully documented. This has
+  led to software developers using different approaches that make
+  changing the mailer on a FTN station rather sophisticated.
+  This document combines the original ideas, introduced by Vince
+  Perriello and Bob Hartman (BinkleyTerm), and Andy Elkin (T-Mail).
+
+
+2. Definitions
+--------------
+
+  Filename case sensitivity - the case of the BSO filenames depends on
+  the OS file system. Lower case filenames are prefered if supported
+  by the file system. If the OS file system supports lower and upper
+  case filenames, the software should be able to handle both for
+  maximum compatibility. That behaviour might be controlled by a
+  configuration option.
+
+  Outbound directory (outbound) - directory where flow and control
+  files are stored. Outbound directory names will have the format
+  <path>[.zzz], for example F:\Mailer\Out.002\ for the zone 2
+  outbound.
+
+  Default Outbound - The Outbound directory for your zone. In this
+  case a directory generic name without a quasi extension is
+  functionally equal to a directory with a quasi extension equal to
+  your own zone number. If we consider node 1:234/5, the default
+  zone is 1, thus "outbound" and "outbound.001" are both valid
+  directories for storing flow and control files and it is recommended
+  to check both of them but create flow and control files only in
+  first, "outbound".
+
+  For supporting point systems an outbound sub-directory is created
+  with name "<nff>.pnt", where <nff> - name of flow file as described
+  below. In this directory flow and control files are created with
+  name formed from point number as 8 hexadecimal digits zero-padded
+  on the left. Thus information concerning to point 104/36.45 is
+  stored in subdirectory "outbound\00680024.pnt" in flow and control
+  files with the name"0000002d.*".
+
+  For supporting communications with systems from a different zone, a
+  number of directories are created with the same generic name chosen
+  for the default directory, plus a quasi extension equal to the zone
+  number expressed as 3 hexadecimal digits zero-padded on the left.
+  If the zone number > 4095 then 4 hexadecimal digits are used in
+  quasi extension. The last can be implemented *only* with a modern
+  OS. Thus information concerning node 2:104/36 is stored in directory
+  "outbound.002" in flow and control files with name "00680024.*".
+  "outbound" is assumed to be a generic name.
+
+  Domain Addressing - is an extended method of designating various
+  FTNs as compared with the zone-only method previously used. Domain
+  addressing adds an additional "layer" to address designation that
+  represents a particular FTN. Within that FTN, zones and nets can be
+  specified without conflicting with identical zones and nets in other
+  FTNs. Domain Addressing is only needed if you operate in two or more
+  Fido Technology Networks (FTNs) using the same Zone numbers, or you
+  wish to keep different Domains' compiled nodelists separate.
+
+  How should Outbound Areas be named when domains are used?
+  As always, the outbound area for your primary address (including
+  domain) is the default outbound.
+
+  Separate Outbound Areas are needed for each Zone in each Domain.
+  These take an identical stem path to the primary outbound, except
+  that the name of the last sub-directory is changed to the
+  <abbreviation> parameter, plus the zone extension.
+
+  For example, if your default outbound is C:\BINK\OUTBOUND
+  for the outbound holding area (and you are in FidoNet), Amiganet
+  (zone 39) outbound mail would be held in the C:\BINK\AMIGANET.027
+  directory instead. Note that outbound areas for domains other than
+  your primary will ALWAYS have a zone extension, and that zone
+  extensions are always specified in Hexadecimal, up to .FFF (4095).
+
+  The outbound holding areas (for Zone 1 FidoNet) would then be as
+  follows:
+
+  c:\bink\outbound        (Default Outbound)
+  c:\bink\outbound.002    (FidoNet Zone 2)
+  c:\bink\outbound.003    (FidoNet Zone 3)
+  c:\bink\outbound.004    (FidoNet Zone 4)
+  c:\bink\amiganet.027    (Amiganet Zone 39)
+  c:\bink\agoranet.02e    (Agoranet Zone 46)
+  c:\bink\dbnet.0c9       (Dbnet Zone 201)
+
+  Flow file - a file with specific name and various extension that
+  contains extension specific information to be sent to remote side.
+
+  The name of flow file is formed from network and node number of the
+  remote system, expressed as 4 hexadecimal digits each, zero-padded
+  on the left. Thus information concerning node 104/36 is stored in
+  flow and control files with name "00680024" but with different
+  extension.
+
+  Control file - same as flow for file but usually does not contain
+  any information inside. Its purpose is to control behavior all
+  software dealing with BSO. A reduced flow file (file does not
+  contain any information inside or is of zero length) also may be
+  considered as a control file.
+
+  Restrictions - time intervals when it is not desirable to call the
+  remote system. Restrictions may be external, introduced, for example
+  by nodelist's information or internal due to economical or
+  organizational reasons.
+
+
+3. Flow files
+-------------
+
+  Flow files contain references to information to be sent to remote
+  system. The address of remote system and name of this file has
+  one-to-one correspondence. Flow files are divided by type and
+  flavour.
+
+  3.1. Types of flow file
+
+       There are 2 types of flow files: netmail, file reference.
+
+       Netmail flow files are an FTS-0001 packet containing packed
+       netmail as described in FTS-0001. This flow file has
+       signature "ut" as 2nd and 3rd letters in extension. During a
+       session this file must be dynamically renamed at the moment
+       of sending to a remote system with a unique name and extension
+       "pkt". The method of creating unique names is implementation
+       dependent.
+
+       This file must be transferred to the remote system at any
+       successful session. If the session is terminated accidentally
+       during sending, this file must be resent in the next session
+       from the beginning. After successful transmission this file
+       must be deleted from the outbound directory.
+
+       Reference files consist of a number of lines (terminated by
+       0x0a or 0x0d,0x0a) each consisting of the name of the file
+       to transfer to the remote system. It has signature "lo" as
+       2nd and 3rd letters in the extension.
+
+       The file name is optionally prefixed with a one character
+       directive that indicates what to do with the file after a
+       succesful transfer.
+
+       The following directives are documented as a standard:
+
+       "#" - Indicates that the files should be truncated to zero-
+       length after successfully sending the file to the remote
+       system. This is normally only employed when sending compressed
+       mail (archived mail) to the remote.
+
+       "^" - delete the file after successfully sending the file to
+       the remote system.
+
+       "~" - skip the line from treatment. It may be useful to mark
+       an already processed line.
+
+       <none> - indicates that the file should be sent and neither be
+       truncated nor deleted after sending. Listing the file with the
+       full path circumvents problems with files that have a name
+       starting with a character that is a known directive.
+
+
+       Software may optionally recognise the following directives:
+
+       "-" As an alternate for "^"
+
+       "!" As an alternate for "~"
+
+       "@" Send file, do not truncate or delete.
+
+       It is recommended that for maximum compatibility new implemen-
+       tations recognise the above directives as documented, but do
+       not use them when creating reference files.
+
+       If an indicated file does not show a path, the result depends
+       on the implementation. The implementation may assume that it
+       resides in the same directory as the flow file, the working
+       directory or some other directory. Also, programs running in
+       different tasks may make different assumptions about what is
+       the default directory. Therefore it is highly recommended to
+       always use the full path in reference files.
+
+       If a file is not found, software must ignore the line and
+       continue processing.
+
+       Whether the mailer does or does not send the files listed in
+       the reference file during the successful session depends on the
+       flavour of the reference file.
+
+       After successful transmission of the listed files the flow file
+       must be deleted from the outbound. (But see below.) Should the
+       session be terminated accidentally while sending the listed
+       files, the flow file must be processed in the next session from
+       the beginning.
+
+
+  3.2. Flavours of flow file
+
+       The flavour of a flow file controls mailer's behavior. It can
+       initiate a poll to a remote system. Especially it is useful
+       with a reduced flow file. Creating such a flow file may force
+       the mailer to execute actions that are not specified in normal
+       mode of operation.
+
+       It is recommended to use only reference files for reduced flow
+       files and to use the method of "touch"ing a file; creating a
+       new file if there isn't one already, or changing the file date
+       to current if there is a file already. The difference in mailer
+       behaviour for flow and reduced flow files is described later.
+
+
+       There are 5 flavours.
+
+       Immediate has "i" as the first char in the extension. Thus the
+       full extension of a netmail file is "iut" and for a reference
+       file is "ilo". If a flow file with such a flavour exists the
+       mailer must try to poll a remote system without taking in
+       consideration any external and internal restrictions. During a
+       successful session files listed in "ilo" file must be sent to
+       the remote system. It is assumed that information mentioned in
+       "iut" and "ilo" will be sent to the specific system. Very often
+       a reduced form is used only for making a poll.
+
+       Continuous has "c" as the first char in the extension. Thus
+       the full extension of netmail file is "cut" and for a reference
+       file is "clo". If a flow file with such flavour exists the
+       mailer must try to poll a remote system taking in consideration
+       internal restrictions but not external ones (assuming that the
+       remote system carries a CM flag). During a successful session
+       files listed in "clo" file must be sent to the remote system.
+       It is assumed that information mentioned in "cut" and "clo"
+       will be sent to the specific system. Very often a reduced form
+       is used for making a poll.
+
+       Direct has "d" as the first char in the extension. Thus the
+       full extension of a netmail file is "dut" and for a reference
+       file is "dlo". If a flow file with such flavour exists the
+       mailer must try to poll a remote system taking into considera-
+       tion both external and internal restrictions. During a success-
+       ful session files listed in "dlo" file must be sent to the
+       remote system. It is assumed that information mentioned in
+       "dut" and "dlo" will be sent to the specific system. Very often
+       a reduced form is used for making a poll.
+
+       Normal has "o" as the first char in extension for netmail and
+       "f" for a reference file (using of "n" is considered as
+       outdated). Thus the full extension of netmail file is "out" and
+       for a reference file is "flo". If a flow file with such flavour
+       exists the mailer must try to poll a remote system taking in
+       consideration both external and internal restrictions. During a
+       successful session files listed in "flo" file must be sent to
+       the remote system. It is assumed that information mentioned in
+       "out" and "flo" may be rerouted by specific programs (such as
+       a netmail tracker) to another system.
+
+       Hold has "h" as the first char in extension. Thus the full
+       extension of a netmail file is "hut" and for a reference file
+       is "hlo". A flow file with such flavour instructs the mailer
+       to wait for a poll from the remote system. During a successful
+       session files listed in "hlo" file must be sent if the remote
+       system is the initiator of the session. If the remote system is
+       not the initator of the session, it is implementation dependant
+       whether the files are send or not. It is assumed that informa-
+       tion mentioned in "hut" and "hlo" may be rerouted by specific
+       programs (such as a netmail tracker) to another system.
+
+       When flow files of more than one flavour are present for a
+       particular AKA of a remote system, they should be processed in
+       the following order:
+
+       Immediate   ("iut" or "ilo")
+       Continuous  ("cut" or "clo")
+       Direct      ("dut" or "dlo")
+       Normal      ("out" or "flo")
+       Hold        ("hut" or "hlo")
+
+
+  3.3. Simple time chart.
+
+       Suppose our node has working hours from 21:00 till 09:00, and
+       the remote system has working hours from 17:00 till 07:00. This
+       time chart indicates when a poll would be produced for
+       different flavours:
+
+  -------------------------------------------------------------------
+  |12|13|14|15|16|17|18|19|20|21|22|23|00|01|02|03|04|05|06|07|08|09|
+  -------------------------------------------------------------------
+i |xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|
+c |--|--|--|--|--|--|--|--|--|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|--|
+d |--|--|--|--|--|--|--|--|--|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|--|--|--|
+f |--|--|--|--|--|--|--|--|--|xx|xx|xx|xx|xx|xx|xx|xx|xx|xx|--|--|--|
+h |--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
+  -------------------------------------------------------------------
+
+  3.4. Differences in flow and reduced flow files.
+
+        "Real" flow file means that the system has a portion of
+        information to be sent while a reduced flow file only
+        expresses a desire to make a poll.
+
+        Thus if a mailer detects a flow file in the directory, it
+        must determine whether this is a real flow file or just a
+        control file.
+
+        If it is a real flow file the mailer must make a poll accor-
+        ding to the flavour, send information to the remote according
+        to the type of flow file and delete the flow file after
+        sending all information. The mailer should not wait for the
+        end of the session when deleting the flow file.
+
+        Thus if a session is terminated accidentally or deliberately
+        after sending the flow file information the mailer will return
+        to its previous state without a priority flow file in the
+        outbound.
+
+        If it is a reduced flow file the mailer must make a poll
+        according its flavour. The mailer has nothing to send from the
+        control file and it must delete the flow file after the
+        successful end of session.
+
+        Thus if a session is terminated accidentally or deliberately
+        while sending information, the mailer will return to its
+        previous state with the priority flow file in the outbound.
+
+        That is why it is not a good idea to lock flow files during
+        the session.
+
+4. File Requests
+----------------
+
+  4.1   File request files are named using the same method as flow
+        files, with an extension of req. The format of request files
+        is documented in FTS-0006. File requests have no flavour on
+        their own. They DO NOT initiate a poll to the remote system,
+        and must be accompanied by a [reduced] flow file. File
+        requests may have additional restrictions (for example,
+        based on Nodelist flags or ZMH restrictions) specific to the
+        request. Normally this file is deleted after receiving the
+        requested files.
+
+        As with NetMail flow files, during a session this file must
+        be dynamically renamed at the moment of sending to a remote
+        system with a unique name and extension of req.
+
+
+5. Control files
+----------------
+
+  5.1.  bsy (busy) control file - REQUIRED
+
+        A bsy is a main control file that must be used by any software
+        dealing with flow files in BSO. It is named the same way as
+        the flow file but with the extension ".bsy".
+
+        Any software must check this file before doing any changes
+        in flow files. If a bsy file exists all changes are prohibited
+        in any corresponding flow files. What the software must do in
+        this case is implementation dependent.
+
+        If a bsy file does not exist software must create it, ensure
+        that it was successfully created, and then work with the flow
+        files. After completing the job, software must delete the bsy
+        file.
+
+        Note to software developers:
+        The most common way to create a file in many languages (eg.
+        ReWrite, fopen) also quietly overwrites an existing file, so
+        there's a race condition between checking, creating and
+        checking. Care must be taken to use the right function and/or
+        the right options to get the correct behaviour.
+
+        During the session and before sending information from flow
+        files the mailer creates the list of all AKAs presented by the
+        remote system. The mailer must then check bsy files
+        corresponding to the list. If a bsy file is detected the
+        corresponding AKA is removed from the list. If all AKAs are
+        removed due to this procedure, the session must be terminated
+        with an appropriate diagnostic message.
+
+        If a bsy file for the AKA is not present the mailer must
+        create it. A bsy file is created by the mailer only after
+        a successful connection with the remote mailer.
+
+        After session - successful or not - the mailer must delete all
+        created bsy files.
+
+        After restoring the system due to a crash it is recommended to
+        run a simple routine to delete all bsy files in all outbounds
+        before starting any software dealing with BSO.
+
+        It is also recommended to check the age of bsy files. It is
+        reasonable to ignore and delete bsy files with an age more
+        than the maximum estimated time of session multiplied on 2.
+        An appropriate diagnostic message may be produced in this
+        case.
+
+        For information purposes a bsy file may contain one line of
+        PID information (less than 70 characters).
+
+  5.2.  csy (call) control file - OPTIONAL
+
+        This control file is created by a mailer when it decides
+        to make poll to remote system. It is named the same way as a
+        flow file but with the extension ".csy". A csy file is valid
+        only for another mailer working together on the same system.
+        Note that the remark regarding race conditions when creating a
+        bsy file, also applies when creating a csy file.
+
+        The presence of a csy file corresponding to any remote AKA
+        indicates that the mailer must stop trying to poll the remote
+        system regardless of the presence of flow files.
+
+        After a session - successful or not - and after an unsuccess-
+        ful try the mailer must delete all created csy files.
+
+        After restoring a system due to a crash it is recommended to
+        run a simple routine to delete all csy files in all outbounds
+        before starting any software dealing with BSO.
+
+        It is also recommended to check the age of csy files. It is
+        reasonable to ignore and delete csy files with an age more
+        than the maximum estimated time of a session multiplied by 2.
+        An appropriate diagnostic message may be produced in this
+        case.
+
+        For information purposes, a csy file may contain one line of
+        PID information (less than 70 characters).
+
+  5.3.  hld (hold) control file - OPTIONAL
+
+        This control file is created by a mailer or other software
+        when it decides to stop trying poll a remote system.
+        hld file is meaningful only for mailers. It is named the same
+        way as a flow file but with the extension ".hld".
+
+        An existing hld file is either replaced by a new one or
+        edited.
+
+        A hld file must contain a one line string with the expiration
+        of the hold period expressed in UNIX-time.
+
+        The presence an hld file corresponding to any remote AKA
+        indicates that the mailer must check the content before trying
+        to poll the remote system. If the expiration time is in the
+        future, the mailer must stop trying to poll the remote system
+        regardless of the presence of any flow files.
+
+        The presence and content of an hld file must be checked before
+        each attempt to create a poll.
+
+        If software finds an hld file with an expiration time in past,
+        it must delete that hld file.
+
+  5.4.  try control file - OPTIONAL
+
+        This control file is created by a mailer when a connect
+        attempt is finished - successful or not. It is named the same
+        way as a flow file but with the extension ".try".  It is used
+        to prevent continuous connection attempts to an undialable
+        node.
+
+        An existing try file is replaced by a new one.
+
+        A try file (if implemented by a mailer) must contain the
+        following:
+
+	NOK - Number of good connects, expressed as a 16-bit,
+        big-endian integer.
+	NBAD - Number of bad connects, expressed as a 16-bit,
+        big-endian integer.
+	CLength - Length of comment in bytes, expressed as an 8-bit
+        unsigned integer.
+	Comment - CLength bytes, detailing the results of the most
+        recent connection attempt.
+
+	On completion of a successful session, NOK is incremented and
+        NBAD is reset to zero.  On completion of a failed session,
+        NBAD is incremented. IF NBAD reaches the mailer's configured
+        limit for failed sessions, the node is marked undialable, NOK
+        and NBAD are reset to zero, and a hld control file is created
+        in accordance with section 5.3.
+
+
+A. References
+-------------
+
+  [FTS-0001] A Basic FidoNet(r) Technical Standard
+             Randy Bush, 30 Sep 95.
+
+  [FTS-0006] YOOHOO and YOOHOO/2U2
+             Vince Perriello, 30 Nov 1991.
+
+             T-Mail. Reference Manual
+             Andy Elkin, 1997.
+
+             BinkleyTerm. Reference Manual
+             1987-1996 Bit Bucket Software, Co.
+
+
+B. Contact Data
+---------------
+
+   Igor Romanovsky
+   Fidonet:  2:5022/60
+   E-mail:   Igor.Romanovsky@tula.net
+   Administrator
+   Fidonet: 2:2/20
+   E-mail: administrator@ftsc.org
+
+
+C. History
+----------
+
+   This document is based on FSP-1034 by Igor Romanovsky. Some minor
+   technical modifications were made by Markus Reschke, Fred Riccio
+   and other FTSC members. Grammar and typographical corrections were
+   made by Dallas Hinton and others.
+
+
+   Rev.1, 2014-11-09: Initial Release.
+   Rev.2, 2015-03-29: Added section on file requests, fixed typos.
+                      Minor reformatting.
+   Rev.3, 2016-10-31: Revised section 5 to correct the documentation
+                      of .csy and .try control files as used by binkd,
+                      which presently is the only application using
+                      the .csy and .try control files.
+                      Removed zones 5 and 6 from the examples.
+
