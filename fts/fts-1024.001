@@ -1,0 +1,506 @@
+**********************************************************************
+FTSC                             FIDONET TECHNICAL STANDARDS COMMITTEE
+**********************************************************************
+
+Publication:    FTS-1024
+Revision:       1
+Title:          Raw ifcico mail transfer protocol
+Author:	        Michiel Broek, 2:280/2802
+Issue Date:     27 August 2003
+Review Date:    27 August 2005
+
+----------------------------------------------------------------------
+
+Status of this document
+-----------------------
+
+   This document is a Fidonet Technical Standard (FTS), issued by the
+   FTSC for the benefit of the Fidonet community.
+
+   This document is released to the public domain, and may be used,
+   copied or modified for any purpose whatever.
+
+
+Abstract
+--------
+
+   This specification defines raw ifcico - a protocol to handle a 
+   session between two Fidonet Technology systems over a reliable 
+   connection.
+   Assumption that the connection is reliable makes possible to
+   eliminate error-checking.
+
+
+Table of contents
+-----------------
+
+    1. Background
+    2. Definitions
+    3. Protocol Overview
+    4. Frame Format
+    5. Protocol Commands and Their Arguments
+    6. Protocol States
+         1. Finite State Machine Notation
+         2. Send files batch
+         3. Receive files batch
+    7. License
+    8. Glossary
+    9. References
+   10. Acknowledgements
+    A. Author Contact Data
+    B. History
+
+     ---------------------------------------------------------------
+
+
+1. Background
+-------------
+
+   The raw ifcico protocol is in use for a long time, and was 
+   developed for Eugene G. Crossers ifmail package by Stanislav
+   Voronyi <stas@uanet.kharkov.ua>.
+
+   This document attempts to document the current practice for
+   communication between two Fidonet systems via a reliable channel,
+   provide technical reference for Fidonet software developers and
+   eventually improve Fidonet connectivity.
+
+
+2. Definitions
+--------------
+
+   The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT" and "MAY"
+   in this document are to be interpreted as specified in [FTA-0006].
+   However, for readability, these words may sometimes not appear in
+   all uppercase letters in this specification. Although it should not
+   impact minimal realization of raw ifcico protocol, it must be noted
+   that Protocol Extensions may override, update or obsolete 
+   requirement levels indicated by the above keywords in chapters from
+   3 to 6 inclusive.
+
+   Calling party in this document is referred to as the Originating
+   side and called party is referred to as the Answering side.
+   Originating side here is the party that initiates the connection
+   between two systems.
+
+   Mailer in this document is a software that implements the protocol.
+
+   Words "frame", "packet", and "block" when used in this document
+   refer to raw ifcico frames, unless explicitly stated otherwise.
+
+   Other definitions that are not local to this document can be found
+   in the Glossary.
+
+
+3. Protocol Overview
+--------------------
+
+   The raw ifcico protocol can only be started when two mailers 
+   initiate a EMSI protocol handshake and the called system presents
+   the TCP EMSI compatibility code. If the calling system also
+   supports the raw ifcico protocol it will transmit the TCP
+   compatibility code to the calling system to initiate the raw
+   ifcico session. Mailers should only present the EMSI TCP
+   compatibility code when the connection is made over data
+   transparent bi-directional channels with reliable transmission.
+
+   Whenever TCP/IP socket is used, the unregistered port number for
+   raw ifcico 60179 SHOULD be used.
+
+   After a successfull EMSI handshake, the calling system starts
+   sending all files to the called system. When all files are sent,
+   the calling system receives all files from the called system.
+   If the calling system allowes requests made by the called system
+   and the called system made file requests, then the calling system
+   will send all requested files to the called system. Normally this
+   will not happen because the calling system does not accept requests
+   during outbound sessions.
+
+
+4. Frame Format
+---------------
+
+   Raw ifcico is defined in terms of sending and receiving 
+   specifically formatted data blocks. We call them frames.
+
+   Command frames carry protocol commands and may change protocol
+   state. Data frames are usually appended to files being received by
+   mailers or may be discarded, depending on the protocol state.
+
+   The particular way of mapping an octet stream or a datagram stream
+   of the transport layer into raw ifcico frames may depend on the
+   underlying protocol suite. At this time, we define such mapping for
+   TCP/IP socket connection which can also be used for similar
+   transports as well.
+
+   The socket stream is being split into raw ifcico frames in the
+   following manner:
+
+    76543210 76543210 76543210 76543210                  76543210
+   +--------+--------+--------+--------+---- ...... ----+--------+
+   |  0xc6  |  Type  | MSBlen | LSBlen |      DATA      |  0x6c  |
+   +--------+--------+--------+--------+---- ...... ----+--------+
+    
+   |<-         Frame header          ->|<- frame data ->|<- end->|
+                                        upto 2048 octets
+
+   If Type is 0x87, this is a command frame.
+
+   If Type is 0xe1, this is a data frame.
+
+   16 bits marked MSBlen and LSBlen carry the size of the DATA part
+   in octets with the LSBlen marked being the least significant.
+   That is, the actual length of a raw ifcico data frame is SIZE+5.
+
+   The size of the DATA part may vary between 1 and 2048 octets. A
+   correct realization should never set SIZE to 0. Upon receiving of a
+   packet header with the SIZE field set to 0, the total length of the
+   incoming packet must be treated as 5, this packet must be dropped,
+   and the event should be logged. The standard implementation uses
+   data blocks of 1024 octets.
+
+   Command frames carry command arguments. Command arguments are an
+   arbitrary symbol string that may be null-terminated. Treating of a
+   null character in the middle of a command depends on realization
+   (with the options being "treat as whitespace" or "treat as
+   end-of-line"). The terminating null character (if any) is either
+   stripped or used by mailers internally as an end-of-line marker.
+
+   Because reliable connections can be slow, the receiver should use
+   a very relaxed timeout on the data to receive.
+   The receiver should wait for each character of a frame for 120
+   seconds.
+
+
+5. Protocol Commands and Their Arguments
+----------------------------------------
+
+   The following commands are defined:
+
+       S <filename> <size> <timestamp%2>
+
+   This is transmitted by the party that is in sendfiles mode to give
+   the information about the file to transmit. The command arguments
+   are separated by spaces. The filename is a 8.3 filename. The size
+   is a unsigned long integer that represents the filesize in bytes.
+   The timestamp is a Unix timestamp in seconds since 1 januari 1970
+   and is rounded up to even seconds. This is to make it compatiblei
+   with DOS file systems that cannot store the file timestamp odd
+   seconds.
+
+
+       RS
+
+   In response to the send file command, the receiving system can send
+   this command (Receive Skip) to indicate that this file is already
+   received and must be skipped.
+
+
+       RN
+
+   In response to the send file commmand, the receiving system can
+   send this command (Receive Not), to refuse this and any further
+   files. The session should be terminated.
+
+
+       ROK [<offset>]
+
+   In response to the send file commmand, the receiving system should
+   send this command (Receive OK) to tell the sender to start sending
+   the file. The optional parameter offset can be given with an offset
+   from which point to start sending the file. If no offset is given,
+   the offset must be assumed zero, start from the begin of file.
+
+
+       EOF
+
+   This command should be send to the receiver to indicate End Of
+   File, no more file datablocks will follow.
+
+
+       FOK
+
+   This command is transmitted in response to the EOF command by the
+   receiving system to indicate that the transmitted file was received
+   without errors.
+
+
+       FERROR
+
+   This command is transmitted in response to the EOF command by the
+   receiving system to indicate that the transmitted file was received
+   with errors. The sending system must mark the file as not 
+   transmitted so it can be send in another session.
+
+
+       SN
+
+   This command is transmitted by the sending system to indicate that
+   the last file is send and no more files will follow.
+
+
+       RN
+
+   This command is transmitted by the receiving system to acknowledge
+   the SN command. 
+
+
+6. Protocol States
+------------------
+
+  6.1 Finite State Machine Notation
+  ---------------------------------
+
+  .-----+---------+----------------------+----------------------+----.
+  |State| State   | Predicate(s)         | Action(s)            |Next|
+  |  #  | Name    |                      |                      | St |
+  |-----+---------+----------------------+----------------------+----|
+  | fnn*|         |                      |                      |    |
+  `-----+---------+----------------------+----------------------+----'
+
+   State #      - Number of this state (e.g. R13).
+                  f  - FSM initial (Window, Sender, Receiver, ...)
+                  nn - state number
+                  *  - state which represents a lower level protocol
+                       which is represented by yet another automation.
+
+   State Name   - Descriptive name of this state.
+
+   Predicate(s) - Conditions which terminate the state. If predicates
+                  are non-exclusive, consider them ordered.
+
+   Action(s)    - Action(s) corresponding to predicate(s)
+
+   Next State   - Subsequent state corresponding to predicate(s)
+
+
+  6.2 Send files batch.
+  ---------------------
+
+   tcpsndfiles (Sender)
+  .-----+---------+----------------------+----------------------+----.
+  |State| State   | Predicate(s)         | Action(s)            |Next|
+  |  #  | Name    |                      |                      | St |
+  |-----+---------+----------------------+----------------------+----|
+  | S0  | Send    |                      | Send 0xaa 0x55       | S1 |
+  |     | sync    |                      | octets               |    |
+  |-----|---------|----------------------|----------------------|----|
+  | S1  | Sync    | 1 Received octet 0xaa| wait for next        | S2 |
+  |     | wait 1  | 2 Received other     | again                | S1 |
+  |     |         | 3 120 seconds nothing| error                | err|
+  |-----|---------|----------------------|----------------------|----|
+  | S2  | Sync    | 1 Received octet 0x55| send files           | S3 |
+  |     | wait 2  | 2 Received other     | again                | S1 |
+  |     |         | 3 120 seconds nothing| error                | err|
+  |-----|---------|----------------------|----------------------|----|
+  | S3  | Send    | 1 more files         | Sendfile             | S4 |
+  |     | files   | 2 all are sent       | End of batch         | S9 |
+  |-----|---------|----------------------|----------------------|----|
+  | S4  | Sendfile|                      | Send S command       | S5 |
+  |     | info    |                      |                      |    |
+  |-----|---------|----------------------|----------------------|----|
+  | S5  | Ackfile | 1 Receive RS         | skip file            | S3 |
+  |     |         | 2 Receive RN         | fatal error          | err|
+  |     |         | 3 Receive ROK <offs> | send data            | S6 |
+  |-----|---------|----------------------|----------------------|----|
+  | S6  | Senddata| 1 End of file        | signal EOF           | S7 |
+  |     | frame   | 2 more datablocks    | continue             | S6 |
+  |-----|---------|----------------------|----------------------|----|
+  | S7  | Send EOF|                      | wait for ack         | S8 |
+  |-----|---------|----------------------|----------------------|----|
+  | S8  | Waitack | 1 Receive FOK        | next file            | S3 |
+  |     |         | 2 Receive FERROR     | next file            | S3 |
+  |-----|---------|----------------------|----------------------|----|
+  | S9  | Finsend |                      | Send SN command      | S10|
+  |-----|---------|----------------------|----------------------|----|
+  | S10 | Finack  | 1 Receive RN         | Batch completed      | OK |
+  |     |         | 2 Timeout            | Batch error          | err|
+  `-----+---------+----------------------+----------------------+----'
+
+
+  6.3 Receive files batch.
+  ------------------------
+  
+  tcprcvfiles (Receiver)
+  .-----+---------+----------------------+----------------------+----.
+  |State| State   | Predicate(s)         | Action(s)            |Next|
+  |  #  | Name    |                      |                      | St |
+  |-----+---------+----------------------+----------------------+----|
+  | R0  | Send    |                      | Send 0xaa 0x55       | R1 |
+  |     | sync    |                      | octets               |    |
+  |-----|---------|----------------------|----------------------|----|
+  | R1  | Sync    | 1 Received octet 0xaa| wait for next        | R2 |
+  |     | wait 1  | 2 Received other     | again                | R1 |
+  |     |         | 3 120 seconds nothing| error                | err|
+  |-----|---------|----------------------|----------------------|----|
+  | R2  | Sync    | 1 Received octet 0x55| Wait command         | R3 |
+  |     | wait 2  | 2 Received other     | again                | R1 |
+  |     |         | 3 120 seconds nothing| error                | err|
+  |-----|---------|----------------------|----------------------|----|
+  | R3  | Wait    | 1 SN                 | End of batch         | R7 |
+  |     | command | 2 S file command     | Receive file         | R4 |
+  |     |         | 3 Garbage            | Report               | err|
+  |     |         | 4 120 seconds nothing| Report               | err|
+  |-----|---------|----------------------|----------------------|----|
+  | R4  | Start   | 1 File allready rcvd | Send RS command      | R3 |
+  |     | receive | 2 Fatal error        | Send RN command      | err|
+  |     |         | 3 Ready for receive  | Send ROK <offset> cmd| R5 |
+  |-----|---------|----------------------|----------------------|----|
+  | R5  | Receive | 1 Data frame         | Append to file       | R5 |
+  |     | frame   | 2 Command EOF        | Received EOF         | R6 |
+  |     |         | 3 Garbage            | Report               | err|
+  |     |         | 4 120 seconds nothing| Report               | err|
+  |-----|---------|----------------------|----------------------|----|
+  | R6  | Rcvd    | 1 File ok            | Send FOK             | R3 |
+  |     | EOF     | 2 File errors        | Send FERROR          | R3 |
+  |-----|---------|----------------------|----------------------|----|
+  | R7  | Finack  |                      | Send RN command      | OK |
+  `-----+---------+----------------------+----------------------+----'
+
+
+7. License
+----------
+
+   Quoted from the ifmail readme:
+    Copyright (c) 1993-2000 Eugene G. Crosser
+
+    THIS SOFTWARE IS PROVIDED AS IS AND COME WITH NO WARRANTY OF ANY 
+    KIND, EITHER EXPRESSED OR IMPLIED.  IN NO EVENT WILL THE COPYRIGHT
+    HOLDER BE LIABLE FOR ANY DAMAGES RESULTING FROM THE USE OF THIS 
+    SOFTWARE.
+
+    This is Open Source(tm) software. Except for the modules borrowed
+    from other packages (which may be subject to different licensing 
+    policy), you may use this software for any purpose, commercial or 
+    noncommercial, including, but not limited to, modifying it and 
+    distributing with or without fee modified or unmodified copies, 
+    provided that the above copyright notice is retained.
+
+
+8. Glossary
+-----------
+
+   Many entries in this glossary are provided courtesy of Butterfly
+   Glossary of Internet and Data Communication terms and RFC-1983.
+
+   connection-oriented
+           Data communication method in which communication proceeds
+           through three well-defined phases: connection
+           establishment, data transfer, connection release. TCP is a
+           connection-oriented protocol.
+
+   data link layer
+           The OSI layer that is responsible for data transfer across
+           a single physical connection, or series of bridged
+           connections, between two Network entities.
+
+   flow control
+           A technique for ensuring that a transmitting entity does
+           not overwhelm a receiving entity.
+
+   IP
+           (Internet Protocol). The Internet Protocol, defined in STD
+           5, RFC 791, is the network layer for the TCP/IP Protocol
+           Suite. It is a connectionless, best-effort packet switching
+           protocol.
+
+   network layer
+           Layer 3 of the OSI reference model. Layer 3 is the layer at
+           which routing, addressing and connection management take
+           place.
+
+   OSI (Open Systems Interconnection) Reference Model
+           A seven-layer structure designed to describe computer
+           network architectures and the way that data passes through
+           them. This model was developed by the ISO (International
+           Organization for Standardization) in 1978 to clearly define
+           the interfaces in multivendor networks, and to provide
+           users of those networks with conceptual guidelines in the
+           construction of such networks.
+
+   port
+           A port is a transport layer demultiplexing value. Each
+           application has a unique port identifier associated with
+           it.
+
+   physical layer
+           The OSI layer that provides the means to activate and use
+           physical connections for bit transmission. In plain terms,
+           the Physical Layer provides the procedures for transferring
+           a single bit across a Physical Media.
+
+   reliable transmission
+           a type of transport service that:
+              * recovers from errors by retransmitting errored frames
+              * delivers frames in correct sequence (also known as
+                stream-oriented)
+              * usually is used in connection-oriented mode
+
+   session layer
+           Layer 5 of the OSI reference model. Coordinates session
+           activity between applications, including application-layer
+           error control, dialog control, and remote procedure calls.
+
+   socket
+           Software structure operating as a communications and point
+           within a network device.
+
+   TCP
+           Transmission Control Protocol. An Internet Standard
+           transport layer reliable protocol defined in STD 7, RFC
+           793. It is connection-oriented and stream-oriented.
+
+   TCP/IP protocol suite
+           Transmission Control Protocol over Internet Protocol. This
+           is a common shorthand which refers to the suite of
+           transport and application protocols which runs over IP.
+
+   transport layer
+           Layer 4 of the OSI reference model. The transport layer is
+           responsible for reliable network communication between end
+           nodes. It implements flow and error control and often uses
+           virtual circuits to ensure reliable data delivery.
+
+   unixtime
+           number of seconds elapsed since 00:00:00 UTC, Jan. 1, 1970.
+
+9. References
+-------------
+
+   [FTS-0001]
+           A Basic FidoNet(r) Technical Standard, Revision 16. Randy
+           Bush, Pacific Systems Group, September 30, 1995. FTS-0001.
+
+   [FTS-0008]
+           Extending FTS-0001 to include Bark requests, Revision 3.
+           
+   [FSC-0056]
+           Joaquim H. Homrighausen, EMSI/IEMSI protocol definition.
+           May 3, 1991. FSC-0056.
+
+   [FSC-0088]
+           Compatibility and Link Qualifier Extensions for EMSI 
+           Sessions, Revision 1. Robert Williamson.
+
+   [FTA-1006]
+           Key words to indicate requirement levels, Fidonet Technical
+           Standards Committee administrative. FTA-1006.
+
+
+10. Acknowledgements
+--------------------
+
+   This document is partially based on extracts from RFCs and FTSC
+   publications too numerous to be acknowledged individually.
+
+   Ifcico is written by Eugene G. Crosser <crosser@average.org>; 
+   2:5020/230@fidonet
+   The raw ifcico protocol is written by Stanislav Voronyi 
+   <stas@uanet.kharkov.ua>
+
+
+B. History
+----------
+
+   Rev.1,  20030810:
+           Initial release.
