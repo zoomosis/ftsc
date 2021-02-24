@@ -1,0 +1,361 @@
+FSC-0013
+  
+                       A Standard for "Bark" File Requests
+                          Draft 3     December 18, 1987
+                        Fidgit Greylock, Greylock Software
+                                         
+                                         
+                      Copyright 1987 Greylock Software, Inc.
+                                         
+                 License to distribute granted exclusively to the
+                        International FidoNet Association.
+
+
+1  Introduction
+
+1.1  This Document
+
+  This document describes the standard  for "Bark"-type FidoNet  file requests.
+It is  based on the  file BARK.DOC by  Thom Henderson,  my own experiences, and
+comments from various network developers.   I have attempted to write this file
+in the style of the FSC001  document, some references to which are made in this
+document.   This  document  assumes that  you have  access to FSC001,  and/or a
+general knowledge of FidoNet mail sessions.
+  Please send comments to Fidgit Greylock at FidoNet node 1:321/112.
+
+
+1.2  Credits
+
+  Thanks to all of the people who answered my questions in NET_DEV, and to Thom
+Henderson for the original BARK.DOC.
+  Special thanks to Bob Hartman, without whose comments this document would not
+be what it is today.
+  Portions of this document are reprinted from  "A  Basic FidoNet(tm) Technical
+Standard", by Ryugen Fisher, copyright 1987, International FidoNet Association.
+   
+
+
+1.3  What are File Requests?
+
+  File Requests are a way of requesting that a  specific file be  sent during a
+FidoNet mail session.  This has many advantages over simply logging on to a BBS
+and downloading a file:  you need not be  a validated user;  you  don't have to
+spend time searching  for the file  on the BBS;  and you can  schedule the file
+request to take place at any time without your being near your computer.
+  There are two commonly  used types of file  requests on FidoNet  today: WaZOO
+and Bark requests.   WaZOO requests are used  by Opus and BinkleyTerm,  and are
+not documented here.   See the file WZ_REQ.DOC by Wynn Wagner for a description
+of these.   Bark requests are somewhat  more complicated,  and are supported by
+most mailers,  including SEAdog,  Dutchie, BinkleyTerm, and to a certain extent
+Opus.  This document describes how to implement Bark-type file requests.
+  Bark file requests are an extension of the network mail session  as described
+in FSC001.
+
+
+1.4  Terms Used in this Document
+
+  The diagrams and notations used in this document  are the same  as those used
+in the FSC001 document.  Please see FSC001 for a description of these.
+  
+  There is one extra terminal used in this notation:
+  
+  someName<max> - String of up to max chars, NOT null terminated
+
+
+2  Performing File Requests
+
+2.1  Introduction
+
+  Originating a Bark request is basically a matter of transmitting a data block
+containing  a filename;  a  date (used  for update requests);  and optionally a
+password, and then using Telink or SEAlink to receive the file.
+  Honoring an  incoming file request is  essentially the above  procedure, from
+the other side.   It's a matter of prompting for a data block; receiving a data
+block; finding the file; and transmitting it using Telink or SEAlink.
+  Update requests are the  same as file  requests,  with one exception.  On the
+end honoring the file request,  if the date in the data block (described below)
+is greater than or equal to the  date of the actual  file on the  honoring end,
+the file will not be sent.   The requestor should set  the date to the  date of
+the actual file on its own end if an update request is desired.
+
+
+2.2  The Data Block
+
+2.2.1  Description
+
+  The data  block in  a Bark  request is  a variable-sized  block  containing a
+header,  a  filename,  a date (which  is used only  for update requests -  in a
+normal file request it's 0) and an optional password.
+  Note that some systems will send a password in the data block even if none is
+needed.  Incoming passwords should be ignored unless the other system is trying
+to request a passworded file.
+  When receiving a data block,  the ETX may be used to determine the end of the
+block.
+  Below is a diagram of the data block in the tradition of FSC001.
+
+
+2.2.2  Diagram
+
+  
+  Bark File Request Data Block
+  
+  
+      .------------------------------------.
+  0   |             ACK - 06H              |
+      +------------------------------------+
+  1   |              Filename              |
+      +------------------------------------+
+  n   |            Space - 20H             |
+      +------------------------------------+
+  n   |                Date                |
+      +------------------------------------+
+  n   |   Space (used only if a password   |
+      |            follows)                |
+      +------------------------------------+
+  n   |        Password (Optional)         |
+      +------------------------------------+
+  n   |             ETX - 03H              |
+      +------------------------------------+
+  n   |           CRC Low Byte             |
+      +------------------------------------+
+  n   |          CRC High Byte             |
+      `------------------------------------'
+
+
+2.2.3  Definitions
+
+  
+  DataBlock (no password) = ACK
+                            Filename<12>
+                            Space
+                            Date<11>
+                            ETX
+                            CRC
+  
+  DataBlock (with password) = ACK
+                              Filename<12>
+                              Space
+                              Date<11>
+                              Space
+                              Password<6|8>
+                              ETX
+                              CRC
+  
+  ACK   = 06H       (* Header for file request block *)
+  Space = 20H       (* Space character *)
+  ETX   = 03H       (* End of block *)
+  
+  Filename          (* Name of file requested *)
+  Date              (* ASCII string; the number of seconds
+                       since midnight, January 1, 1970 *)
+  Password          (* The password needed to request this
+                       file, if any.  Maximum length is 6 for
+                       BinkleyTerm and Opus, 8 for SEAdog
+                       and Dutchie. *)
+  
+  CRC = crc[2]      (* CCITT Cyclic Redundancy Check.  The
+                       same algorithm as used for XModem
+                       CRCs.  The CRC is calculated on
+                       all data in the block between but
+                       not including the ACK and the ETX *)
+  
+
+
+2.3  The Request
+
+2.3.1  Description
+
+  File  Requests  are performed at  the end of  a normal  FidoNet mail session.
+Below are diagrams detailing a full FidoNet mail session with file requests for
+both  the   originator  and  answerer   of  the  session.    The  diagrams  are
+self-contained and neither refers to the other;  however,  both refer to states
+defined  in  FSC001.   These diagrams  replace  the  corresponding  diagrams in
+FSC001.
+  Parts of the diagrams below have been reprinted from FSC001.
+  Note that you may use SEAlink in place of Telink when sending or  receiving a
+file during a file request.
+
+
+2.3.2  Originator Diagram
+
+  
+  Originator of Mail Session
+  
+  .-----+----------+-------------------------+-------------------------+-----.
+  |State| State    | Predicate(s)            | Action(s)               | Next|
+  |  #  | Name     |                         |                         | St  |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S0  | SendInit |                         | dial modem              | S1  |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S1  | WaitCxD  | 1 carrier detected      | delay 1-5 seconds       | S2  |
+  |     |          | 2 busy, etc.            | report no connection    | exit|
+  |     |          | 3 voice                 | report no carrier       | exit|
+  |     |          | 4 carrier not detected  | report no connection    | exit|
+  |     |          |   within 60 seconds     |                         |     |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S2  | WhackCRs | 1 over 30 seconds       | report no response <cr> | exit|
+  |     |          | 2 ?? <cr>s received     | delay 1 sec             | S3  |
+  |     |          | 3 <cr>s not received    | send <cr> <sp> <cr> <sp>| S2  |
+  |     |          |                         |   delay ??? secs        |     |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S3  | WaitClear| 1 no input for 0.5 secs | send TSYNCH = AEH       | S4  |
+  |     |          | 2 over 60 seconds       | hang up, report garbage | exit|
+  |     |          |   and line not clear    |                         |     |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S4* | SendMail |                         | (XMODEM send packet XS0)| S5  |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S5  | CheckMail| 1 XMODEM successful     | (Fido registers success)| S6  |
+  |     |          | 2 XMODEM fail or timeout| hang up, report mail bad| exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S6* | SendFiles|                         | (BATCH send files BS0)  | S7  |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S7  | CheckFile| 1 BATCH send successful |                         | S8  |
+  |     |          | 2 BATCH send failed     | hang up, rept files fail| exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S8  | TryPickup| 1 wish to pickup        |                         | S9  |
+  |     |          | 2 no desire to pickup   | delay 5 secs            | exit|
+  |     |          |                         |   hang up, rept send ok |     |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S9  | GetIntent| 1 Received TSYNC        | (receive mail)          | S10 |
+  |     |          | 2 Received SYN          | (honor file requests)   | S15 |
+  |     |          | 3 Received ENQ          | (request files)         | S18 |
+  |     |          | 4 Received 'C' or NAK   | send EOT                | S9  |
+  |     |          | 5 Nothing in 60 seconds | note receive failed     | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S10 | RecMail  |                         | (XMODEM rec packet XR0) | S11 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S11 | XRecEnd  | 1 XMODEM successful     | delay 1 second          | S12 |
+  |     |          |                         |   flush input           |     |
+  |     |          | 2 XMODEM failed         | hang up, rept mail fail | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S12 | RecFiles |                         | (BATCH rec files BR0)   | S13 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S13 | ChkFiles | 1 BATCH recv successful | delay 2 secs            | S14 |
+  |     |          | 2 BATCH recv failed     | hang up, report bad file| exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S14 | GetIntent| 1 Received SYN          | (honor file requests)   | S15 |
+  |     |          | 2 Received ENQ          | (request files)         | S18 |
+  |     |          | 3 Received 'C' or NAK   | send EOT                | S14 |
+  |     |          | 4 Nothing in 60 seconds | hang up; note can't req | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S15 | HonorReqs| 1 Wish to honor requests| Send ENQ                | S16 |
+  |     |          | 2 Do not wish to honor  |                         |     |
+  |     |          |   requests              | Send CAN                | S18 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S16 | WaitChar | 1 Got ACK               | Get data block, starting|     |
+  |     |          |                         | with 2nd byte (ACK is   |     |
+  |     |          |                         | the header), check name,|     |
+  |     |          |                         | date, password          | S17 |
+  |     |          | 2 Got ETB               |                         | S18 |
+  |     |          | 3 Nothing in 60 seconds | Hang up; report error   | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S17 | SendFile | 1 File exists; date and |                         |     |
+  |     |          |   password ok           | Send file using Telink  | S15 |
+  |     |          | 2 Can't send file       | Wait for 'C' or NAK from|     |
+  |     |          |                         | Telink, send EOT        | S15 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S18 | Request  | 1 Wish to request       |                         | S19 |
+  |     |          | 2 Do not wish to request| hang up                 | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S19 | WaitChar | 1 Received ENQ          |                         | S20 |
+  |     |          | 2 Received CAN          | Hang up; report other   |     |
+  |     |          |                         | end refuses requests    | exit|
+  |     |          | 3 Nothing in 60 seconds | Hang up                 | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S20 | StartReq | 1 No more files to req  | Send ETB; hang up       | exit|
+  |     |          | 2 Another file to req   |                         | S21 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S21 | SendBlock|                         | Send data block for this|     |
+  |     |          |                         | file, byte by byte      | S22 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | S22 | WaitChar | 1 Received ACK          | Receive file with Telink| S20 |
+  |     |          | 2 Received other char;  |                         |     |
+  |     |          |   10th try              | Hang up; report errors  | exit|
+  |     |          | 3 Received other char   | Increment retry count   | S21 |
+  |     |          | 4 Nothing in 60 seconds | Hang up; report errors  | exit|
+  `-----+----------+-------------------------+-------------------------+-----'
+  
+
+
+2.3.3  Answerer Diagram
+
+  
+  Answerer of Mail Session
+  
+  .-----+----------+-------------------------+-------------------------+-----.
+  |State| State    | Predicate(s)            | Action(s)               | Next|
+  |  #  | Name     |                         |                         | St  |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R0  | WaitCxD  | 1 carrier detected      |                         | R1  |
+  |     |          | 2 external timer expires| report no calls         | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R1  | WaitBaud | 1 baud rate detected    | send signon with <cr>s  | R2  |
+  |     |          | 2 no detect in ?? secs  | hang up, report no baud | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R2  | WaitTsync| 1 TSYNCH received       | (receive mail)          | R3  |
+  |     |          | 2 60 seconds timeout    | hang up, report not Fido| exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R3* | RecMail  |                         | (XMODEM rec packet XR0) | R4  |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R4  | XRecEnd  | 1 XMODEM successful     | delay 1 second          | R5  |
+  |     |          |                         |   flush input           |     |
+  |     |          | 2 XMODEM failed         | hang up, rept mail fail | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R5* | RecFiles |                         | (BATCH rec files BR0)   | R6  |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R6  | ChkFiles | 1 BATCH recv successful | delay 2 secs            | R7  |
+  |     |          | 2 BATCH recv failed     | hang up, report bad file| exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R7  | AllowPkup| 1 have pickup for sender| receiver becomes sender | R8  |
+  |     |          | 2 nothing to pickup     | rept recv ok            | R13 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R8  | WaitClear| 1 no input for 0.5 secs | send TSYNCH = AEH       | R9  |
+  |     |          | 2 over 60 seconds       | hang up, report garbage | exit|
+  |     |          |   and line not clear    |                         |     |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R9  | SendMail |                         | (XMODEM send packet XS0)| R10 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R10 | CheckMail| 1 XMODEM successful     | (Fido registers success)| R11 |
+  |     |          | 2 XMODEM fail or timeout| hang up, report mail bad| exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R11 | SendFiles|                         | (BATCH send files BS0)  | R12 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R12 | CheckFile| 1 BATCH send successful |                         | R13 |
+  |     |          | 2 BATCH send failed     | hang up, rept files fail| exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R13 | Requests | 1 Wish to request files | Send SYN                | R14 |
+  |     |          | 2 Do not wish to request|                         | R18 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R14 | WaitChar | 1 Received ENQ          |                         | R15 |
+  |     |          | 2 Received CAN          | report other end refuses|     |
+  |     |          |                         | requests                | R18 |
+  |     |          | 3 Nothing in 60 seconds | hang up; report errors  | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R15 | StartReq | 1 No more files to req  | Send ETB                | R18 |
+  |     |          | 2 Another file to req   |                         | R16 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R16 | SendBlock|                         | Send data block for this|     |
+  |     |          |                         | file, byte by byte      | R17 |
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R17 | WaitChar | 1 Received ACK          | Receive file with Telink| R15 |
+  |     |          | 2 Received other char;  |                         |     |
+  |     |          |   10th try              | Hang up; report errors  | exit|
+  |     |          | 3 Received other char   | Increment retry count   | R16 |
+  |     |          | 4 Nothing in 60 seconds | Hang up; report errors  | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R18 | HonorReq | 1 Wish to honor requests| Send ENQ                | R19 |
+  |     |          | 2 Do not wish to honor  |                         |     |
+  |     |          |   requests              | Send CAN; hang up       | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R19 | WaitChar | 1 Got ACK               | Get data block, starting|     |
+  |     |          |                         | with 2nd byte (ACK is   |     |
+  |     |          |                         | the header), check name,|     |
+  |     |          |                         | date, password          | R20 |
+  |     |          | 2 Got ETB               | hang up                 | exit|
+  |     |          | 3 Nothing in 60 seconds | hang up; report error   | exit|
+  |-----+----------+-------------------------+-------------------------+-----|
+  | R20 | SendFile | 1 File exists; date and |                         |     |
+  |     |          |   password ok           | Send file using Telink  | R18 |
+  |     |          | 2 Can't send file       | Wait for 'C' or NAK from|     |
+  |     |          |                         | Telink, send EOT        | R18 |
+  `-----+----------+-------------------------+-------------------------+-----'
