@@ -1,0 +1,252 @@
+*********************************************************************
+FTSC				FIDONET TECHNICAL STANDARDS COMMITTEE
+*********************************************************************
+
+Publication:    FTS-5004
+Revision:       1 
+Title:		DNS Distributed Nodelist
+Author(s):	Alexey Vissarionov, 2:5020/545
+                FTSC members and administrator
+Issue Date:     6 January 2013
+=====================================================================
+
+Contents:
+0. Introduction
+1. Translation of a Fidonet address into a host name
+2. Service port location
+3. Resolving algorithm
+4. NS zone generation
+5. Examples
+6. References
+
+
+0. Introduction
+
+Abstract:
+
+This document describes the method of distributing Fidonet nodelist
+data through the DNS infrastructure for use by IP-capable Fidonet
+mailers.
+
+Status:
+
+This document is a Fidonet Technical Standard (FTS) - it specifies
+the best current practices for the Fidonet community. It is hereby
+released to the public domain, and may be used, copied or modified
+for any purpose whatever.
+
+This document supersedes and replaces FSP-1035.
+FSP-1035 is preserved in the FTSC reference library as FRL-1035.
+
+
+1. Translation of a Fidonet address into a host name.
+
+The format of Fidonet address is:
+
+Z:N/F.P@W
+
+Where the fields are:
+
+Z - Zone Number:
+	The zone the node is part of.
+
+N - Net Number:
+	The network the node is a member of.
+
+F - Node Number:
+	The actual node number.
+
+P - Point Number:
+	If the system is a point rather than a node then
+	this is their point number at that node.
+	Optional. If ".P" is missing then assume 0 (node itself).
+
+W - Network name:
+	The name of the "Fidonet Technology Network".
+	Optional.
+
+Fidonet address should be translated into host name as:
+
+[pP.]fF.nN.zZ.RD.
+
+where the fields refer to...
+
+P	- Point Number, as in Fidonet address (FA)
+	Optional.
+
+F	- Node Number, as in FA
+	Must be present.
+
+N	- Net Number, as in FA
+	Must be present.
+
+Z	- Zone Number, as in FA
+	Must be present.
+
+RD	- Root Domain assigned to DDN.
+	Must be present.
+
+In the past, when a node carried IP protocol flags, but no IP
+connection information, it was often assumed to partake in the
+fidonet.net project and that the information could be found
+there. The fidonet.net domain however was lost for the Fidonet
+community in 2011 when the keeper allowed it to expire.
+
+Dependence on an individual to maintain the domain registration is
+a weakness of the DDN system, therefore it is strongly recommended
+that implementations that make use of a DDN service allow the user
+to easily configure the root domain and to configure overrides for
+often used stationary links so that these links won't be lost when
+the DDN service is interrupted or discontinued.
+
+Please note the trailing dot - it should exist in "host name"
+parameter when making the DNS query to avoid resolving hosts
+like "f545.n5020.z2.ddn.example.tld.office.local. instead of
+"f545.n5020.z2.ddn.example.tld."
+
+As points normally don't accept incoming connections, the rest
+of this document uses node addresses for any and all examples.
+However, the techniques described here may be used for points
+as well.
+
+
+2. Service port location.
+
+If a node accepts connections on a non-standard port, NS zone
+should contain a SRV record for every protocol flag.
+
+Format of SRV record is:
+
+_service._proto.name	IN SRV	priority weight port host
+
+Where the fields are:
+
+service:	service name - "binkp" or "ifcico";
+		other names may be added in the future
+proto:		protocol family - only "tcp" is used for now
+name:		record name
+priority:	host priority, lower value means more preferred;
+		if record contains only one host, this value should
+		be set to zero
+weight:		relative weight for records with the same priority,
+		used for load-balancing; if no load-balancing is
+		performed, this value should be set to one
+port:		decimal number of the TCP or UDP port
+host:		the hostname of the machine providing the service.
+
+
+3. Resolving algorithm.
+
+* Query DDN for SRV record. If it exists - perform connection using
+resolved hostname:port pair.
+* Query DDN for AAAA and A records. On success, perform connection
+using resolved address and default port.
+* If both failed, return the "server not found" error.
+
+Note: CNAME targets MUST NOT be queried for SRV records.
+
+
+4. NS zone generation.
+
+The only valid source for DDN records is FTS-5000 world nodelist.
+Data from partial (network etc.) segments SHOULD NOT appear in
+DDN until they get into world nodelist. Data from any sources
+other than nodelist MUST NOT appear in DDN NS zones.
+
+To be published in DDN, the node MUST have at least one Internet
+address published in the nodelist. The IP protocol flags or the
+INA flag SHOULD be used for that purpose, but some nodes use the
+system name instead, so the implementations SHOULD look for a
+hostname in the protocol flag, the INA flag and the system name
+field in that order.
+
+Multiple INA flags MAY be used if they carry different addresses.
+Multiple IP protocol flags MAY be used for different port
+numbers; if the default port is listed among others, the SRV
+record for it MUST be added to resulting NS zone.
+
+If the INA flag (or any of the protocol flags) of any node carries
+host name built from the FTN address using DDN or any other method,
+that node MUST be skipped and MUST NOT appear in resulting NS zone.
+In general, such names SHOULD NOT appear in the nodelist.
+
+
+5. Examples.
+
+This section contains some examples of valid records which may
+appear in DDN.
+
+; INA:fido.example.net,IBN
+; no SRV record required
+f9999			IN CNAME	fido.example.net.
+
+; INA:192.0.2.123,INA:[2001:0DB8:F1D0::2:5020:9999],IBN
+; both A and AAAA records are created
+_binkp._tcp.f9999	IN SRV		0 1 24554 f9999
+f9999			IN A		192.0.2.123
+			IN AAAA		2001:0DB8:F1D0::2:5020:9999
+
+; INA:fido.example.net,IBN:12345
+_binkp._tcp.f9999	IN SRV		0 1 12345 fido.example.net.
+
+; INA:192.0.2.123,IBN:12345
+_binkp._tcp.f9999	IN SRV		0 1 12345 f9999
+f9999			IN A		192.0.2.123
+
+; INA:fido.example.net,IBN,IBN:12345
+; here the default port is supported, so we use CNAME to provide
+; backward compatibility for old mailers
+; also, some sort of (equal) load-balancing is performed here
+_binkp._tcp.f9999	IN SRV		0 1 24554 fido.example.net.
+			IN SRV		0 1 12345 fido.example.net.
+f9999			IN CNAME	fido.example.net.
+
+; IBN:192.0.2.123,IBN:fido.example.net:12345
+; only first record (numeric IP) will be available to old mailers
+_binkp._tcp.f9999	IN SRV		0 1 12345 fido.example.net.
+			IN SRV		0 1 24554 f9999
+f9999			IN A		192.0.2.123
+
+; INA:fido.example.net,IBN:fido.example.com,IFC:12345
+; both mailers listen at fido.example.net, but only binkp-capable
+; mailer listens at fido.example.com
+; ifcico-capable mailer uses non-standard port
+; also, CNAME record is created to provide backward compatibility
+; for old binkp-capable mailers
+_binkp._tcp.f9999	IN SRV		0 1 24554 fido.example.net.
+			IN SRV		0 1 24554 fido.example.com.
+_ifcico._tcp.f9999	IN SRV		0 1 12345 fido.example.net.
+f9999			IN CNAME	fido.example.net.
+
+; INA:fido.example.net,IBN,IFC:fido.example.com:12345
+; both mailers listen at fido.example.net, but only ifcico-capable
+; mailer listens at non-standard port on fido.example.com
+_binkp._tcp.f9999	IN SRV		0 1 24554 fido.example.net.
+_ifcico._tcp.f9999	IN SRV		0 1 12345 fido.example.com.
+			IN SRV		0 1 12345 fido.example.net.
+f9999			IN CNAME	fido.example.net.
+
+; IBN:fido.example.net,IFC:fido.example.com:12345
+; no INA flag means there's no common address
+_binkp._tcp.f9999	IN SRV		0 1 24554 fido.example.net.
+_ifcico._tcp.f9999	IN SRV		0 1 12345 fido.example.com.
+f9999			IN CNAME	fido.example.net.
+
+
+6. References.
+
+FTA-1006 "Key words to indicate requirement levels"
+FTS-5000 "The Distribution Nodelist"
+FTS-5001 "Nodelist flags and userflags"
+FTS-1026 "Binkp/1.0 Protocol specification"
+FTS-1024 "Raw ifcico mail transfer protocol"
+FRL-1035 "DNS Distributed Nodelist".
+RFC-2872 "A DNS RR for specifying the location of services (DNS SRV)"
+
+
+History
+=======
+
+   Rev.1, 20130106  - Alexey Vissarionov (2:5020/545), first release.
+
+*********************************************************************
